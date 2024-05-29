@@ -75,18 +75,5 @@ abstract class ModulesServiceProvider extends ServiceProvider
     {
         $this->app->register(ConsoleServiceProvider::class);
         $this->app->register(ContractsServiceProvider::class);
-
-        $this->registerModuleRoutes();
-    }
-
-    protected function registerModuleRoutes(): void
-    {
-        if (!$this->app->routesAreCached()) {
-            $route = $this->app['config']->get('modules.route');
-
-            if (!empty($route)) {
-                Route::prefix($route['prefix'])->middleware($route['middlewares'])->group($this->app['config']->get('modules.module.routes'));
-            }
-        }
     }
 }
