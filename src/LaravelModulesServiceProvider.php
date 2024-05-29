@@ -3,10 +3,18 @@
 namespace Nwidart\Modules;
 
 use Composer\InstalledVersions;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Support\Facades\Event;
 use Nwidart\Modules\Contracts\RepositoryInterface;
+use Nwidart\Modules\Exceptions\Handler;
 use Nwidart\Modules\Exceptions\InvalidActivatorClass;
+use Nwidart\Modules\Support\Db\Query;
+use Nwidart\Modules\Support\Macros\MacrosRegister;
 use Nwidart\Modules\Support\Stub;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class LaravelModulesServiceProvider extends ModulesServiceProvider
 {
@@ -17,6 +25,10 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     {
         $this->registerNamespaces();
         $this->registerModules();
+
+        $this->registerEvents();
+        $this->listenDBLog();
+        $this->app->make(MacrosRegister::class)->boot();
 
         AboutCommand::add('Laravel-Modules', [
             'Version' => fn () => InstalledVersions::getPrettyVersion('nwidart/laravel-modules'),
@@ -73,5 +85,41 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
             return new $class($app);
         });
         $this->app->alias(Contracts\RepositoryInterface::class, 'modules');
+    }
+    /**
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-23 上午10:07
+     */
+    protected function registerEvents(): void
+    {
+        Event::listen(RequestHandled::class, config('modules.response.request_handled_listener'));
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-23 上午10:07
+     */
+    protected function listenDBLog(): void
+    {
+        if ($this->app['config']->get('modules.listen_db_log')) {
+            Query::listen();
+
+            $this->app->terminating(function () {
+                Query::log();
+            });
+        }
+    }
+    /**
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-23 上午10:07
+     */
+    protected function registerExceptionHandler(): void
+    {
+        if (isRequestFromAjax()) {
+            $this->app->singleton(ExceptionHandler::class, Handler::class);
+        }
     }
 }

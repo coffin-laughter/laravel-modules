@@ -71,7 +71,7 @@ class ScopeMakeCommand extends GeneratorCommand
         $parts = explode("/", $namespace);
         $models = end($parts);
 
-        return $models.'\Scopes';
+        return $models . '\Scopes';
     }
 
     protected function getStubName(): string

@@ -118,30 +118,30 @@ return [
             'command' => ['path' => 'app/Console', 'generate' => false],
             'component-class' => ['path' => 'app/View/Components', 'generate' => false],
             'emails' => ['path' => 'app/Emails', 'generate' => false],
-            'event' => ['path' => 'app/Events', 'generate' => false],
+            'event' => ['path' => 'app/Events', 'generate' => true],
             'enums' => ['path' => 'app/Enums', 'generate' => false],
             'exceptions' => ['path' => 'app/Exceptions', 'generate' => false],
             'jobs' => ['path' => 'app/Jobs', 'generate' => false],
             'helpers' => ['path' => 'app/Helpers', 'generate' => false],
             'interfaces' => ['path' => 'app/Interfaces', 'generate' => false],
             'listener' => ['path' => 'app/Listeners', 'generate' => false],
-            'model' => ['path' => 'app/Models', 'generate' => false],
+            'model' => ['path' => 'app/Models', 'generate' => true],
             'notifications' => ['path' => 'app/Notifications', 'generate' => false],
             'observer' => ['path' => 'app/Observers', 'generate' => false],
-            'policies' => ['path' => 'app/Policies', 'generate' => false],
+            'policies' => ['path' => 'app/Policies', 'generate' => true],
             'provider' => ['path' => 'app/Providers', 'generate' => true],
-            'repository' => ['path' => 'app/Repositories', 'generate' => false],
-            'resource' => ['path' => 'app/Transformers', 'generate' => false],
+            'repository' => ['path' => 'app/Repositories', 'generate' => true],
+            'resource' => ['path' => 'app/Transformers', 'generate' => true],
             'route-provider' => ['path' => 'app/Providers', 'generate' => true],
             'rules' => ['path' => 'app/Rules', 'generate' => false],
-            'services' => ['path' => 'app/Services', 'generate' => false],
-            'scopes' => ['path' => 'app/Models/Scopes', 'generate' => false],
+            'services' => ['path' => 'app/Services', 'generate' => true],
+            'scopes' => ['path' => 'app/Models/Scopes', 'generate' => true],
             'traits' => ['path' => 'app/Traits', 'generate' => false],
 
             // app/Http/
             'controller' => ['path' => 'app/Http/Controllers', 'generate' => true],
-            'filter' => ['path' => 'app/Http/Middleware', 'generate' => false],
-            'request' => ['path' => 'app/Http/Requests', 'generate' => false],
+            'filter' => ['path' => 'app/Http/Middleware', 'generate' => true],
+            'request' => ['path' => 'app/Http/Requests', 'generate' => true],
 
             // config/
             'config' => ['path' => 'config', 'generate' => true],
@@ -155,16 +155,16 @@ return [
             'lang' => ['path' => 'lang', 'generate' => false],
 
             // resource/
-            'assets' => ['path' => 'resources/assets', 'generate' => true],
+            'assets' => ['path' => 'resources/assets', 'generate' => false],
             'component-view' => ['path' => 'resources/views/components', 'generate' => false],
-            'views' => ['path' => 'resources/views', 'generate' => true],
+            'views' => ['path' => 'resources/views', 'generate' => false],
 
             // routes/
             'routes' => ['path' => 'routes', 'generate' => true],
 
             // tests/
-            'test-feature' => ['path' => 'tests/Feature', 'generate' => true],
-            'test-unit' => ['path' => 'tests/Unit', 'generate' => true],
+            'test-feature' => ['path' => 'tests/Feature', 'generate' => false],
+            'test-unit' => ['path' => 'tests/Unit', 'generate' => false],
         ],
     ],
 
@@ -264,4 +264,49 @@ return [
     ],
 
     'activator' => 'file',
+
+    'super_admin' => 1,
+
+    'request_allowed' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | coffin-admin response
+    |--------------------------------------------------------------------------
+    */
+    'response' => [
+        // it's a controller middleware, it's set in CatchController
+        // if you not need json response, don't extend CatchController
+        'always_json' => \Nwidart\Modules\Middleware\JsonResponseMiddleware::class,
+
+        // response listener
+        // it  listens [RequestHandled] event, if you don't need this
+        // you can change this config
+        'request_handled_listener' => \Nwidart\Modules\Listeners\RequestHandledListener::class,
+    ],
+
+    /*
+   |--------------------------------------------------------------------------
+   | database sql log
+   |--------------------------------------------------------------------------
+   */
+    'listen_db_log' => true,
+
+    /*
+   |--------------------------------------------------------------------------
+   | admin auth model
+   |--------------------------------------------------------------------------
+   */
+    'auth_model' => \Modules\User\Models\User::class,
+
+    'route' => [
+        'prefix' => 'api',
+
+        'middlewares' => [
+            \Nwidart\Modules\Middleware\AuthMiddleware::class,
+            \Nwidart\Modules\Middleware\JsonResponseMiddleware::class,
+        ],
+
+        // 'cache_path' => base_path('bootstrap/cache') . DIRECTORY_SEPARATOR . 'admin_route_cache.php'
+    ],
 ];
