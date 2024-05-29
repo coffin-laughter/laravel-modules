@@ -18,6 +18,8 @@ namespace Nwidart\Modules\Base;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Nwidart\Modules\Enums\Code;
+use Nwidart\Modules\Exceptions\FailedException;
 
 class CoffinController extends Controller
 {

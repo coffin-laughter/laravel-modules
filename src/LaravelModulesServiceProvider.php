@@ -43,6 +43,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
         $this->registerServices();
         $this->setupStubPath();
         $this->registerProviders();
+        $this->registerExceptionHandler();
 
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'modules');
     }

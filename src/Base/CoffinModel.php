@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Nwidart\Modules\Base;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Nwidart\Modules\Support\Db\SoftDelete;
