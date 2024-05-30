@@ -4,7 +4,7 @@ namespace Nwidart\Modules\Enums;
 
 enum Code: int implements Enum
 {
-    case SUCCESS = 10000; // 成功
+    case SUCCESS = 200; // 成功
     case LOST_LOGIN = 10001; //  登录失效
     case VALIDATE_FAILED = 10002; // 验证错误
     case PERMISSION_FORBIDDEN = 10003; // 权限禁止
@@ -31,7 +31,7 @@ enum Code: int implements Enum
     public function value(): int
     {
         return match ($this) {
-            Code::SUCCESS => 10000,
+            Code::SUCCESS => 200,
             Code::LOST_LOGIN => 10001,
             Code::VALIDATE_FAILED => 10002,
             Code::PERMISSION_FORBIDDEN => 10003,
