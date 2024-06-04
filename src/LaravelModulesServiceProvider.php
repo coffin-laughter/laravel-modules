@@ -3,6 +3,7 @@
 namespace Nwidart\Modules;
 
 use Composer\InstalledVersions;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Events\RequestHandled;
@@ -21,24 +22,30 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     /**
      * Booting the package.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->registerNamespaces();
         $this->registerModules();
 
         $this->registerEvents();
-        $this->listenDBLog();
-        $this->app->make(MacrosRegister::class)->boot();
+        try {
+            $this->listenDBLog();
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        }
+        try {
+            $this->app->make(MacrosRegister::class)->boot();
+        } catch (BindingResolutionException $e) {
+        }
 
         AboutCommand::add('Laravel-Modules', [
-            'Version' => fn () => InstalledVersions::getPrettyVersion('nwidart/laravel-modules'),
+            'Version' => fn () => InstalledVersions::getPrettyVersion('coffin-laughter/laravel-modules'),
         ]);
     }
 
     /**
      * Register the service provider.
      */
-    public function register()
+    public function register(): void
     {
         $this->registerServices();
         $this->setupStubPath();
@@ -51,7 +58,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     /**
      * Setup stub path.
      */
-    public function setupStubPath()
+    public function setupStubPath(): void
     {
         $path = $this->app['config']->get('modules.stubs.path') ?? __DIR__ . '/Commands/stubs';
         Stub::setBasePath($path);
@@ -68,7 +75,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     /**
      * {@inheritdoc}
      */
-    protected function registerServices()
+    protected function registerServices(): void
     {
         $this->app->singleton(Contracts\RepositoryInterface::class, function ($app) {
             $path = $app['config']->get('modules.paths.modules');

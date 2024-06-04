@@ -28,7 +28,7 @@ abstract class CoffinException extends HttpException
      * @param string $message
      * @param int|Code $code
      */
-    public function __construct(string $message = '', int|Code $code = 0)
+    public function __construct(string $message = '', int|Enum $code = 0)
     {
         if ($code instanceof Enum) {
             $code = $code->value();
