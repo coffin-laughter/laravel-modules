@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -14,8 +25,13 @@ class ExceptionMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
-    protected $name = 'module:make-exception';
     protected $description = 'Create a new exception class for the specified module.';
+    protected $name = 'module:make-exception';
+
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.exceptions.namespace', 'Exceptions');
+    }
 
     public function getDestinationFilePath(): string
     {
@@ -26,22 +42,17 @@ class ExceptionMakeCommand extends GeneratorCommand
         return $path . $filePath . '/' . $this->getExceptionName() . '.php';
     }
 
-    protected function getTemplateContents(): string
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'CLASS_NAMESPACE'   => $this->getClassNamespace($module),
-            'CLASS'             => $this->getClassNameWithoutNamespace(),
-        ]))->render();
-    }
-
     protected function getArguments(): array
     {
         return [
             ['name', InputArgument::REQUIRED, 'The name of the action class.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
+    }
+
+    protected function getExceptionName(): array|string
+    {
+        return Str::studly($this->argument('name'));
     }
 
     /**
@@ -56,21 +67,6 @@ class ExceptionMakeCommand extends GeneratorCommand
         ];
     }
 
-    protected function getExceptionName(): array|string
-    {
-        return Str::studly($this->argument('name'));
-    }
-
-    private function getClassNameWithoutNamespace(): array|string
-    {
-        return class_basename($this->getExceptionName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.exceptions.namespace', 'Exceptions');
-    }
-
     protected function getStubName(): string
     {
         if ($this->option('render')) {
@@ -82,5 +78,20 @@ class ExceptionMakeCommand extends GeneratorCommand
         return $this->option('report')
             ? '/exception-report.stub'
             : '/exception.stub';
+    }
+
+    protected function getTemplateContents(): string
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'CLASS_NAMESPACE'   => $this->getClassNamespace($module),
+            'CLASS'             => $this->getClassNameWithoutNamespace(),
+        ]))->render();
+    }
+
+    private function getClassNameWithoutNamespace(): array|string
+    {
+        return class_basename($this->getExceptionName());
     }
 }

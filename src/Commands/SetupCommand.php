@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands;
 
@@ -7,6 +18,12 @@ use Illuminate\Console\Command;
 class SetupCommand extends Command
 {
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Setting up modules folders for first use.';
+    /**
      * The console command name.
      *
      * @var string
@@ -14,20 +31,15 @@ class SetupCommand extends Command
     protected $name = 'module:setup';
 
     /**
-     * The console command description.
-     *
-     * @var string
+     * Generate the assets folder.
      */
-    protected $description = 'Setting up modules folders for first use.';
-
-    /**
-     * Execute the console command.
-     */
-    public function handle(): int
+    public function generateAssetsFolder()
     {
-        $code = $this->generateModulesFolder();
-
-        return $this->generateAssetsFolder() | $code;
+        return $this->generateDirectory(
+            $this->laravel['modules']->config('paths.assets'),
+            'Assets directory created successfully',
+            'Assets directory already exist'
+        );
     }
 
     /**
@@ -43,15 +55,13 @@ class SetupCommand extends Command
     }
 
     /**
-     * Generate the assets folder.
+     * Execute the console command.
      */
-    public function generateAssetsFolder()
+    public function handle(): int
     {
-        return $this->generateDirectory(
-            $this->laravel['modules']->config('paths.assets'),
-            'Assets directory created successfully',
-            'Assets directory already exist'
-        );
+        $code = $this->generateModulesFolder();
+
+        return $this->generateAssetsFolder() | $code;
     }
 
     /**

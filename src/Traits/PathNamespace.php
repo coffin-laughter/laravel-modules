@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Traits;
 
@@ -7,27 +18,23 @@ use Illuminate\Support\Str;
 trait PathNamespace
 {
     /**
-     * Get a well-formatted StudlyCase representation of path components.
+     * Get the app path basename.
      */
-    public function studly_path(string $path, $ds = '/'): string
+    public function app_path(?string $path = null): string
     {
-        return collect(explode($ds, $this->clean_path($path, $ds)))->map(fn ($path) => Str::studly($path))->implode($ds);
+        $config_path = config('modules.paths.app_folder');
+        $app_path = strlen($config_path) ? trim($config_path, '/') : 'app';
+        $app_path .= strlen($path) ? '/' . $path : '';
+
+        return $this->clean_path($app_path);
     }
 
     /**
-     * Get a well-formatted StudlyCase namespace.
+     * Clean path
      */
-    public function studly_namespace(string $namespace, $ds = '\\'): string
+    public function clean_path(string $path, $ds = '/'): string
     {
-        return $this->studly_path($namespace, $ds);
-    }
-
-    /**
-     * Get a well-formatted namespace from a given path.
-     */
-    public function path_namespace(string $path): string
-    {
-        return Str::of($this->studly_path($path))->replace('/', '\\')->trim('\\');
+        return Str::of($path)->explode($ds)->reject(empty($path))->implode($ds);
     }
 
     /**
@@ -42,22 +49,25 @@ trait PathNamespace
     }
 
     /**
-     * Clean path
+     * Get a well-formatted namespace from a given path.
      */
-    public function clean_path(string $path, $ds = '/'): string
+    public function path_namespace(string $path): string
     {
-        return Str::of($path)->explode($ds)->reject(empty($path))->implode($ds);
+        return Str::of($this->studly_path($path))->replace('/', '\\')->trim('\\');
     }
 
     /**
-     * Get the app path basename.
+     * Get a well-formatted StudlyCase namespace.
      */
-    public function app_path(?string $path = null): string
+    public function studly_namespace(string $namespace, $ds = '\\'): string
     {
-        $config_path = config('modules.paths.app_folder');
-        $app_path = strlen($config_path) ? trim($config_path, '/') : 'app';
-        $app_path .= strlen($path) ? '/' . $path : '';
-
-        return $this->clean_path($app_path);
+        return $this->studly_path($namespace, $ds);
+    }
+    /**
+     * Get a well-formatted StudlyCase representation of path components.
+     */
+    public function studly_path(string $path, $ds = '/'): string
+    {
+        return collect(explode($ds, $this->clean_path($path, $ds)))->map(fn ($path) => Str::studly($path))->implode($ds);
     }
 }

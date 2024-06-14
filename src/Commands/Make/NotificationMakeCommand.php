@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -12,13 +23,6 @@ final class NotificationMakeCommand extends GeneratorCommand
 {
     use ModuleCommandTrait;
 
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-notification';
-
     protected $argumentName = 'name';
 
     /**
@@ -28,10 +32,44 @@ final class NotificationMakeCommand extends GeneratorCommand
      */
     protected $description = 'Create a new notification class for the specified module.';
 
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-notification';
+
     public function getDefaultNamespace(): string
     {
         return config('modules.paths.generator.notifications.namespace')
             ?? ltrim(config('modules.paths.generator.notifications.path', 'Notifications'), config('modules.paths.app_folder', ''));
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['name', InputArgument::REQUIRED, 'The name of the notification class.'],
+            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+        ];
+    }
+
+    /**
+     * Get the destination file path.
+     *
+     * @return string
+     */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $notificationPath = GenerateConfigReader::read('notifications');
+
+        return $path . $notificationPath->getPath() . '/' . $this->getFileName() . '.php';
     }
 
     /**
@@ -50,37 +88,10 @@ final class NotificationMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the destination file path.
-     *
-     * @return string
-     */
-    protected function getDestinationFilePath()
-    {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $notificationPath = GenerateConfigReader::read('notifications');
-
-        return $path . $notificationPath->getPath() . '/' . $this->getFileName() . '.php';
-    }
-
-    /**
      * @return string
      */
     private function getFileName()
     {
         return Str::studly($this->argument('name'));
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::REQUIRED, 'The name of the notification class.'],
-            ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
-        ];
     }
 }

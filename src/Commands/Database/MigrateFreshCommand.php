@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Database;
 
@@ -12,18 +23,31 @@ class MigrateFreshCommand extends Command
     use ModuleCommandTrait;
 
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Reset all database tables and re-run the modules migrations.';
+
+    /**
      * The console command name.
      *
      * @var string
      */
     protected $name = 'module:migrate-fresh';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Reset all database tables and re-run the modules migrations.';
+    public function getModuleName()
+    {
+        $module = $this->argument('module');
+
+        if (!$module) {
+            return null;
+        }
+
+        $module = app('modules')->find($module);
+
+        return $module ? $module->getStudlyName() : null;
+    }
 
     /**
      * Execute the console command.
@@ -39,10 +63,10 @@ class MigrateFreshCommand extends Command
         }
 
         $this->call('module:migrate-refresh', [
-            'module' => $this->getModuleName(),
+            'module'     => $this->getModuleName(),
             '--database' => $this->option('database'),
-            '--force' => $this->option('force'),
-            '--seed' => $this->option('seed'),
+            '--force'    => $this->option('force'),
+            '--seed'     => $this->option('seed'),
         ]);
 
         return 0;
@@ -72,18 +96,5 @@ class MigrateFreshCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
         ];
-    }
-
-    public function getModuleName()
-    {
-        $module = $this->argument('module');
-
-        if (!$module) {
-            return null;
-        }
-
-        $module = app('modules')->find($module);
-
-        return $module ? $module->getStudlyName() : null;
     }
 }

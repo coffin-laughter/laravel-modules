@@ -1,22 +1,32 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Support;
 
 class Stub
 {
     /**
-     * The stub path.
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * The base path of stub file.
      *
      * @var null|string
      */
     protected static $basePath = null;
+    /**
+     * The stub path.
+     *
+     * @var string
+     */
+    protected $path;
 
     /**
      * The replacements array.
@@ -38,6 +48,16 @@ class Stub
     }
 
     /**
+     * Handle magic method __toString.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->render();
+    }
+
+    /**
      * Create new self instance.
      *
      * @param string $path
@@ -48,42 +68,6 @@ class Stub
     public static function create($path, array $replaces = [])
     {
         return new static($path, $replaces);
-    }
-
-    /**
-     * Set stub path.
-     *
-     * @param string $path
-     *
-     * @return self
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get stub path.
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        $path = static::getBasePath() . $this->path;
-
-        return file_exists($path) ? $path : __DIR__ . '/../Commands/stubs' . $this->path;
-    }
-
-    /**
-     * Set base path.
-     *
-     * @param string $path
-     */
-    public static function setBasePath($path)
-    {
-        static::$basePath = $path;
     }
 
     /**
@@ -113,6 +97,28 @@ class Stub
     }
 
     /**
+     * Get stub path.
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        $path = static::getBasePath() . $this->path;
+
+        return file_exists($path) ? $path : __DIR__ . '/../Commands/stubs' . $this->path;
+    }
+
+    /**
+     * Get replacements.
+     *
+     * @return array
+     */
+    public function getReplaces()
+    {
+        return $this->replaces;
+    }
+
+    /**
      * Get stub contents.
      *
      * @return string
@@ -120,19 +126,6 @@ class Stub
     public function render()
     {
         return $this->getContents();
-    }
-
-    /**
-     * Save stub to specific path.
-     *
-     * @param string $path
-     * @param string $filename
-     *
-     * @return bool
-     */
-    public function saveTo($path, $filename)
-    {
-        return file_put_contents($path . '/' . $filename, $this->getContents());
     }
 
     /**
@@ -150,22 +143,39 @@ class Stub
     }
 
     /**
-     * Get replacements.
+     * Save stub to specific path.
      *
-     * @return array
+     * @param string $path
+     * @param string $filename
+     *
+     * @return bool
      */
-    public function getReplaces()
+    public function saveTo($path, $filename)
     {
-        return $this->replaces;
+        return file_put_contents($path . '/' . $filename, $this->getContents());
     }
 
     /**
-     * Handle magic method __toString.
+     * Set base path.
      *
-     * @return string
+     * @param string $path
      */
-    public function __toString()
+    public static function setBasePath($path)
     {
-        return $this->render();
+        static::$basePath = $path;
+    }
+
+    /**
+     * Set stub path.
+     *
+     * @param string $path
+     *
+     * @return self
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
     }
 }

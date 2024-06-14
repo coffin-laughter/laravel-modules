@@ -32,7 +32,7 @@ class CoffinController extends Controller
     {
         $user = Auth::guard($guard ?: getGuardName())->user();
 
-        if (! $user) {
+        if (!$user) {
             throw new FailedException('登录失效, 请重新登录', Code::LOST_LOGIN);
         }
 

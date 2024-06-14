@@ -2,58 +2,43 @@
 
 namespace $CLASS_NAMESPACE$;
 
-use App\Http\Controllers\Controller;
+use Nwidart\Modules\Base\CoffinController as Controller;
 use Illuminate\Http\Request;
 
 class $CLASS$ extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-
-        return response()->json([]);
+    public function __construct(
+        protected readonly $CLASS$ $model
+    ) {
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function index(Request $request)
+    {
+        return $this->model->getList();
+    }
+
     public function store(Request $request)
     {
-        //
-
-        return response()->json([]);
+        return $this->model->storeBy($request->all());
     }
 
-    /**
-     * Show the specified resource.
-     */
     public function show($id)
     {
-        //
-
-        return response()->json([]);
+        return $this->model->firstBy($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
-        //
-
-        return response()->json([]);
+        return $this->model->updateBy($id, $request->all());
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    public function enable($id)
+    {
+        return $this->model->toggleBy($id);
+    }
+
     public function destroy($id)
     {
-        //
-
-        return response()->json([]);
+        return $this->model->deleteBy($id);
     }
 }

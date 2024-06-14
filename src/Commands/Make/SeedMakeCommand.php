@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -18,14 +29,23 @@ class SeedMakeCommand extends GeneratorCommand
     protected $argumentName = 'name';
 
     /**
+     * The console command description.
+     */
+    protected $description = 'Create a new seeder for the specified module.';
+
+    /**
      * The console command name.
      */
     protected $name = 'module:make-seed';
 
     /**
-     * The console command description.
+     * Get default namespace.
      */
-    protected $description = 'Create a new seeder for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.seeder.namespace')
+            ?? ltrim(config('modules.paths.generator.seeder.path', 'Database/Seeders'), config('modules.paths.app_folder', ''));
+    }
 
     /**
      * Get the console command arguments.
@@ -36,6 +56,17 @@ class SeedMakeCommand extends GeneratorCommand
             ['name', InputArgument::REQUIRED, 'The name of seeder will be created.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
+    }
+
+    protected function getDestinationFilePath(): mixed
+    {
+        $this->clearCache();
+
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $seederPath = GenerateConfigReader::read('seeder');
+
+        return $path . $seederPath->getPath() . '/' . $this->getSeederName() . '.php';
     }
 
     /**
@@ -58,22 +89,11 @@ class SeedMakeCommand extends GeneratorCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub('/seeder.stub', [
-            'NAME' => $this->getSeederName(),
-            'MODULE' => $this->getModuleName(),
+            'NAME'      => $this->getSeederName(),
+            'MODULE'    => $this->getModuleName(),
             'NAMESPACE' => $this->getClassNamespace($module),
 
         ]))->render();
-    }
-
-    protected function getDestinationFilePath(): mixed
-    {
-        $this->clearCache();
-
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $seederPath = GenerateConfigReader::read('seeder');
-
-        return $path . $seederPath->getPath() . '/' . $this->getSeederName() . '.php';
     }
 
     /**
@@ -90,14 +110,5 @@ class SeedMakeCommand extends GeneratorCommand
         }
 
         return Str::studly($string);
-    }
-
-    /**
-     * Get default namespace.
-     */
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.seeder.namespace')
-            ?? ltrim(config('modules.paths.generator.seeder.path', 'Database/Seeders'), config('modules.paths.app_folder', ''));
     }
 }

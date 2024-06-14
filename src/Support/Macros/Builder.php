@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -30,19 +29,12 @@ class Builder
         $this->tree();
     }
 
-    public function whereLike(): void
-    {
-        LaravelBuilder::macro(__FUNCTION__, function ($filed, $value) {
-            return $this->where($filed, 'like', "%$value%");
-        });
-    }
-
     public function quickSearch(): void
     {
         LaravelBuilder::macro(__FUNCTION__, function (array $params = []) {
             $params = array_merge(request()->all(), $params);
 
-            if (! property_exists($this->model, 'searchable')) {
+            if (!property_exists($this->model, 'searchable')) {
                 return $this;
             }
 
@@ -53,7 +45,7 @@ class Builder
 
             $wheres = [];
 
-            if (! empty($this->model->searchable)) {
+            if (!empty($this->model->searchable)) {
                 foreach ($this->model->searchable as $field => $op) {
                     // 临时变量
                     $_field = $field;
@@ -111,6 +103,13 @@ class Builder
             $fields = array_merge([$id, $parentId], $fields);
 
             return $this->get($fields)->toTree(0, $parentId);
+        });
+    }
+
+    public function whereLike(): void
+    {
+        LaravelBuilder::macro(__FUNCTION__, function ($filed, $value) {
+            return $this->where($filed, 'like', "%$value%");
         });
     }
 }

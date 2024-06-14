@@ -21,17 +21,6 @@ class Tree
     protected static string $pk = 'id';
 
     /**
-     * @param string $pk
-     * @return Tree
-     */
-    public static function setPk(string $pk): Tree
-    {
-        self::$pk = $pk;
-
-        return new self();
-    }
-
-    /**
      * @param array  $items
      * @param int    $pid
      * @param string $pidField
@@ -55,5 +44,16 @@ class Tree
         }
 
         return $tree;
+    }
+
+    /**
+     * @param string $pk
+     * @return Tree
+     */
+    public static function setPk(string $pk): Tree
+    {
+        self::$pk = $pk;
+
+        return new self();
     }
 }

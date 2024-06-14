@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -14,8 +25,8 @@ class TestMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
-    protected $name = 'module:make-test';
     protected $description = 'Create a new test class for the specified module.';
+    protected $name = 'module:make-test';
 
     public function getDefaultNamespace(): string
     {
@@ -39,6 +50,22 @@ class TestMakeCommand extends GeneratorCommand
             ['name', InputArgument::REQUIRED, 'The name of the form request class.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        if ($this->option('feature')) {
+            $testPath = GenerateConfigReader::read('test-feature');
+        } else {
+            $testPath = GenerateConfigReader::read('test-unit');
+        }
+
+        return $path . $testPath->getPath() . '/' . $this->getFileName() . '.php';
     }
 
     /**
@@ -69,22 +96,6 @@ class TestMakeCommand extends GeneratorCommand
             'NAMESPACE' => $this->getClassNamespace($module),
             'CLASS'     => $this->getClass(),
         ]))->render();
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getDestinationFilePath()
-    {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        if ($this->option('feature')) {
-            $testPath = GenerateConfigReader::read('test-feature');
-        } else {
-            $testPath = GenerateConfigReader::read('test-unit');
-        }
-
-        return $path . $testPath->getPath() . '/' . $this->getFileName() . '.php';
     }
 
     /**

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -20,18 +31,18 @@ class RequestMakeCommand extends GeneratorCommand
     protected $argumentName = 'name';
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-request';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a new form request class for the specified module.';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-request';
 
     public function getDefaultNamespace(): string
     {
@@ -55,6 +66,18 @@ class RequestMakeCommand extends GeneratorCommand
     /**
      * @return mixed
      */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $requestPath = GenerateConfigReader::read('request');
+
+        return $path . $requestPath->getPath() . '/' . $this->getFileName() . '.php';
+    }
+
+    /**
+     * @return mixed
+     */
     protected function getTemplateContents()
     {
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
@@ -63,18 +86,6 @@ class RequestMakeCommand extends GeneratorCommand
             'NAMESPACE' => $this->getClassNamespace($module),
             'CLASS'     => $this->getClass(),
         ]))->render();
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getDestinationFilePath()
-    {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $requestPath = GenerateConfigReader::read('request');
-
-        return $path . $requestPath->getPath() . '/' . $this->getFileName() . '.php';
     }
 
     /**

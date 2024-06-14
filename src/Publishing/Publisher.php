@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Publishing;
 
@@ -9,6 +20,19 @@ use Nwidart\Modules\Module;
 
 abstract class Publisher implements PublisherInterface
 {
+    /**
+     * The laravel console instance.
+     *
+     * @var \Illuminate\Console\Command
+     */
+    protected $console;
+
+    /**
+     * The error message will displayed at console.
+     *
+     * @var string
+     */
+    protected $error = '';
     /**
      * The name of module will used.
      *
@@ -23,11 +47,11 @@ abstract class Publisher implements PublisherInterface
     protected $repository;
 
     /**
-     * The laravel console instance.
+     * Determine whether the result message will shown in the console.
      *
-     * @var \Illuminate\Console\Command
+     * @var bool
      */
-    protected $console;
+    protected $showMessage = true;
 
     /**
      * The success message will displayed at console.
@@ -37,20 +61,6 @@ abstract class Publisher implements PublisherInterface
     protected $success;
 
     /**
-     * The error message will displayed at console.
-     *
-     * @var string
-     */
-    protected $error = '';
-
-    /**
-     * Determine whether the result message will shown in the console.
-     *
-     * @var bool
-     */
-    protected $showMessage = true;
-
-    /**
      * The constructor.
      *
      * @param Module $module
@@ -58,76 +68,6 @@ abstract class Publisher implements PublisherInterface
     public function __construct(Module $module)
     {
         $this->module = $module;
-    }
-
-    /**
-     * Show the result message.
-     *
-     * @return self
-     */
-    public function showMessage()
-    {
-        $this->showMessage = true;
-
-        return $this;
-    }
-
-    /**
-     * Hide the result message.
-     *
-     * @return self
-     */
-    public function hideMessage()
-    {
-        $this->showMessage = false;
-
-        return $this;
-    }
-
-    /**
-     * Get module instance.
-     *
-     * @return \Nwidart\Modules\Module
-     */
-    public function getModule()
-    {
-        return $this->module;
-    }
-
-    /**
-     * Set modules repository instance.
-     * @param RepositoryInterface $repository
-     * @return $this
-     */
-    public function setRepository(RepositoryInterface $repository)
-    {
-        $this->repository = $repository;
-
-        return $this;
-    }
-
-    /**
-     * Get modules repository instance.
-     *
-     * @return RepositoryInterface
-     */
-    public function getRepository()
-    {
-        return $this->repository;
-    }
-
-    /**
-     * Set console instance.
-     *
-     * @param \Illuminate\Console\Command $console
-     *
-     * @return $this
-     */
-    public function setConsole(Command $console)
-    {
-        $this->console = $console;
-
-        return $this;
     }
 
     /**
@@ -141,6 +81,13 @@ abstract class Publisher implements PublisherInterface
     }
 
     /**
+     * Get destination path.
+     *
+     * @return string
+     */
+    abstract public function getDestinationPath();
+
+    /**
      * Get laravel filesystem instance.
      *
      * @return \Illuminate\Filesystem\Filesystem
@@ -151,11 +98,24 @@ abstract class Publisher implements PublisherInterface
     }
 
     /**
-     * Get destination path.
+     * Get module instance.
      *
-     * @return string
+     * @return \Nwidart\Modules\Module
      */
-    abstract public function getDestinationPath();
+    public function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * Get modules repository instance.
+     *
+     * @return RepositoryInterface
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
 
     /**
      * Get source path.
@@ -163,6 +123,18 @@ abstract class Publisher implements PublisherInterface
      * @return string
      */
     abstract public function getSourcePath();
+
+    /**
+     * Hide the result message.
+     *
+     * @return self
+     */
+    public function hideMessage()
+    {
+        $this->showMessage = false;
+
+        return $this;
+    }
 
     /**
      * Publish something.
@@ -191,5 +163,43 @@ abstract class Publisher implements PublisherInterface
             $this->console->components->task($this->module->getStudlyName(), fn () => false);
             $this->console->components->error($this->error);
         }
+    }
+
+    /**
+     * Set console instance.
+     *
+     * @param \Illuminate\Console\Command $console
+     *
+     * @return $this
+     */
+    public function setConsole(Command $console)
+    {
+        $this->console = $console;
+
+        return $this;
+    }
+
+    /**
+     * Set modules repository instance.
+     * @param RepositoryInterface $repository
+     * @return $this
+     */
+    public function setRepository(RepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
+
+    /**
+     * Show the result message.
+     *
+     * @return self
+     */
+    public function showMessage()
+    {
+        $this->showMessage = true;
+
+        return $this;
     }
 }

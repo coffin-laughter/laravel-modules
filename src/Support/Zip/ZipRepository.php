@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -48,6 +47,16 @@ class ZipRepository
     }
 
     /**
+     * Add an empty directory
+     *
+     * @param $dirName
+     */
+    public function addEmptyDir($dirName): void
+    {
+        $this->archive->addEmptyDir($dirName);
+    }
+
+    /**
      * Add a file to the opened Archive
      *
      * @param $pathToFile
@@ -56,16 +65,6 @@ class ZipRepository
     public function addFile($pathToFile, $pathInArchive): void
     {
         $this->archive->addFile($pathToFile, $pathInArchive);
-    }
-
-    /**
-     * Add an empty directory
-     *
-     * @param $dirName
-     */
-    public function addEmptyDir($dirName): void
-    {
-        $this->archive->addEmptyDir($dirName);
     }
 
     /**
@@ -80,13 +79,52 @@ class ZipRepository
     }
 
     /**
-     * Remove a file permanently from the Archive
-     *
-     * @param string $pathInArchive
+     * Closes the archive and saves it
      */
-    public function removeFile(string $pathInArchive): void
+    public function close(): void
     {
-        $this->archive->deleteName($pathInArchive);
+        @$this->archive->close();
+    }
+
+    /**
+     * Will loop over every item in the archive and will execute the callback on them
+     * Will provide the filename for every item
+     *
+     * @param $callback
+     */
+    public function each($callback): void
+    {
+        for ($i = 0; $i < $this->archive->numFiles; ++$i) {
+            //skip if folder
+            $stats = $this->archive->statIndex($i);
+            if ($stats['size'] === 0 && $stats['crc'] === 0) {
+                continue;
+            }
+            call_user_func_array($callback, [
+                'file'  => $this->archive->getNameIndex($i),
+                'stats' => $this->archive->statIndex($i),
+            ]);
+        }
+    }
+
+    /**
+     * Checks whether the file is in the archive
+     *
+     * @param $fileInArchive
+     *
+     * @return bool
+     */
+    public function fileExists($fileInArchive): bool
+    {
+        return $this->archive->locateName($fileInArchive) !== false;
+    }
+
+    /**
+     * @return mixed|ZipArchive
+     */
+    public function getArchive(): mixed
+    {
+        return $this->archive;
     }
 
     /**
@@ -114,36 +152,23 @@ class ZipRepository
     }
 
     /**
-     * Will loop over every item in the archive and will execute the callback on them
-     * Will provide the filename for every item
+     * Returns the status of the archive as a string
      *
-     * @param $callback
+     * @return string
      */
-    public function each($callback): void
+    public function getStatus(): string
     {
-        for ($i = 0; $i < $this->archive->numFiles; ++$i) {
-            //skip if folder
-            $stats = $this->archive->statIndex($i);
-            if ($stats['size'] === 0 && $stats['crc'] === 0) {
-                continue;
-            }
-            call_user_func_array($callback, [
-                'file' => $this->archive->getNameIndex($i),
-                'stats' => $this->archive->statIndex($i),
-            ]);
-        }
+        return $this->archive->getStatusString();
     }
 
     /**
-     * Checks whether the file is in the archive
+     * Remove a file permanently from the Archive
      *
-     * @param $fileInArchive
-     *
-     * @return bool
+     * @param string $pathInArchive
      */
-    public function fileExists($fileInArchive): bool
+    public function removeFile(string $pathInArchive): void
     {
-        return $this->archive->locateName($fileInArchive) !== false;
+        $this->archive->deleteName($pathInArchive);
     }
 
     /**
@@ -160,32 +185,6 @@ class ZipRepository
     }
 
     /**
-     * Returns the status of the archive as a string
-     *
-     * @return string
-     */
-    public function getStatus(): string
-    {
-        return $this->archive->getStatusString();
-    }
-
-    /**
-     * @return mixed|ZipArchive
-     */
-    public function getArchive(): mixed
-    {
-        return $this->archive;
-    }
-
-    /**
-     * Closes the archive and saves it
-     */
-    public function close(): void
-    {
-        @$this->archive->close();
-    }
-
-    /**
      * get error message
      *
      * @param $resultCode
@@ -197,12 +196,12 @@ class ZipRepository
             ZipArchive::ER_EXISTS => 'ZipArchive::ER_EXISTS - File already exists.',
             ZipArchive::ER_INCONS => 'ZipArchive::ER_INCONS - Zip archive inconsistent.',
             ZipArchive::ER_MEMORY => 'ZipArchive::ER_MEMORY - Malloc failure.',
-            ZipArchive::ER_NOENT => 'ZipArchive::ER_NOENT - No such file.',
-            ZipArchive::ER_NOZIP => 'ZipArchive::ER_NOZIP - Not a zip archive.',
-            ZipArchive::ER_OPEN => 'ZipArchive::ER_OPEN - Can\'t open file.',
-            ZipArchive::ER_READ => 'ZipArchive::ER_READ - Read error.',
-            ZipArchive::ER_SEEK => 'ZipArchive::ER_SEEK - Seek error.',
-            default => "An unknown error [$resultCode] has occurred.",
+            ZipArchive::ER_NOENT  => 'ZipArchive::ER_NOENT - No such file.',
+            ZipArchive::ER_NOZIP  => 'ZipArchive::ER_NOZIP - Not a zip archive.',
+            ZipArchive::ER_OPEN   => 'ZipArchive::ER_OPEN - Can\'t open file.',
+            ZipArchive::ER_READ   => 'ZipArchive::ER_READ - Read error.',
+            ZipArchive::ER_SEEK   => 'ZipArchive::ER_SEEK - Seek error.',
+            default               => "An unknown error [$resultCode] has occurred.",
         };
     }
 }

@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -34,10 +33,49 @@ class Collection
         $this->download();
     }
 
-    public function toTree(): void
+    public function download(): void
     {
-        LaravelCollection::macro(__FUNCTION__, function (int $pid = 0, string $pidField = 'parent_id', string $child = 'children') {
-            return LaravelCollection::make(Tree::done($this->all(), $pid, $pidField, $child));
+        LaravelCollection::macro(__FUNCTION__, function (array $header) {
+            $items = $this->toArray();
+            $export = new class ($items, $header) extends Export {
+                protected array $items;
+                public function __construct(array $items, array $header)
+                {
+                    $this->items = $items;
+
+                    $this->header = $header;
+                }
+                public function array(): array
+                {
+                    // TODO: Implement array() method.
+                    return $this->items;
+                }
+            };
+
+            return $export->download();
+        });
+    }
+
+    public function export(): void
+    {
+        LaravelCollection::macro(__FUNCTION__, function (array $header) {
+            $items = $this->toArray();
+            $export = new class ($items, $header) extends Export {
+                protected array $items;
+                public function __construct(array $items, array $header)
+                {
+                    $this->items = $items;
+
+                    $this->header = $header;
+                }
+                public function array(): array
+                {
+                    // TODO: Implement array() method.
+                    return $this->items;
+                }
+            };
+
+            return $export->export();
         });
     }
 
@@ -66,49 +104,10 @@ class Collection
         });
     }
 
-    public function export(): void
+    public function toTree(): void
     {
-        LaravelCollection::macro(__FUNCTION__, function (array $header) {
-            $items = $this->toArray();
-            $export = new class ($items, $header) extends Export {
-                protected array $items;
-                public function __construct(array $items, array $header)
-                {
-                    $this->items = $items;
-
-                    $this->header = $header;
-                }
-                public function array(): array
-                {
-                    // TODO: Implement array() method.
-                    return $this->items;
-                }
-            };
-
-            return $export->export();
-        });
-    }
-
-    public function download(): void
-    {
-        LaravelCollection::macro(__FUNCTION__, function (array $header) {
-            $items = $this->toArray();
-            $export = new class ($items, $header) extends Export {
-                protected array $items;
-                public function __construct(array $items, array $header)
-                {
-                    $this->items = $items;
-
-                    $this->header = $header;
-                }
-                public function array(): array
-                {
-                    // TODO: Implement array() method.
-                    return $this->items;
-                }
-            };
-
-            return $export->download();
+        LaravelCollection::macro(__FUNCTION__, function (int $pid = 0, string $pidField = 'parent_id', string $child = 'children') {
+            return LaravelCollection::make(Tree::done($this->all(), $pid, $pidField, $child));
         });
     }
 }

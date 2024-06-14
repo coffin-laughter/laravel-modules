@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Database;
 
@@ -12,18 +23,18 @@ class MigrateRollbackCommand extends BaseCommand
     use MigrationLoaderTrait;
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:migrate-rollback';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Rollback the modules migrations.';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:migrate-rollback';
 
     public function executeAction($name): void
     {
@@ -33,7 +44,7 @@ class MigrateRollbackCommand extends BaseCommand
 
         $database = $this->option('database');
 
-        if (! empty($database)) {
+        if (!empty($database)) {
             $migrator->setDatabase($database);
         }
 
@@ -41,7 +52,7 @@ class MigrateRollbackCommand extends BaseCommand
 
         if (count($migrated)) {
             foreach ($migrated as $migration) {
-                $this->components->task("Rollback: <info>{$migration}</info>", );
+                $this->components->task("Rollback: <info>{$migration}</info>");
             }
 
             return;

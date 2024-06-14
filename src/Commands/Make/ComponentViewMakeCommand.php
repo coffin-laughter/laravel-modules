@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -21,18 +32,18 @@ class ComponentViewMakeCommand extends GeneratorCommand
     protected $argumentName = 'name';
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-component-view';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a new component-view for the specified module.';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-component-view';
 
     /**
      * Get the console command arguments.
@@ -50,20 +61,20 @@ class ComponentViewMakeCommand extends GeneratorCommand
     /**
      * @return mixed
      */
-    protected function getTemplateContents()
-    {
-        return (new Stub('/component-view.stub', ['QUOTE' => Inspiring::quote()]))->render();
-    }
-
-    /**
-     * @return mixed
-     */
     protected function getDestinationFilePath()
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
         $factoryPath = GenerateConfigReader::read('component-view');
 
         return $path . $factoryPath->getPath() . '/' . $this->getFileName();
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTemplateContents()
+    {
+        return (new Stub('/component-view.stub', ['QUOTE' => Inspiring::quote()]))->render();
     }
 
     /**

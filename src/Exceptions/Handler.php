@@ -24,11 +24,14 @@ use Symfony\Component\HttpFoundation\Response;
 class Handler extends ExceptionHandler
 {
     /**
-     * 异常类型及其相应自定义日志级别的列表。
-     * @var array<int, class-string<\Throwable>>
+     * 在出现验证异常时不会闪存到会话中的输入列表。
+     *
+     * @var array<int, string>
      */
-    protected $levels = [
-        //
+    protected $dontFlash = [
+        'current_password',
+        'password',
+        'password_confirmation',
     ];
 
     /**
@@ -39,16 +42,12 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         //
     ];
-
     /**
-     * 在出现验证异常时不会闪存到会话中的输入列表。
-     *
-     * @var array<int, string>
+     * 异常类型及其相应自定义日志级别的列表。
+     * @var array<int, class-string<\Throwable>>
      */
-    protected $dontFlash = [
-        'current_password',
-        'password',
-        'password_confirmation',
+    protected $levels = [
+        //
     ];
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -24,25 +24,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 trait WithRelations
 {
     /**
-     * @param array $data
+     * @param Model $model
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
      * @time  : 2024-05-15 下午2:40
      */
-    protected function createRelations(array $data): void
+    public function deleteRelations(Model $model): void
     {
-        foreach ($this->getRelationsData($data) as $relation => $relationData) {
-            $isRelation = $this->{$relation}();
-            if (!count($relationData)) {
-                continue;
-            }
-
+        $relations = $this->getRelations();
+        foreach ($relations as $relation) {
+            $isRelation = $model->{$relation}();
+            // BelongsToMany
             if ($isRelation instanceof BelongsToMany) {
-                $isRelation->attach($relationData);
-            }
-
-            if ($isRelation instanceof HasMany || $isRelation instanceof HasOne) {
-                $isRelation->create($relationData);
+                $isRelation->detach();
             }
         }
     }
@@ -65,21 +59,26 @@ trait WithRelations
             }
         }
     }
-
     /**
-     * @param Model $model
+     * @param array $data
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
      * @time  : 2024-05-15 下午2:40
      */
-    public function deleteRelations(Model $model): void
+    protected function createRelations(array $data): void
     {
-        $relations = $this->getRelations();
-        foreach ($relations as $relation) {
-            $isRelation = $model->{$relation}();
-            // BelongsToMany
+        foreach ($this->getRelationsData($data) as $relation => $relationData) {
+            $isRelation = $this->{$relation}();
+            if (!count($relationData)) {
+                continue;
+            }
+
             if ($isRelation instanceof BelongsToMany) {
-                $isRelation->detach();
+                $isRelation->attach($relationData);
+            }
+
+            if ($isRelation instanceof HasMany || $isRelation instanceof HasOne) {
+                $isRelation->create($relationData);
             }
         }
     }

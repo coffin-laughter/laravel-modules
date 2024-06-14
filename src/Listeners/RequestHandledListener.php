@@ -52,7 +52,7 @@ class RequestHandledListener
     {
         $responseData = [
             'success' => true,
-            'code' => Code::SUCCESS->value(),
+            'code'    => Code::SUCCESS->value(),
             'message' => Code::SUCCESS->message(),
         ];
 

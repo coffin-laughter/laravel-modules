@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Process;
 
@@ -23,30 +34,24 @@ class Updater extends Runner
     }
 
     /**
-     * Check if composer should output anything.
-     *
-     * @return string
-     */
-    private function isComposerSilenced()
-    {
-        return config('modules.composer.composer-output') === false ? ' --quiet' : '';
-    }
-
-    /**
      * @param Module $module
      */
-    private function installRequires(Module $module)
+    private function copyScriptsToMainComposerJson(Module $module)
     {
-        $packages = $module->getComposerAttr('require', []);
+        $scripts = $module->getComposerAttr('scripts', []);
 
-        $concatenatedPackages = '';
-        foreach ($packages as $name => $version) {
-            $concatenatedPackages .= "\"{$name}:{$version}\" ";
+        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
+
+        foreach ($scripts as $key => $script) {
+            if (array_key_exists($key, $composer['scripts'])) {
+                $composer['scripts'][$key] = array_unique(array_merge($composer['scripts'][$key], $script));
+
+                continue;
+            }
+            $composer['scripts'] = array_merge($composer['scripts'], [$key => $script]);
         }
 
-        if (!empty($concatenatedPackages)) {
-            $this->run("composer require {$concatenatedPackages}{$this->isComposerSilenced()}");
-        }
+        file_put_contents(base_path('composer.json'), json_encode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
     }
 
     /**
@@ -69,21 +74,27 @@ class Updater extends Runner
     /**
      * @param Module $module
      */
-    private function copyScriptsToMainComposerJson(Module $module)
+    private function installRequires(Module $module)
     {
-        $scripts = $module->getComposerAttr('scripts', []);
+        $packages = $module->getComposerAttr('require', []);
 
-        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
-
-        foreach ($scripts as $key => $script) {
-            if (array_key_exists($key, $composer['scripts'])) {
-                $composer['scripts'][$key] = array_unique(array_merge($composer['scripts'][$key], $script));
-
-                continue;
-            }
-            $composer['scripts'] = array_merge($composer['scripts'], [$key => $script]);
+        $concatenatedPackages = '';
+        foreach ($packages as $name => $version) {
+            $concatenatedPackages .= "\"{$name}:{$version}\" ";
         }
 
-        file_put_contents(base_path('composer.json'), json_encode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+        if (!empty($concatenatedPackages)) {
+            $this->run("composer require {$concatenatedPackages}{$this->isComposerSilenced()}");
+        }
+    }
+
+    /**
+     * Check if composer should output anything.
+     *
+     * @return string
+     */
+    private function isComposerSilenced()
+    {
+        return config('modules.composer.composer-output') === false ? ' --quiet' : '';
     }
 }

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Actions;
 
@@ -8,16 +19,24 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
-use function Laravel\Prompts\multiselect;
-
 use Nwidart\Modules\Facades\Module;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
+use function Laravel\Prompts\multiselect;
+
 class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
 {
     public const ALL = 'All';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Prune models by module that are no longer needed';
 
     protected $name = 'module:prune';
 
@@ -35,45 +54,13 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
                                 {--pretend : Display the number of prunable records found instead of deleting them}';
 
     /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Prune models by module that are no longer needed';
-
-    protected function promptForMissingArguments(InputInterface $input, OutputInterface $output): void
-    {
-        if ($this->option('all')) {
-            $input->setArgument('module', [self::ALL]);
-
-            return;
-        }
-
-        $selected_item = multiselect(
-            label   : 'Select Modules',
-            options : [
-                self::ALL,
-                ...array_keys(Module::all()),
-            ],
-            required: 'You must select at least one module',
-        );
-
-        $input->setArgument(
-            'module',
-            value: in_array(self::ALL, $selected_item)
-                ? [self::ALL]
-                : $selected_item
-        );
-    }
-
-    /**
      * Determine the models that should be pruned.
      *
      * @return Collection
      */
     protected function models(): Collection
     {
-        if (! empty($models = $this->option('model'))) {
+        if (!empty($models = $this->option('model'))) {
             return collect($models)->filter(function ($model) {
                 return class_exists($model);
             })->values();
@@ -81,7 +68,7 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
 
         $except = $this->option('except');
 
-        if (! empty($models) && ! empty($except)) {
+        if (!empty($models) && !empty($except)) {
             throw new InvalidArgumentException('The --models and --except options cannot be combined.');
         }
 
@@ -111,7 +98,7 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
                     Str::after($model->getRealPath(), realpath(config('modules.paths.modules')))
                 );
             })->values()
-            ->when(! empty($except), function ($models) use ($except) {
+            ->when(!empty($except), function ($models) use ($except) {
                 return $models->reject(function ($model) use ($except) {
                     return in_array($model, $except);
                 });
@@ -120,6 +107,31 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
             })->filter(function ($model) {
                 return $this->isPrunable($model);
             })->values();
+    }
+
+    protected function promptForMissingArguments(InputInterface $input, OutputInterface $output): void
+    {
+        if ($this->option('all')) {
+            $input->setArgument('module', [self::ALL]);
+
+            return;
+        }
+
+        $selected_item = multiselect(
+            label   : 'Select Modules',
+            options : [
+                self::ALL,
+                ...array_keys(Module::all()),
+            ],
+            required: 'You must select at least one module',
+        );
+
+        $input->setArgument(
+            'module',
+            value: in_array(self::ALL, $selected_item)
+                ? [self::ALL]
+                : $selected_item
+        );
     }
 
 }

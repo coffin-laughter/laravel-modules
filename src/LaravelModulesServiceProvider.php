@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules;
 
@@ -28,10 +39,12 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
         $this->registerModules();
 
         $this->registerEvents();
+
         try {
             $this->listenDBLog();
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
         }
+
         try {
             $this->app->make(MacrosRegister::class)->boot();
         } catch (BindingResolutionException $e) {
@@ -73,37 +86,6 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function registerServices(): void
-    {
-        $this->app->singleton(Contracts\RepositoryInterface::class, function ($app) {
-            $path = $app['config']->get('modules.paths.modules');
-
-            return new Laravel\LaravelFileRepository($app, $path);
-        });
-        $this->app->singleton(Contracts\ActivatorInterface::class, function ($app) {
-            $activator = $app['config']->get('modules.activator');
-            $class = $app['config']->get('modules.activators.' . $activator)['class'];
-
-            if ($class === null) {
-                throw InvalidActivatorClass::missingConfig();
-            }
-
-            return new $class($app);
-        });
-        $this->app->alias(Contracts\RepositoryInterface::class, 'modules');
-    }
-    /**
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-23 上午10:07
-     */
-    protected function registerEvents(): void
-    {
-        Event::listen(RequestHandled::class, config('modules.response.request_handled_listener'));
-    }
-
-    /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      *
@@ -124,10 +106,41 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
      * @time  : 2024-05-23 上午10:07
      */
+    protected function registerEvents(): void
+    {
+        Event::listen(RequestHandled::class, config('modules.response.request_handled_listener'));
+    }
+    /**
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-23 上午10:07
+     */
     protected function registerExceptionHandler(): void
     {
         if (isRequestFromAjax()) {
             $this->app->singleton(ExceptionHandler::class, Handler::class);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function registerServices(): void
+    {
+        $this->app->singleton(Contracts\RepositoryInterface::class, function ($app) {
+            $path = $app['config']->get('modules.paths.modules');
+
+            return new Laravel\LaravelFileRepository($app, $path);
+        });
+        $this->app->singleton(Contracts\ActivatorInterface::class, function ($app) {
+            $activator = $app['config']->get('modules.activator');
+            $class = $app['config']->get('modules.activators.' . $activator)['class'];
+
+            if ($class === null) {
+                throw InvalidActivatorClass::missingConfig();
+            }
+
+            return new $class($app);
+        });
+        $this->app->alias(Contracts\RepositoryInterface::class, 'modules');
     }
 }

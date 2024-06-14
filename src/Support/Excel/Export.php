@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -31,13 +30,45 @@ abstract class Export implements FromArray, ShouldAutoSize, WithHeadings, WithCo
 {
     protected array $data;
 
-    protected array $search;
+    protected ?string $filename = null;
 
     protected array $header = [];
 
-    protected ?string $filename = null;
+    protected array $search;
 
     protected bool $unlimitedMemory = false;
+
+    public function columnWidths(): array
+    {
+        $columns = [];
+
+        $column = ord('A') - 1;
+
+        foreach ($this->header as $k => $item) {
+            $column += 1;
+            if (is_string($k) && is_numeric($item)) {
+                $columns[chr($column)] = $item;
+            }
+        }
+
+        return $columns;
+    }
+
+    public function download(string $filename = null): BinaryFileResponse
+    {
+        $filename = $filename ?: $this->getFilename();
+        $writeType = $this->getWriteType();
+
+        return Excel::download(
+            $this,
+            $filename,
+            $writeType,
+            [
+                'filename'   => $filename,
+                'write_type' => $writeType,
+            ]
+        );
+    }
 
     public function export(): string
     {
@@ -65,43 +96,12 @@ abstract class Export implements FromArray, ShouldAutoSize, WithHeadings, WithCo
         }
     }
 
-    public function download(string $filename = null): BinaryFileResponse
+    public function getCsvSettings(): array
     {
-        $filename = $filename ?: $this->getFilename();
-        $writeType = $this->getWriteType();
-
-        return Excel::download(
-            $this,
-            $filename,
-            $writeType,
-            [
-                'filename' => $filename,
-                'write_type' => $writeType,
-            ]
-        );
-    }
-
-    public function setSearch(array $search): static
-    {
-        $this->search = $search;
-
-        return $this;
-    }
-
-    public function getSearch(): array
-    {
-        return $this->search;
-    }
-
-    protected function getWriteType(): string
-    {
-        $toCsvLimit = config('modules.excel.export.csv_limit');
-
-        if ($this instanceof WithCustomCsvSettings && count($this->array()) >= $toCsvLimit) {
-            return \Maatwebsite\Excel\Excel::CSV;
-        }
-
-        return \Maatwebsite\Excel\Excel::XLSX;
+        return [
+            'delimiter' => ';',
+            'use_bom'   => false,
+        ];
     }
 
     public function getExportPath(): string
@@ -113,13 +113,6 @@ abstract class Export implements FromArray, ShouldAutoSize, WithHeadings, WithCo
         }
 
         return $path;
-    }
-
-    public function setFilename(string $filename): static
-    {
-        $this->filename = $filename;
-
-        return $this;
     }
 
     public function getFilename(string $type = null): string
@@ -136,11 +129,9 @@ abstract class Export implements FromArray, ShouldAutoSize, WithHeadings, WithCo
         return $this->header;
     }
 
-    public function setHeader(array $header): static
+    public function getSearch(): array
     {
-        $this->header = $header;
-
-        return $this;
+        return $this->search;
     }
 
     public function headings(): array
@@ -160,27 +151,35 @@ abstract class Export implements FromArray, ShouldAutoSize, WithHeadings, WithCo
         return $headings;
     }
 
-    public function columnWidths(): array
+    public function setFilename(string $filename): static
     {
-        $columns = [];
+        $this->filename = $filename;
 
-        $column = ord('A') - 1;
-
-        foreach ($this->header as $k => $item) {
-            $column += 1;
-            if (is_string($k) && is_numeric($item)) {
-                $columns[chr($column)] = $item;
-            }
-        }
-
-        return $columns;
+        return $this;
     }
 
-    public function getCsvSettings(): array
+    public function setHeader(array $header): static
     {
-        return [
-            'delimiter' => ';',
-            'use_bom' => false,
-        ];
+        $this->header = $header;
+
+        return $this;
+    }
+
+    public function setSearch(array $search): static
+    {
+        $this->search = $search;
+
+        return $this;
+    }
+
+    protected function getWriteType(): string
+    {
+        $toCsvLimit = config('modules.excel.export.csv_limit');
+
+        if ($this instanceof WithCustomCsvSettings && count($this->array()) >= $toCsvLimit) {
+            return \Maatwebsite\Excel\Excel::CSV;
+        }
+
+        return \Maatwebsite\Excel\Excel::XLSX;
     }
 }

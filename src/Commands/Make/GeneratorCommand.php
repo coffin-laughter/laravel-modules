@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -20,18 +31,38 @@ abstract class GeneratorCommand extends Command
     protected $argumentName = '';
 
     /**
-     * Get template contents.
+     * Get class name.
      *
      * @return string
      */
-    abstract protected function getTemplateContents();
+    public function getClass()
+    {
+        return class_basename($this->argument($this->argumentName));
+    }
 
     /**
-     * Get the destination file path.
+     * Get class namespace.
+     *
+     * @param \Nwidart\Modules\Module $module
      *
      * @return string
      */
-    abstract protected function getDestinationFilePath();
+    public function getClassNamespace($module)
+    {
+        $path_namespace = $this->path_namespace(str_replace($this->getClass(), '', $this->argument($this->argumentName)));
+
+        return $this->module_namespace($module->getStudlyName(), $this->getDefaultNamespace() . ($path_namespace ? '\\' . $path_namespace : ''));
+    }
+
+    /**
+     * Get default namespace.
+     *
+     * @return string
+     */
+    public function getDefaultNamespace(): string
+    {
+        return '';
+    }
 
     /**
      * Execute the console command.
@@ -60,42 +91,22 @@ abstract class GeneratorCommand extends Command
         return 0;
     }
 
-    /**
-     * Get class name.
-     *
-     * @return string
-     */
-    public function getClass()
-    {
-        return class_basename($this->argument($this->argumentName));
-    }
-
-    /**
-     * Get default namespace.
-     *
-     * @return string
-     */
-    public function getDefaultNamespace(): string
-    {
-        return '';
-    }
-
-    /**
-     * Get class namespace.
-     *
-     * @param \Nwidart\Modules\Module $module
-     *
-     * @return string
-     */
-    public function getClassNamespace($module)
-    {
-        $path_namespace = $this->path_namespace(str_replace($this->getClass(), '', $this->argument($this->argumentName)));
-
-        return $this->module_namespace($module->getStudlyName(), $this->getDefaultNamespace() . ($path_namespace ? '\\' . $path_namespace : ''));
-    }
-
     public function module(?string $name = null): Module
     {
         return $this->laravel['modules']->findOrFail($name ?? $this->getModuleName());
     }
+
+    /**
+     * Get the destination file path.
+     *
+     * @return string
+     */
+    abstract protected function getDestinationFilePath();
+
+    /**
+     * Get template contents.
+     *
+     * @return string
+     */
+    abstract protected function getTemplateContents();
 }

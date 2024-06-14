@@ -34,21 +34,11 @@ abstract class CoffinException extends HttpException
             $code = $code->value();
         }
 
-        if ($this->code instanceof Enum && ! $code) {
+        if ($this->code instanceof Enum && !$code) {
             $code = $this->code->value();
         }
 
         parent::__construct($this->statusCode(), $message ?: $this->message, null, [], $code);
-    }
-
-    /**
-     * status code
-     *
-     * @return int
-     */
-    public function statusCode(): int
-    {
-        return 500;
     }
 
     /**
@@ -63,5 +53,15 @@ abstract class CoffinException extends HttpException
 
             'message' => $this->message,
         ];
+    }
+
+    /**
+     * status code
+     *
+     * @return int
+     */
+    public function statusCode(): int
+    {
+        return 500;
     }
 }

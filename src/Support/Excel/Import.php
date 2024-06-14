@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -35,21 +34,37 @@ abstract class Import implements ToCollection, WithChunkReading, WithStartRow, W
     use RegistersEventListeners;
     use SkipsFailures;
 
+    protected int $chunk = 0;
+
+    protected int $chunkSize = 200;
+
     protected array $err = [];
 
-    protected static int $total = 0;
+    protected static int $importMaxNum = 5000;
 
     protected array $params = [];
 
     protected int $size = 500;
 
-    protected int $chunk = 0;
-
     protected int $start = 2;
 
-    protected static int $importMaxNum = 5000;
+    protected static int $total = 0;
 
-    protected int $chunkSize = 200;
+    public static function beforeImport(BeforeImport $event): void
+    {
+        $total = $event->getReader()->getTotalRows()['Worksheet'];
+
+        static::$total = $total;
+
+        if ($total > static::$importMaxNum) {
+            throw new FailedException(sprintf('最大支持导入数量 %d 条', self::$importMaxNum));
+        }
+    }
+
+    public function chunkSize(): int
+    {
+        return $this->chunkSize;
+    }
 
     public function import(string|UploadedFile $filePath, string $disk = null, string $readerType = null): int|array
     {
@@ -79,11 +94,17 @@ abstract class Import implements ToCollection, WithChunkReading, WithStartRow, W
             return [
                 'error' => $errors,
                 'total' => static::$total,
-                'path' => $filePath,
+                'path'  => $filePath,
             ];
         }
 
         return static::$total;
+    }
+
+    public function rules(): array
+    {
+        // TODO: Implement rules() method.
+        return [];
     }
 
     public function setParams($params): static
@@ -93,31 +114,9 @@ abstract class Import implements ToCollection, WithChunkReading, WithStartRow, W
         return $this;
     }
 
-    public static function beforeImport(BeforeImport $event): void
-    {
-        $total = $event->getReader()->getTotalRows()['Worksheet'];
-
-        static::$total = $total;
-
-        if ($total > static::$importMaxNum) {
-            throw new FailedException(sprintf('最大支持导入数量 %d 条', self::$importMaxNum));
-        }
-    }
-
-    public function chunkSize(): int
-    {
-        return $this->chunkSize;
-    }
-
     public function startRow(): int
     {
         // TODO: Implement startRow() method.
         return $this->start;
-    }
-
-    public function rules(): array
-    {
-        // TODO: Implement rules() method.
-        return [];
     }
 }

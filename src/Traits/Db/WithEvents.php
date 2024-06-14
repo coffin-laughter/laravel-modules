@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -23,26 +22,11 @@ trait WithEvents
     /**
      * @var Closure|null
      */
-    protected ?Closure $beforeGetList = null;
-
+    protected ?Closure $afterFirstBy = null;
     /**
      * @var Closure|null
      */
-    protected ?Closure $afterFirstBy = null;
-
-    /**
-     * @param Closure $closure
-     * @return $this
-     *
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:39
-     */
-    public function setBeforeGetList(Closure $closure): static
-    {
-        $this->beforeGetList = $closure;
-
-        return $this;
-    }
+    protected ?Closure $beforeGetList = null;
 
     /**
      * @param Closure $closure
@@ -54,6 +38,20 @@ trait WithEvents
     public function setAfterFirstBy(Closure $closure): static
     {
         $this->afterFirstBy = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @param Closure $closure
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-15 下午2:39
+     */
+    public function setBeforeGetList(Closure $closure): static
+    {
+        $this->beforeGetList = $closure;
 
         return $this;
     }

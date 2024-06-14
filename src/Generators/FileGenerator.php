@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Generators;
 
@@ -7,13 +18,6 @@ use Nwidart\Modules\Exceptions\FileAlreadyExistException;
 
 class FileGenerator extends Generator
 {
-    /**
-     * The path wil be used.
-     *
-     * @var string
-     */
-    protected $path;
-
     /**
      * The contens will be used.
      *
@@ -27,6 +31,12 @@ class FileGenerator extends Generator
      * @var \Illuminate\Filesystem\Filesystem|null
      */
     protected $filesystem;
+    /**
+     * The path wil be used.
+     *
+     * @var string
+     */
+    protected $path;
     /**
      * @var bool
      */
@@ -47,6 +57,22 @@ class FileGenerator extends Generator
     }
 
     /**
+     * Generate the file.
+     */
+    public function generate()
+    {
+        $path = $this->getPath();
+        if (!$this->filesystem->exists($path)) {
+            return $this->filesystem->put($path, $this->getContents());
+        }
+        if ($this->overwriteFile === true) {
+            return $this->filesystem->put($path, $this->getContents());
+        }
+
+        throw new FileAlreadyExistException('File already exists!');
+    }
+
+    /**
      * Get contents.
      *
      * @return mixed
@@ -54,6 +80,26 @@ class FileGenerator extends Generator
     public function getContents()
     {
         return $this->contents;
+    }
+
+    /**
+     * Get filesystem.
+     *
+     * @return mixed
+     */
+    public function getFilesystem()
+    {
+        return $this->filesystem;
+    }
+
+    /**
+     * Get path.
+     *
+     * @return mixed
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 
     /**
@@ -71,16 +117,6 @@ class FileGenerator extends Generator
     }
 
     /**
-     * Get filesystem.
-     *
-     * @return mixed
-     */
-    public function getFilesystem()
-    {
-        return $this->filesystem;
-    }
-
-    /**
      * Set filesystem.
      *
      * @param Filesystem $filesystem
@@ -92,16 +128,6 @@ class FileGenerator extends Generator
         $this->filesystem = $filesystem;
 
         return $this;
-    }
-
-    /**
-     * Get path.
-     *
-     * @return mixed
-     */
-    public function getPath()
-    {
-        return $this->path;
     }
 
     /**
@@ -123,21 +149,5 @@ class FileGenerator extends Generator
         $this->overwriteFile = $overwrite;
 
         return $this;
-    }
-
-    /**
-     * Generate the file.
-     */
-    public function generate()
-    {
-        $path = $this->getPath();
-        if (!$this->filesystem->exists($path)) {
-            return $this->filesystem->put($path, $this->getContents());
-        }
-        if ($this->overwriteFile === true) {
-            return $this->filesystem->put($path, $this->getContents());
-        }
-
-        throw new FileAlreadyExistException('File already exists!');
     }
 }

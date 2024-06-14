@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -14,8 +25,13 @@ class CastMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
-    protected $name = 'module:make-cast';
     protected $description = 'Create a new Eloquent cast class for the specified module.';
+    protected $name = 'module:make-cast';
+
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.casts.namespace', 'Casts');
+    }
 
     public function getDestinationFilePath(): string
     {
@@ -26,22 +42,17 @@ class CastMakeCommand extends GeneratorCommand
         return $path . $filePath . '/' . $this->getCastName() . '.php';
     }
 
-    protected function getTemplateContents(): string
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'CLASS_NAMESPACE'   => $this->getClassNamespace($module),
-            'CLASS'             => $this->getClassNameWithoutNamespace(),
-        ]))->render();
-    }
-
     protected function getArguments(): array
     {
         return [
             ['name', InputArgument::REQUIRED, 'The name of the cast class.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
+    }
+
+    protected function getCastName(): array|string
+    {
+        return Str::studly($this->argument('name'));
     }
 
     /**
@@ -54,23 +65,23 @@ class CastMakeCommand extends GeneratorCommand
         ];
     }
 
-    protected function getCastName(): array|string
+    protected function getStubName(): string
     {
-        return Str::studly($this->argument('name'));
+        return '/cast.stub';
+    }
+
+    protected function getTemplateContents(): string
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'CLASS_NAMESPACE'   => $this->getClassNamespace($module),
+            'CLASS'             => $this->getClassNameWithoutNamespace(),
+        ]))->render();
     }
 
     private function getClassNameWithoutNamespace(): array|string
     {
         return class_basename($this->getCastName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.casts.namespace', 'Casts');
-    }
-
-    protected function getStubName(): string
-    {
-        return '/cast.stub';
     }
 }

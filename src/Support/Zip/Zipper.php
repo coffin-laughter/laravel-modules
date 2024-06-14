@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
- *  | Module [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
  *  +-------------------------------------------------------------------------------------------
  *  | This is not a free software, without any authorization is not allowed to use and spread.
  *  +-------------------------------------------------------------------------------------------
@@ -30,17 +29,16 @@ class Zipper
     /**
      * Constant for extracting
      */
-    public const WHITELIST = 1;
-
-    /**
-     * Constant for extracting
-     */
     public const BLACKLIST = 2;
 
     /**
      * Constant for matching only strictly equal file names
      */
     public const EXACT_MATCH = 4;
+    /**
+     * Constant for extracting
+     */
+    public const WHITELIST = 1;
 
     /**
      * @var string Represents the current location in the archive
@@ -53,14 +51,14 @@ class Zipper
     private Filesystem $file;
 
     /**
-     * @var ZipRepository|null Handler to the archive
-     */
-    private ?ZipRepository $repository;
-
-    /**
      * @var string The path to the current zip file
      */
     private string $filePath;
+
+    /**
+     * @var ZipRepository|null Handler to the archive
+     */
+    private ?ZipRepository $repository;
 
     /**
      * Constructor
@@ -83,151 +81,6 @@ class Zipper
     }
 
     /**
-     * Create a new zip Archive if the file does not exists
-     * opens a zip archive if the file exists
-     *
-     * @param $pathToFile string The file to open
-     * @return $this Zipper instance
-     * @throws Exception
-     */
-    public function make(string $pathToFile): \Nwidart\Modules\Support\Zip\Zipper
-    {
-        $new = $this->createArchiveFile($pathToFile);
-
-        $this->repository = new ZipRepository($pathToFile, $new);
-
-        $this->filePath = $pathToFile;
-
-        return $this;
-    }
-
-    /**
-     * Create a new zip archive or open an existing one
-     *
-     * @param $pathToFile
-     *
-     * @return $this
-     * @throws Exception
-     */
-    public function zip($pathToFile): Zipper
-    {
-        $this->make($pathToFile);
-
-        return $this;
-    }
-
-    /**
-     * Create a new phar file or open one
-     *
-     * @param $pathToFile
-     *
-     * @return $this
-     * @throws Exception
-     */
-    public function phar($pathToFile): Zipper
-    {
-        $this->make($pathToFile, 'phar');
-
-        return $this;
-    }
-
-    /**
-     * Create a new rar file or open one
-     *
-     * @param $pathToFile
-     *
-     * @return $this
-     * @throws Exception
-     */
-    public function rar($pathToFile): Zipper
-    {
-        $this->make($pathToFile, 'rar');
-
-        return $this;
-    }
-
-    /**
-     * Extracts the opened zip archive to the specified location <br/>
-     * you can provide an array of files and folders and define if they should be a white list
-     * or a black list to extract. By default this method compares file names using "string starts with" logic
-     *
-     * @param $path string The path to extract to
-     * @param array $files An array of files
-     * @param int $methodFlags The Method the files should be treated
-     *
-     * @throws Exception
-     */
-    public function extractTo(string $path, array $files = [], int $methodFlags = self::BLACKLIST): void
-    {
-        if (! $this->file->exists($path) && ! $this->file->makeDirectory($path, 0755, true)) {
-            throw new RuntimeException('Failed to create folder');
-        }
-
-        if ($methodFlags & self::EXACT_MATCH) {
-            $matchingMethod = function ($haystack) use ($files) {
-                return in_array($haystack, $files, true);
-            };
-        } else {
-            $matchingMethod = function ($haystack) use ($files) {
-                return Str::startsWith($haystack, $files);
-            };
-        }
-
-        if ($methodFlags & self::WHITELIST) {
-            $this->extractFilesInternal($path, $matchingMethod);
-        } else {
-            // blacklist - extract files that do not match with $matchingMethod
-            $this->extractFilesInternal($path, function ($filename) use ($matchingMethod) {
-                return ! $matchingMethod($filename);
-            });
-        }
-    }
-
-    /**
-     * Extracts matching files/folders from the opened zip archive to the specified location.
-     *
-     * @param string $extractToPath The path to extract to
-     * @param string $regex regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
-     *
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
-     */
-    public function extractMatchingRegex(string $extractToPath, string $regex): void
-    {
-        if (empty($regex)) {
-            throw new InvalidArgumentException('Missing pass valid regex parameter');
-        }
-
-        $this->extractFilesInternal($extractToPath, function ($filename) use ($regex) {
-            $match = preg_match($regex, $filename);
-            if ($match === 1) {
-                return true;
-            } elseif ($match === false) {
-                throw new RuntimeException("regular expression match on '$filename' failed with error. Please check if pattern is valid regular expression.");
-            }
-
-            return false;
-        });
-    }
-
-    /**
-     * Gets the content of a single file if available
-     *
-     * @param $filePath string The full path (including all folders) of the file in the zip
-     *
-     * @return string returns the content or throws an exception
-     * @throws Exception
-     */
-    public function getFileContent(string $filePath): string
-    {
-        if ($this->repository->fileExists($filePath) === false) {
-            throw new Exception(sprintf('The file "%s" cannot be found', $filePath));
-        }
-
-        return $this->repository->getFileContent($filePath);
-    }
-
-    /**
      * Add one or multiple files to the zip.
      *
      * @param $pathToAdd array|string An array or string of files and folders to add
@@ -239,7 +92,7 @@ class Zipper
     {
         if (is_array($pathToAdd)) {
             foreach ($pathToAdd as $key => $dir) {
-                if (! is_int($key)) {
+                if (!is_int($key)) {
                     $this->add($dir, $key);
                 } else {
                     $this->add($dir);
@@ -288,61 +141,6 @@ class Zipper
     }
 
     /**
-     * Gets the status of the zip.
-     *
-     * @return string The status of the internal zip file
-     */
-    public function getStatus(): string
-    {
-        return $this->repository->getStatus();
-    }
-
-    /**
-     * Remove a file or array of files and folders from the zip archive
-     *
-     * @param $fileToRemove array|string The path/array to the files in the zip
-     *
-     * @return $this Zipper instance
-     */
-    public function remove(array|string $fileToRemove): Zipper
-    {
-        if (is_array($fileToRemove)) {
-            $self = $this;
-            $this->repository->each(function ($file) use ($fileToRemove, $self) {
-                if (Str::startsWith($file, $fileToRemove)) {
-                    $self->getRepository()->removeFile($file);
-                }
-            });
-        } else {
-            $this->repository->removeFile($fileToRemove);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Returns the path of the current zip file if there is one.
-     *
-     * @return string The path to the file
-     */
-    public function getFilePath(): string
-    {
-        return $this->filePath;
-    }
-
-    /**
-     * Sets the password to be used for decompressing
-     *
-     * @param $password
-     *
-     * @return bool
-     */
-    public function usePassword($password): bool
-    {
-        return $this->repository->usePassword($password);
-    }
-
-    /**
      * Closes the zip file and frees all handles
      */
     public function close(): void
@@ -351,6 +149,95 @@ class Zipper
             $this->repository->close();
         }
         $this->filePath = '';
+    }
+
+    /**
+     * Checks if a file is present in the archive
+     *
+     * @param $fileInArchive
+     *
+     * @return bool
+     */
+    public function contains($fileInArchive): bool
+    {
+        return $this->repository->fileExists($fileInArchive);
+    }
+
+    /**
+     * Deletes the archive file
+     */
+    public function delete(): void
+    {
+        if (null !== $this->repository) {
+            $this->repository->close();
+        }
+
+        $this->file->delete($this->filePath);
+        $this->filePath = '';
+    }
+
+    /**
+     * Extracts matching files/folders from the opened zip archive to the specified location.
+     *
+     * @param string $extractToPath The path to extract to
+     * @param string $regex regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
+     *
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public function extractMatchingRegex(string $extractToPath, string $regex): void
+    {
+        if (empty($regex)) {
+            throw new InvalidArgumentException('Missing pass valid regex parameter');
+        }
+
+        $this->extractFilesInternal($extractToPath, function ($filename) use ($regex) {
+            $match = preg_match($regex, $filename);
+            if ($match === 1) {
+                return true;
+            } elseif ($match === false) {
+                throw new RuntimeException("regular expression match on '$filename' failed with error. Please check if pattern is valid regular expression.");
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Extracts the opened zip archive to the specified location <br/>
+     * you can provide an array of files and folders and define if they should be a white list
+     * or a black list to extract. By default this method compares file names using "string starts with" logic
+     *
+     * @param $path string The path to extract to
+     * @param array $files An array of files
+     * @param int $methodFlags The Method the files should be treated
+     *
+     * @throws Exception
+     */
+    public function extractTo(string $path, array $files = [], int $methodFlags = self::BLACKLIST): void
+    {
+        if (!$this->file->exists($path) && !$this->file->makeDirectory($path, 0755, true)) {
+            throw new RuntimeException('Failed to create folder');
+        }
+
+        if ($methodFlags & self::EXACT_MATCH) {
+            $matchingMethod = function ($haystack) use ($files) {
+                return in_array($haystack, $files, true);
+            };
+        } else {
+            $matchingMethod = function ($haystack) use ($files) {
+                return Str::startsWith($haystack, $files);
+            };
+        }
+
+        if ($methodFlags & self::WHITELIST) {
+            $this->extractFilesInternal($path, $matchingMethod);
+        } else {
+            // blacklist - extract files that do not match with $matchingMethod
+            $this->extractFilesInternal($path, function ($filename) use ($matchingMethod) {
+                return !$matchingMethod($filename);
+            });
+        }
     }
 
     /**
@@ -366,31 +253,6 @@ class Zipper
         $this->currentFolder = $path;
 
         return $this;
-    }
-
-    /**
-     * Resets the internal folder to the root of the zip file.
-     *
-     * @return $this
-     */
-    public function home(): Zipper
-    {
-        $this->currentFolder = '';
-
-        return $this;
-    }
-
-    /**
-     * Deletes the archive file
-     */
-    public function delete(): void
-    {
-        if (null !== $this->repository) {
-            $this->repository->close();
-        }
-
-        $this->file->delete($this->filePath);
-        $this->filePath = '';
     }
 
     /**
@@ -414,23 +276,20 @@ class Zipper
     }
 
     /**
-     * Checks if a file is present in the archive
+     * Gets the content of a single file if available
      *
-     * @param $fileInArchive
+     * @param $filePath string The full path (including all folders) of the file in the zip
      *
-     * @return bool
+     * @return string returns the content or throws an exception
+     * @throws Exception
      */
-    public function contains($fileInArchive): bool
+    public function getFileContent(string $filePath): string
     {
-        return $this->repository->fileExists($fileInArchive);
-    }
+        if ($this->repository->fileExists($filePath) === false) {
+            throw new Exception(sprintf('The file "%s" cannot be found', $filePath));
+        }
 
-    /**
-     * @return ZipRepository
-     */
-    public function getRepository(): ZipRepository
-    {
-        return $this->repository;
+        return $this->repository->getFileContent($filePath);
     }
 
     /**
@@ -442,6 +301,16 @@ class Zipper
     }
 
     /**
+     * Returns the path of the current zip file if there is one.
+     *
+     * @return string The path to the file
+     */
+    public function getFilePath(): string
+    {
+        return $this->filePath;
+    }
+
+    /**
      * Gets the path to the internal folder
      *
      * @return string
@@ -449,6 +318,36 @@ class Zipper
     public function getInternalPath(): string
     {
         return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
+    }
+
+    /**
+     * @return ZipRepository
+     */
+    public function getRepository(): ZipRepository
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Gets the status of the zip.
+     *
+     * @return string The status of the internal zip file
+     */
+    public function getStatus(): string
+    {
+        return $this->repository->getStatus();
+    }
+
+    /**
+     * Resets the internal folder to the root of the zip file.
+     *
+     * @return $this
+     */
+    public function home(): Zipper
+    {
+        $this->currentFolder = '';
+
+        return $this;
     }
 
     /**
@@ -487,42 +386,103 @@ class Zipper
         return $filesList;
     }
 
-    private function getCurrentFolderWithTrailingSlash(): string
-    {
-        if (empty($this->currentFolder)) {
-            return '';
-        }
-
-        $lastChar = mb_substr($this->currentFolder, -1);
-        if ($lastChar !== '/' || $lastChar !== '\\') {
-            return $this->currentFolder . '/';
-        }
-
-        return $this->currentFolder;
-    }
-
-    //---------------------PRIVATE FUNCTIONS-------------
-
     /**
-     * @param $pathToZip
+     * Create a new zip Archive if the file does not exists
+     * opens a zip archive if the file exists
      *
-     * @return bool
+     * @param $pathToFile string The file to open
+     * @return $this Zipper instance
      * @throws Exception
      */
-    private function createArchiveFile($pathToZip): bool
+    public function make(string $pathToFile): \Nwidart\Modules\Support\Zip\Zipper
     {
-        if (! $this->file->exists($pathToZip)) {
-            $dirname = dirname($pathToZip);
-            if (! $this->file->exists($dirname) && ! $this->file->makeDirectory($dirname, 0755, true)) {
-                throw new RuntimeException('Failed to create folder');
-            } elseif (! $this->file->isWritable($dirname)) {
-                throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
-            }
+        $new = $this->createArchiveFile($pathToFile);
 
-            return true;
+        $this->repository = new ZipRepository($pathToFile, $new);
+
+        $this->filePath = $pathToFile;
+
+        return $this;
+    }
+
+    /**
+     * Create a new phar file or open one
+     *
+     * @param $pathToFile
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function phar($pathToFile): Zipper
+    {
+        $this->make($pathToFile, 'phar');
+
+        return $this;
+    }
+
+    /**
+     * Create a new rar file or open one
+     *
+     * @param $pathToFile
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function rar($pathToFile): Zipper
+    {
+        $this->make($pathToFile, 'rar');
+
+        return $this;
+    }
+
+    /**
+     * Remove a file or array of files and folders from the zip archive
+     *
+     * @param $fileToRemove array|string The path/array to the files in the zip
+     *
+     * @return $this Zipper instance
+     */
+    public function remove(array|string $fileToRemove): Zipper
+    {
+        if (is_array($fileToRemove)) {
+            $self = $this;
+            $this->repository->each(function ($file) use ($fileToRemove, $self) {
+                if (Str::startsWith($file, $fileToRemove)) {
+                    $self->getRepository()->removeFile($file);
+                }
+            });
+        } else {
+            $this->repository->removeFile($fileToRemove);
         }
 
-        return false;
+        return $this;
+    }
+
+    /**
+     * Sets the password to be used for decompressing
+     *
+     * @param $password
+     *
+     * @return bool
+     */
+    public function usePassword($password): bool
+    {
+        return $this->repository->usePassword($password);
+    }
+
+    /**
+     * Create a new zip archive or open an existing one
+     *
+     * @param $pathToFile
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function zip($pathToFile): Zipper
+    {
+        $this->make($pathToFile);
+
+        return $this;
     }
 
     /**
@@ -552,7 +512,7 @@ class Zipper
      */
     private function addFile(string $pathToAdd, string $fileName = null): void
     {
-        if (! $fileName) {
+        if (!$fileName) {
             $info = pathinfo($pathToAdd);
             $fileName = isset($info['extension']) ?
                 $info['filename'] . '.' . $info['extension'] :
@@ -573,12 +533,36 @@ class Zipper
         $this->repository->addFromString($this->getInternalPath() . $filename, $content);
     }
 
+    //---------------------PRIVATE FUNCTIONS-------------
+
+    /**
+     * @param $pathToZip
+     *
+     * @return bool
+     * @throws Exception
+     */
+    private function createArchiveFile($pathToZip): bool
+    {
+        if (!$this->file->exists($pathToZip)) {
+            $dirname = dirname($pathToZip);
+            if (!$this->file->exists($dirname) && !$this->file->makeDirectory($dirname, 0755, true)) {
+                throw new RuntimeException('Failed to create folder');
+            } elseif (!$this->file->isWritable($dirname)) {
+                throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     private function extractFilesInternal($path, callable $matchingMethod): void
     {
         $self = $this;
         $this->repository->each(function ($fileName) use ($path, $matchingMethod, $self) {
             $currentPath = $self->getCurrentFolderWithTrailingSlash();
-            if (! empty($currentPath) && ! Str::startsWith($fileName, $currentPath)) {
+            if (!empty($currentPath) && !Str::startsWith($fileName, $currentPath)) {
                 return;
             }
 
@@ -606,12 +590,26 @@ class Zipper
 
         // We need to create the directory first in case it doesn't exist
         $dir = pathinfo($path . DIRECTORY_SEPARATOR . $tmpPath, PATHINFO_DIRNAME);
-        if (! $this->file->exists($dir) && ! $this->file->makeDirectory($dir, 0755, true, true)) {
+        if (!$this->file->exists($dir) && !$this->file->makeDirectory($dir, 0755, true, true)) {
             throw new RuntimeException('Failed to create folders');
         }
 
         $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
         $fileStream = $this->getRepository()->getFileStream($fileName);
         $this->getFileHandler()->put($toPath, $fileStream);
+    }
+
+    private function getCurrentFolderWithTrailingSlash(): string
+    {
+        if (empty($this->currentFolder)) {
+            return '';
+        }
+
+        $lastChar = mb_substr($this->currentFolder, -1);
+        if ($lastChar !== '/' || $lastChar !== '\\') {
+            return $this->currentFolder . '/';
+        }
+
+        return $this->currentFolder;
     }
 }

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Process;
 
@@ -10,31 +21,17 @@ use Symfony\Component\Process\Process;
 class Installer
 {
     /**
-     * The module name.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The version of module being installed.
-     *
-     * @var string
-     */
-    protected $version;
-
-    /**
-     * The module repository instance.
-     * @var \Nwidart\Modules\Contracts\RepositoryInterface
-     */
-    protected $repository;
-
-    /**
      * The console command instance.
      *
      * @var \Illuminate\Console\Command
      */
     protected $console;
+    /**
+     * The module name.
+     *
+     * @var string
+     */
+    protected $name;
 
     /**
      * The destionation path.
@@ -44,19 +41,32 @@ class Installer
     protected $path;
 
     /**
+     * The module repository instance.
+     * @var \Nwidart\Modules\Contracts\RepositoryInterface
+     */
+    protected $repository;
+
+    /**
      * The process timeout.
      *
      * @var int
      */
     protected $timeout = 3360;
+
     /**
-     * @var null|string
+     * The version of module being installed.
+     *
+     * @var string
      */
-    private $type;
+    protected $version;
     /**
      * @var bool
      */
     private $tree;
+    /**
+     * @var null|string
+     */
+    private $type;
 
     /**
      * The constructor.
@@ -75,77 +85,53 @@ class Installer
     }
 
     /**
-     * Set destination path.
+     * Get branch name.
      *
-     * @param string $path
-     *
-     * @return $this
+     * @return string
      */
-    public function setPath($path)
+    public function getBranch()
     {
-        $this->path = $path;
-
-        return $this;
+        return is_null($this->version) ? 'master' : $this->version;
     }
 
     /**
-     * Set the module repository instance.
-     * @param \Nwidart\Modules\Contracts\RepositoryInterface $repository
-     * @return $this
+     * Get destination path.
+     *
+     * @return string
      */
-    public function setRepository(RepositoryInterface $repository)
+    public function getDestinationPath()
     {
-        $this->repository = $repository;
-
-        return $this;
-    }
-
-    /**
-     * Set console command instance.
-     *
-     * @param \Illuminate\Console\Command $console
-     *
-     * @return $this
-     */
-    public function setConsole(Command $console)
-    {
-        $this->console = $console;
-
-        return $this;
-    }
-
-    /**
-     * Set process timeout.
-     *
-     * @param int $timeout
-     *
-     * @return $this
-     */
-    public function setTimeout($timeout)
-    {
-        $this->timeout = $timeout;
-
-        return $this;
-    }
-
-    /**
-     * Run the installation process.
-     *
-     * @return \Symfony\Component\Process\Process
-     */
-    public function run()
-    {
-        $process = $this->getProcess();
-
-        $process->setTimeout($this->timeout);
-
-        if ($this->console instanceof Command) {
-            $process->run(function ($type, $line) {
-                $this->console->line($line);
-            });
+        if ($this->path) {
+            return $this->path;
         }
 
-        return $process;
+        return $this->repository->getModulePath($this->getModuleName());
+    }
+
+    /**
+     * Get module name.
+     *
+     * @return string
+     */
+    public function getModuleName()
+    {
+        $parts = explode('/', $this->name);
+
+        return Str::studly(end($parts));
+    }
+
+    /**
+     * Get composer package name.
+     *
+     * @return string
+     */
+    public function getPackageName()
+    {
+        if (is_null($this->version)) {
+            return $this->name . ':dev-master';
+        }
+
+        return $this->name . ':' . $this->version;
     }
 
     /**
@@ -164,20 +150,6 @@ class Installer
         }
 
         return $this->installViaComposer();
-    }
-
-    /**
-     * Get destination path.
-     *
-     * @return string
-     */
-    public function getDestinationPath()
-    {
-        if ($this->path) {
-            return $this->path;
-        }
-
-        return $this->repository->getModulePath($this->getModuleName());
     }
 
     /**
@@ -221,39 +193,17 @@ class Installer
     }
 
     /**
-     * Get branch name.
+     * Install the module via composer.
      *
-     * @return string
+     * @return \Symfony\Component\Process\Process
      */
-    public function getBranch()
+    public function installViaComposer()
     {
-        return is_null($this->version) ? 'master' : $this->version;
-    }
-
-    /**
-     * Get module name.
-     *
-     * @return string
-     */
-    public function getModuleName()
-    {
-        $parts = explode('/', $this->name);
-
-        return Str::studly(end($parts));
-    }
-
-    /**
-     * Get composer package name.
-     *
-     * @return string
-     */
-    public function getPackageName()
-    {
-        if (is_null($this->version)) {
-            return $this->name . ':dev-master';
-        }
-
-        return $this->name . ':' . $this->version;
+        return Process::fromShellCommandline(sprintf(
+            'cd %s && composer require %s',
+            base_path(),
+            $this->getPackageName()
+        ));
     }
 
     /**
@@ -292,16 +242,76 @@ class Installer
     }
 
     /**
-     * Install the module via composer.
+     * Run the installation process.
      *
      * @return \Symfony\Component\Process\Process
      */
-    public function installViaComposer()
+    public function run()
     {
-        return Process::fromShellCommandline(sprintf(
-            'cd %s && composer require %s',
-            base_path(),
-            $this->getPackageName()
-        ));
+        $process = $this->getProcess();
+
+        $process->setTimeout($this->timeout);
+
+        if ($this->console instanceof Command) {
+            $process->run(function ($type, $line) {
+                $this->console->line($line);
+            });
+        }
+
+        return $process;
+    }
+
+    /**
+     * Set console command instance.
+     *
+     * @param \Illuminate\Console\Command $console
+     *
+     * @return $this
+     */
+    public function setConsole(Command $console)
+    {
+        $this->console = $console;
+
+        return $this;
+    }
+
+    /**
+     * Set destination path.
+     *
+     * @param string $path
+     *
+     * @return $this
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the module repository instance.
+     * @param \Nwidart\Modules\Contracts\RepositoryInterface $repository
+     * @return $this
+     */
+    public function setRepository(RepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
+
+    /**
+     * Set process timeout.
+     *
+     * @param int $timeout
+     *
+     * @return $this
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+
+        return $this;
     }
 }

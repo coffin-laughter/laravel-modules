@@ -28,15 +28,13 @@ use Nwidart\Modules\Traits\Db\WithAttributes;
 
 abstract class CoffinModel extends Model
 {
-    use WithAttributes;
     use BaseOperate;
-    use Trans;
-    use SoftDeletes;
     use ScopeTrait;
+    use SoftDeletes;
+    use Trans;
+    use WithAttributes;
 
     protected $dateFormat = 'U';
-
-    protected $perPage = 10;
 
     protected array $defaultCasts = [
         'created_at' => 'datetime:Y-m-d H:i',
@@ -46,11 +44,22 @@ abstract class CoffinModel extends Model
 
     protected array $defaultHidden = ['deleted_at'];
 
+    protected $perPage = 10;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
         $this->init();
+    }
+
+    /**
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-21 下午5:54
+     */
+    public static function bootSoftDeletes(): void
+    {
+        static::addGlobalScope(new SoftDelete());
     }
 
     protected function init()
@@ -65,15 +74,6 @@ abstract class CoffinModel extends Model
                 $this->setDataRange();
             }
         }
-    }
-
-    /**
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-21 下午5:54
-     */
-    public static function bootSoftDeletes(): void
-    {
-        static::addGlobalScope(new SoftDelete());
     }
 
     /**

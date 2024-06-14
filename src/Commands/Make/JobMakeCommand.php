@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -13,12 +24,7 @@ class JobMakeCommand extends GeneratorCommand
 {
     use ModuleCommandTrait;
 
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-job';
+    protected $argumentName = 'name';
 
     /**
      * The console command description.
@@ -27,7 +33,12 @@ class JobMakeCommand extends GeneratorCommand
      */
     protected $description = 'Create a new job class for the specified module';
 
-    protected $argumentName = 'name';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-job';
 
     public function getDefaultNamespace(): string
     {
@@ -49,6 +60,20 @@ class JobMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the destination file path.
+     *
+     * @return string
+     */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $jobPath = GenerateConfigReader::read('jobs');
+
+        return $path . $jobPath->getPath() . '/' . $this->getFileName() . '.php';
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -58,6 +83,18 @@ class JobMakeCommand extends GeneratorCommand
         return [
             ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous.'],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStubName(): string
+    {
+        if ($this->option('sync')) {
+            return '/job.stub';
+        }
+
+        return '/job-queued.stub';
     }
 
     /**
@@ -76,36 +113,10 @@ class JobMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the destination file path.
-     *
-     * @return string
-     */
-    protected function getDestinationFilePath()
-    {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $jobPath = GenerateConfigReader::read('jobs');
-
-        return $path . $jobPath->getPath() . '/' . $this->getFileName() . '.php';
-    }
-
-    /**
      * @return string
      */
     private function getFileName()
     {
         return Str::studly($this->argument('name'));
-    }
-
-    /**
-     * @return string
-     */
-    protected function getStubName(): string
-    {
-        if ($this->option('sync')) {
-            return '/job.stub';
-        }
-
-        return '/job-queued.stub';
     }
 }
