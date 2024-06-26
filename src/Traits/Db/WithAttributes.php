@@ -136,6 +136,20 @@ trait WithAttributes
     }
 
     /**
+     * @param bool $isPaginate
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-15 下午2:38
+     */
+    public function setPaginate(bool $isPaginate = true): static
+    {
+        $this->isPaginate = $isPaginate;
+
+        return $this;
+    }
+
+    /**
      * @param string $parentId
      * @return $this
      *
@@ -145,6 +159,20 @@ trait WithAttributes
     public function setParentIdColumn(string $parentId): static
     {
         $this->parentIdColumn = $parentId;
+
+        return $this;
+    }
+
+    /**
+     * @param string $sortField
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-05-15 下午2:38
+     */
+    public function setSortField(string $sortField): static
+    {
+        $this->sortField = $sortField;
 
         return $this;
     }
@@ -160,34 +188,6 @@ trait WithAttributes
         if (property_exists($this, 'form') && !empty($this->form)) {
             $this->form = [];
         }
-
-        return $this;
-    }
-
-    /**
-     * @param bool $isPaginate
-     * @return $this
-     *
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:38
-     */
-    protected function setPaginate(bool $isPaginate = true): static
-    {
-        $this->isPaginate = $isPaginate;
-
-        return $this;
-    }
-
-    /**
-     * @param string $sortField
-     * @return $this
-     *
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:38
-     */
-    protected function setSortField(string $sortField): static
-    {
-        $this->sortField = $sortField;
 
         return $this;
     }
