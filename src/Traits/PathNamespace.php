@@ -63,6 +63,7 @@ trait PathNamespace
     {
         return $this->studly_path($namespace, $ds);
     }
+
     /**
      * Get a well-formatted StudlyCase representation of path components.
      */

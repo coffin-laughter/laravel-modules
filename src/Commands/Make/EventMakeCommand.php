@@ -74,6 +74,7 @@ class EventMakeCommand extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'The name of the event.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 

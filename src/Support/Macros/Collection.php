@@ -39,12 +39,14 @@ class Collection
             $items = $this->toArray();
             $export = new class ($items, $header) extends Export {
                 protected array $items;
+
                 public function __construct(array $items, array $header)
                 {
                     $this->items = $items;
 
                     $this->header = $header;
                 }
+
                 public function array(): array
                 {
                     // TODO: Implement array() method.
@@ -62,12 +64,14 @@ class Collection
             $items = $this->toArray();
             $export = new class ($items, $header) extends Export {
                 protected array $items;
+
                 public function __construct(array $items, array $header)
                 {
                     $this->items = $items;
 
                     $this->header = $header;
                 }
+
                 public function array(): array
                 {
                     // TODO: Implement array() method.

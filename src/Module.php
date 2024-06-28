@@ -71,8 +71,8 @@ abstract class Module
     /**
      * The constructor.
      * @param Container $app
-     * @param $name
-     * @param $path
+     * @param           $name
+     * @param           $path
      */
     public function __construct(Container $app, string $name, $path)
     {
@@ -153,7 +153,7 @@ abstract class Module
      * Get a specific data from json file by given the key.
      *
      * @param string $key
-     * @param null $default
+     * @param null   $default
      *
      * @return mixed
      */
@@ -213,7 +213,7 @@ abstract class Module
     /**
      * Get a specific data from composer.json file by given the key.
      *
-     * @param $key
+     * @param      $key
      * @param null $default
      *
      * @return mixed
@@ -465,8 +465,8 @@ abstract class Module
     /**
      * Register a translation file namespace.
      *
-     * @param  string  $path
-     * @param  string  $namespace
+     * @param string $path
+     * @param string $namespace
      * @return void
      */
     private function loadTranslationsFrom(string $path, string $namespace): void

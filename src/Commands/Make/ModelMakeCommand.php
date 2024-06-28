@@ -44,6 +44,7 @@ class ModelMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'module:make-model';
+
     /**
      * Get default namespace.
      *
@@ -80,6 +81,7 @@ class ModelMakeCommand extends GeneratorCommand
         return [
             ['model', InputArgument::REQUIRED, 'The name of model will be created.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 
@@ -136,15 +138,15 @@ class ModelMakeCommand extends GeneratorCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub('/model.stub', [
-            'NAME'              => $this->getModelName(),
-            'FILLABLE'          => $this->getFillable(),
-            'NAMESPACE'         => $this->getClassNamespace($module),
-            'CLASS'             => $this->getClass(),
-            'LOWER_NAME'        => $module->getLowerName(),
-            'MODULE'            => $this->getModuleName(),
-            'STUDLY_NAME'       => $module->getStudlyName(),
-            'MODULE_NAMESPACE'  => $this->laravel['modules']->config('namespace'),
-            'TABLE'             => $this->getTableName(),
+            'NAME'             => $this->getModelName(),
+            'FILLABLE'         => $this->getFillable(),
+            'NAMESPACE'        => $this->getClassNamespace($module),
+            'CLASS'            => $this->getClass(),
+            'LOWER_NAME'       => $module->getLowerName(),
+            'MODULE'           => $this->getModuleName(),
+            'STUDLY_NAME'      => $module->getStudlyName(),
+            'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
+            'TABLE'            => $this->getTableName(),
         ]))->render();
     }
 

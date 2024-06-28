@@ -111,11 +111,11 @@ class ObserverMakeCommand extends GeneratorCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub('/observer.stub', [
-                'NAMESPACE'       => $this->getClassNamespace($module),
-                'NAME'            => $this->getModelName(),
-                'MODEL_NAMESPACE' => $this->getModelNamespace(),
-                'NAME_VARIABLE'   => $this->getModelVariable(),
-            ]))->render();
+            'NAMESPACE'       => $this->getClassNamespace($module),
+            'NAME'            => $this->getModelName(),
+            'MODEL_NAMESPACE' => $this->getModelNamespace(),
+            'NAME_VARIABLE'   => $this->getModelVariable(),
+        ]))->render();
     }
 
     /**
@@ -135,7 +135,7 @@ class ObserverMakeCommand extends GeneratorCommand
     }
 
     /**
-     *  @return mixed|string
+     * @return mixed|string
      */
     private function getModelVariable(): string
     {

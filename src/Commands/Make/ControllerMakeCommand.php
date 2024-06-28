@@ -75,6 +75,7 @@ class ControllerMakeCommand extends GeneratorCommand
         return [
             ['controller', InputArgument::REQUIRED, 'The name of the controller class.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 

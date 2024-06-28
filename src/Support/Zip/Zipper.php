@@ -83,7 +83,7 @@ class Zipper
     /**
      * Add one or multiple files to the zip.
      *
-     * @param $pathToAdd array|string An array or string of files and folders to add
+     * @param            $pathToAdd array|string An array or string of files and folders to add
      * @param mixed|null $fileName
      *
      * @return $this Zipper instance
@@ -129,7 +129,7 @@ class Zipper
      * Add a file to the zip using its contents
      *
      * @param $filename string The name of the file to create
-     * @param $content string The file contents
+     * @param $content  string The file contents
      *
      * @return $this Zipper instance
      */
@@ -180,7 +180,7 @@ class Zipper
      * Extracts matching files/folders from the opened zip archive to the specified location.
      *
      * @param string $extractToPath The path to extract to
-     * @param string $regex regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
+     * @param string $regex         regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
@@ -208,9 +208,9 @@ class Zipper
      * you can provide an array of files and folders and define if they should be a white list
      * or a black list to extract. By default this method compares file names using "string starts with" logic
      *
-     * @param $path string The path to extract to
-     * @param array $files An array of files
-     * @param int $methodFlags The Method the files should be treated
+     * @param       $path        string The path to extract to
+     * @param array $files       An array of files
+     * @param int   $methodFlags The Method the files should be treated
      *
      * @throws Exception
      */
@@ -507,7 +507,7 @@ class Zipper
     /**
      * Add the file to the zip
      *
-     * @param string $pathToAdd
+     * @param string      $pathToAdd
      * @param string|null $fileName
      */
     private function addFile(string $pathToAdd, string $fileName = null): void

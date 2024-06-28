@@ -18,6 +18,7 @@ use Nwidart\Modules\Traits\PathNamespace;
 class GeneratorPath
 {
     use PathNamespace;
+
     private $generate;
     private $namespace;
 
@@ -34,7 +35,7 @@ class GeneratorPath
         }
 
         $this->path = $config;
-        $this->generate = (bool) $config;
+        $this->generate = (bool)$config;
         $this->namespace = $this->path_namespace(ltrim($config, config('modules.paths.app_folder', '')));
     }
 

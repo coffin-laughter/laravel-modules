@@ -102,6 +102,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
             });
         }
     }
+
     /**
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
      * @time  : 2024-05-23 上午10:07
@@ -110,6 +111,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     {
         Event::listen(RequestHandled::class, config('modules.response.request_handled_listener'));
     }
+
     /**
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
      * @time  : 2024-05-23 上午10:07

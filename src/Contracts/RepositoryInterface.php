@@ -54,7 +54,7 @@ interface RepositoryInterface
 
     /**
      * Get a specific config data from a configuration file.
-     * @param string $key
+     * @param string      $key
      *
      * @param string|null $default
      * @return mixed

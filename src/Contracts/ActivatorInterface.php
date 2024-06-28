@@ -20,7 +20,7 @@ interface ActivatorInterface
     /**
      * Deletes a module activation status
      *
-     * @param  Module $module
+     * @param Module $module
      */
     public function delete(Module $module): void;
 
@@ -30,6 +30,7 @@ interface ActivatorInterface
      * @param Module $module
      */
     public function disable(Module $module): void;
+
     /**
      * Enables a module
      *
@@ -41,7 +42,7 @@ interface ActivatorInterface
      * Determine whether the given status same with a module status.
      *
      * @param Module $module
-     * @param bool $status
+     * @param bool   $status
      *
      * @return bool
      */
@@ -56,15 +57,15 @@ interface ActivatorInterface
      * Set active state for a module.
      *
      * @param Module $module
-     * @param bool $active
+     * @param bool   $active
      */
     public function setActive(Module $module, bool $active): void;
 
     /**
      * Sets a module status by its name
      *
-     * @param  string $name
-     * @param  bool $active
+     * @param string $name
+     * @param bool   $active
      */
     public function setActiveByName(string $name, bool $active): void;
 }

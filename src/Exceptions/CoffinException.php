@@ -25,7 +25,7 @@ abstract class CoffinException extends HttpException
     protected $code = 0;
 
     /**
-     * @param string $message
+     * @param string   $message
      * @param int|Code $code
      */
     public function __construct(string $message = '', int|Enum $code = 0)

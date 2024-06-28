@@ -132,7 +132,7 @@ class SchemaParser implements Arrayable
      */
     public function getCustomAttribute($column)
     {
-        return (array) $this->customAttributes[$column];
+        return (array)$this->customAttributes[$column];
     }
 
     /**

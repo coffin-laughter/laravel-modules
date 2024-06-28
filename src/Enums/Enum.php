@@ -19,5 +19,6 @@ namespace Nwidart\Modules\Enums;
 interface Enum
 {
     public function name(): string;
+
     public function value(): int;
 }

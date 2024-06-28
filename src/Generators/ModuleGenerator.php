@@ -115,11 +115,11 @@ class ModuleGenerator extends Generator
 
     /**
      * The constructor.
-     * @param $name
+     * @param                $name
      * @param FileRepository $module
-     * @param Config     $config
-     * @param Filesystem $filesystem
-     * @param Console    $console
+     * @param Config         $config
+     * @param Filesystem     $filesystem
+     * @param Console        $console
      */
     public function __construct(
         $name,
@@ -297,9 +297,9 @@ class ModuleGenerator extends Generator
         if (GenerateConfigReader::read('controller')->generate() === true) {
             $options = $this->type == 'api' ? ['--api' => true] : [];
             $this->console->call('module:make-controller', [
-                'controller' => $this->getName() . 'Controller',
-                'module'     => $this->getName(),
-            ] + $options);
+                    'controller' => $this->getName() . 'Controller',
+                    'module'     => $this->getName(),
+                ] + $options);
         }
     }
 
@@ -546,7 +546,7 @@ class ModuleGenerator extends Generator
      */
     protected function getAppFolderNameReplacement()
     {
-        return  $this->module->config('paths.app_folder');
+        return $this->module->config('paths.app_folder');
     }
 
     /**

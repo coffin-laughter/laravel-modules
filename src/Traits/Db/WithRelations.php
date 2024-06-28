@@ -59,6 +59,7 @@ trait WithRelations
             }
         }
     }
+
     /**
      * @param array $data
      *

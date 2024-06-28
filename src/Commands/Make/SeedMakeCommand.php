@@ -55,6 +55,7 @@ class SeedMakeCommand extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'The name of seeder will be created.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 

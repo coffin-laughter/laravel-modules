@@ -62,6 +62,7 @@ class ProviderMakeCommand extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'The service provider name.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 

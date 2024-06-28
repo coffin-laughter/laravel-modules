@@ -106,6 +106,7 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         return self::defaultCommands()->toArray();
     }
+
     public function register(): void
     {
         $this->commands(config('modules.commands', self::defaultCommands()->toArray()));

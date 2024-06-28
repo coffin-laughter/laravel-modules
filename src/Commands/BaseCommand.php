@@ -66,7 +66,7 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
             $this->components->info($info);
         }
 
-        $modules = (array) $this->argument('module');
+        $modules = (array)$this->argument('module');
 
         foreach ($modules as $module) {
             $this->executeAction($module);
@@ -97,8 +97,8 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
         }
 
         $selected_item = multiselect(
-            label   : 'Select Modules',
-            options : [
+            label: 'Select Modules',
+            options: [
                 self::ALL,
                 ...$modules,
             ],

@@ -50,7 +50,7 @@ class Migrator
 
     /**
      * Create new instance.
-     * @param Module $module
+     * @param Module      $module
      * @param Application $application
      * @param string|null $subpath
      */
@@ -99,7 +99,7 @@ class Migrator
         $result = $query->orderBy('migration', 'desc')->get();
 
         return collect($result)->map(function ($item) {
-            return (array) $item;
+            return (array)$item;
         })->pluck('migration');
     }
 
@@ -218,7 +218,7 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param array  $files
+     * @param array $files
      */
     public function requireFiles(array $files)
     {

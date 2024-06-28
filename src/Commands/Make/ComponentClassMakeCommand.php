@@ -70,6 +70,7 @@ class ComponentClassMakeCommand extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'The name of the component.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 
@@ -83,6 +84,7 @@ class ComponentClassMakeCommand extends GeneratorCommand
 
         return $path . $factoryPath->getPath() . '/' . $this->getFileName();
     }
+
     /**
      * @return mixed
      */
@@ -91,12 +93,13 @@ class ComponentClassMakeCommand extends GeneratorCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub('/component-class.stub', [
-            'NAMESPACE'         => $this->getClassNamespace($module),
-            'CLASS'             => $this->getClass(),
-            'LOWER_NAME'        => $module->getLowerName(),
-            'COMPONENT_NAME'    => 'components.' . Str::lower($this->argument('name')),
+            'NAMESPACE'      => $this->getClassNamespace($module),
+            'CLASS'          => $this->getClass(),
+            'LOWER_NAME'     => $module->getLowerName(),
+            'COMPONENT_NAME' => 'components.' . Str::lower($this->argument('name')),
         ]))->render();
     }
+
     /**
      * Write the view template for the component.
      *
@@ -104,7 +107,7 @@ class ComponentClassMakeCommand extends GeneratorCommand
      */
     protected function writeComponentViewTemplate()
     {
-        $this->call('module:make-component-view', ['name' => $this->argument('name') , 'module' => $this->argument('module')]);
+        $this->call('module:make-component-view', ['name' => $this->argument('name'), 'module' => $this->argument('module')]);
     }
 
     /**
