@@ -84,6 +84,7 @@ class MigrationMakeCommand extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'The migration name will be created.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be created.'],
+            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 

@@ -22,7 +22,7 @@ trait ModuleCommandTrait
     {
         $module = $this->argument('module') ?: app('modules')->getUsedNow();
 
-        $dir = $this->argument('dir');
+        $dir = $this->argument('dir') ?: config('modules.namespace');
 
         if ($dir) {
             $dir = Str::ucfirst(Str::camel($dir));
