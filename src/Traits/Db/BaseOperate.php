@@ -420,7 +420,7 @@ trait BaseOperate
                 $data['creator_id'] = $user->id;
             }
 
-            if (in_array($this->getTenantIdColumn(), $this->getFillable())) {
+            if (empty($data['tenant_id']) && in_array($this->getTenantIdColumn(), $this->getFillable())) {
                 $data['tenant_id'] = $user->tenant_id;
             }
         }
