@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Nwidart\Modules\Traits\Db;
 
+use Illuminate\Support\Facades\Auth;
+
 trait ScopeTrait
 {
     /**
@@ -35,5 +37,20 @@ trait ScopeTrait
                 'creator' => $userModel->whereColumn($userModel->getKeyName(), $model->getTable() . '.' . $model->getCreatorIdColumn())->select('username')->limit(1),
             ]);
         }
+    }
+
+    public function scopeTenantData($query)
+    {
+        $model = app(static::class);
+        if (in_array($model->getTenantIdColumn(), $model->getFillable())) {
+            $currenUser = Auth::guard(getGuardName())->user();
+            if ($currenUser->isSuperAdmin()) {
+                return $query;
+            } else {
+                return $query->where($model->getTenantIdColumn(), $currenUser->tenant_id);
+            }
+        }
+
+        return $query;
     }
 }

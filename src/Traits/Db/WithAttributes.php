@@ -67,6 +67,11 @@ trait WithAttributes
     protected string $sortField = '';
 
     /**
+     * @var bool
+     */
+    protected bool $tenantData = false;
+
+    /**
      * @return array
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
@@ -173,6 +178,13 @@ trait WithAttributes
     public function setSortField(string $sortField): static
     {
         $this->sortField = $sortField;
+
+        return $this;
+    }
+
+    public function setTenantData(bool $tenantData = true): static
+    {
+        $this->tenantData = $tenantData;
 
         return $this;
     }
