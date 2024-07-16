@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Nwidart\Modules\Support\Db\SoftDelete;
 use Nwidart\Modules\Traits\Db\BaseOperate;
+use Nwidart\Modules\Traits\Db\ScopeTenantData;
 use Nwidart\Modules\Traits\Db\ScopeTrait;
 use Nwidart\Modules\Traits\Db\Trans;
 use Nwidart\Modules\Traits\Db\WithAttributes;
@@ -30,6 +31,7 @@ abstract class CoffinModel extends Model
 {
     use BaseOperate;
     use ScopeTrait;
+    use ScopeTenantData;
     use SoftDeletes;
     use Trans;
     use WithAttributes;

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  *  +-------------------------------------------------------------------------------------------
  *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
@@ -15,26 +16,22 @@ declare(strict_types=1);
 
 namespace Nwidart\Modules\Traits\Db;
 
-trait ScopeTrait
+use Illuminate\Support\Facades\Auth;
+
+trait ScopeTenantData
 {
-    /**
-     * 创建者
-     * @param $query
-     *
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:43
-     */
-    public static function scopeCreator($query): void
+    public function scopeTenantData($query)
     {
         $model = app(static::class);
-
-        if (in_array($model->getCreatorIdColumn(), $model->getFillable())) {
-            $userModel = app(getAuthUserModel());
-
-            $query->addSelect([
-                'creator' => $userModel->whereColumn($userModel->getKeyName(), $model->getTable() . '.' . $model->getCreatorIdColumn())->select('username')->limit(1),
-            ]);
+        if (in_array($model->getTenantIdColumn(), $model->getFillable())) {
+            $currenUser = Auth::guard(getGuardName())->user();
+            if ($currenUser->isSuperAdmin()) {
+                return $query;
+            } else {
+                return $query->where($model->getTenantIdColumn(), $currenUser->tenant_id);
+            }
         }
-    }
 
+        return $query;
+    }
 }
