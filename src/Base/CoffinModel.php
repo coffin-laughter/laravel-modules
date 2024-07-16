@@ -73,6 +73,11 @@ abstract class CoffinModel extends Model
             if (str_contains($trait, 'DataRange')) {
                 $this->setDataRange();
             }
+
+            if (str_contains($trait, 'TenantData')) {
+                $this->setTenantData();
+            }
+
         }
     }
 

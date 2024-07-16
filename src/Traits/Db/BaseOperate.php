@@ -212,6 +212,11 @@ trait BaseOperate
             $builder = $builder->dataRange();
         }
 
+        // 租户数据
+        if ($this->tenantData) {
+            $builder = $builder->tenantData();
+        }
+
         // before list
         if ($this->beforeGetList instanceof Closure) {
             $builder = call_user_func($this->beforeGetList, $builder);
