@@ -14,6 +14,7 @@
 namespace Nwidart\Modules;
 
 use Countable;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -56,6 +57,10 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     protected $stubPath;
 
+    /**
+     * @var CacheManager
+     */
+    private $cache;
 
     /**
      * @var ConfigRepository
@@ -67,10 +72,6 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     private $files;
 
-    /**
-     * @var UrlGenerator
-     */
-    private $url;
     /**
      * @var UrlGenerator
      */
@@ -122,25 +123,6 @@ abstract class FileRepository implements Countable, RepositoryInterface
     public function allDisabled(): array
     {
         return $this->getByStatus(false);
-    }
-
-    /**
-     * Format the cached data as array of modules.
-     *
-     * @param  array  $cached
-     * @return array
-     */
-    public function allDisabled(): array
-    {
-        $modules = [];
-
-        foreach ($cached as $name => $module) {
-            $path = $module['path'];
-
-            $modules[$name] = $this->createModule($this->app, $name, $path);
-        }
-
-        return $modules;
     }
 
     /**
@@ -585,4 +567,23 @@ abstract class FileRepository implements Countable, RepositoryInterface
      * @return \Nwidart\Modules\Module
      */
     abstract protected function createModule(...$args);
+
+    /**
+     * Format the cached data as array of modules.
+     *
+     * @param  array  $cached
+     * @return array
+     */
+    protected function formatCached($cached)
+    {
+        $modules = [];
+
+        foreach ($cached as $name => $module) {
+            $path = $module['path'];
+
+            $modules[$name] = $this->createModule($this->app, $name, $path);
+        }
+
+        return $modules;
+    }
 }
