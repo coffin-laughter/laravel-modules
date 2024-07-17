@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -13,13 +24,6 @@ class ObserverMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-observer';
-
-    /**
      * The name of argument name.
      *
      * @var string
@@ -32,6 +36,43 @@ class ObserverMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $description = 'Create a new observer for the specified module.';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-observer';
+
+    /**
+     * Get default namespace.
+     */
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.observer.namespace')
+            ?? ltrim(config('modules.paths.generator.observer.path', 'Observers'), config('modules.paths.app_folder', ''));
+    }
+
+    /**
+     * Get model namespace.
+     */
+    public function getModelNamespace(): string
+    {
+        $path = $this->laravel['modules']->config('paths.generator.model.path', 'Entities');
+
+        $path = str_replace('/', '\\', $path);
+
+        return $this->laravel['modules']->config('namespace') . '\\' . $this->laravel['modules']->findOrFail($this->getModuleName()) . '\\' . $path;
+    }
+
+    public function handle(): int
+    {
+        $this->components->info('Creating observer...');
+
+        parent::handle();
+
+        return 0;
+    }
 
     /**
      * Get the console command arguments.
@@ -49,28 +90,36 @@ class ObserverMakeCommand extends GeneratorCommand
     /**
      * @return mixed
      */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $observerPath = GenerateConfigReader::read('observer');
+
+        return $path . $observerPath->getPath() . '/' . $this->getFileName();
+    }
+
+    /**
+     * @return mixed
+     */
     protected function getTemplateContents()
     {
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub('/observer.stub', [
-            'NAMESPACE' => $this->getClassNamespace($module),
-            'NAME' => $this->getModelName(),
+            'NAMESPACE'       => $this->getClassNamespace($module),
+            'NAME'            => $this->getModelName(),
             'MODEL_NAMESPACE' => $this->getModelNamespace(),
-            'NAME_VARIABLE' => $this->getModelVariable(),
+            'NAME_VARIABLE'   => $this->getModelVariable(),
         ]))->render();
     }
 
     /**
-     * Get model namespace.
+     * @return string
      */
-    public function getModelNamespace(): string
+    private function getFileName()
     {
-        $path = $this->laravel['modules']->config('paths.generator.model.path', 'Entities');
-
-        $path = str_replace('/', '\\', $path);
-
-        return $this->laravel['modules']->config('namespace').'\\'.$this->laravel['modules']->findOrFail($this->getModuleName()).'\\'.$path;
+        return Str::studly($this->argument('name')) . 'Observer.php';
     }
 
     /**
@@ -86,44 +135,6 @@ class ObserverMakeCommand extends GeneratorCommand
      */
     private function getModelVariable(): string
     {
-        return '$'.Str::lower($this->argument('name'));
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getDestinationFilePath()
-    {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $observerPath = GenerateConfigReader::read('observer');
-
-        return $path.$observerPath->getPath().'/'.$this->getFileName();
-    }
-
-    /**
-     * @return string
-     */
-    private function getFileName()
-    {
-        return Str::studly($this->argument('name')).'Observer.php';
-    }
-
-    public function handle(): int
-    {
-        $this->components->info('Creating observer...');
-
-        parent::handle();
-
-        return 0;
-    }
-
-    /**
-     * Get default namespace.
-     */
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.observer.namespace')
-            ?? ltrim(config('modules.paths.generator.observer.path', 'Observers'), config('modules.paths.app_folder', ''));
+        return '$' . Str::lower($this->argument('name'));
     }
 }

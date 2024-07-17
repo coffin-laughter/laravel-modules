@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Database;
 
@@ -18,18 +29,18 @@ class SeedCommand extends BaseCommand
     use ModuleCommandTrait;
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:seed';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Run database seeder from the specified module or from all modules.';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:seed';
 
     public function executeAction($name): void
     {
@@ -59,19 +70,6 @@ class SeedCommand extends BaseCommand
     }
 
     /**
-     * @throws RuntimeException
-     */
-    public function getModuleRepository(): RepositoryInterface
-    {
-        $modules = $this->laravel['modules'];
-        if (! $modules instanceof RepositoryInterface) {
-            throw new RuntimeException('Module repository not found!');
-        }
-
-        return $modules;
-    }
-
-    /**
      * @return Module
      *
      * @throws RuntimeException
@@ -84,6 +82,58 @@ class SeedCommand extends BaseCommand
         }
 
         return $modules->find($name);
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function getModuleRepository(): RepositoryInterface
+    {
+        $modules = $this->laravel['modules'];
+        if (!$modules instanceof RepositoryInterface) {
+            throw new RuntimeException('Module repository not found!');
+        }
+
+        return $modules;
+    }
+
+    /**
+     * Get master database seeder name for the specified module.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function getSeederName($name)
+    {
+        $name = Str::studly($name);
+
+        $namespace = $this->laravel['modules']->config('namespace');
+        $config = GenerateConfigReader::read('seeder');
+        $seederPath = str_replace('/', '\\', $config->getPath());
+
+        return $namespace . '\\' . $name . '\\' . $seederPath . '\\' . $name . 'DatabaseSeeder';
+    }
+
+    /**
+     * Get master database seeder name for the specified module under a different namespace than Modules.
+     *
+     * @param  string  $name
+     * @return array $foundModules array containing namespace paths
+     */
+    public function getSeederNames($name)
+    {
+        $name = Str::studly($name);
+
+        $seederPath = GenerateConfigReader::read('seeder');
+        $seederPath = str_replace('/', '\\', $seederPath->getPath());
+
+        $foundModules = [];
+        foreach ($this->laravel['modules']->config('scan.paths') as $path) {
+            $namespace = array_slice(explode('/', $path), -1)[0];
+            $foundModules[] = $namespace . '\\' . $name . '\\' . $seederPath . '\\' . $name . 'DatabaseSeeder';
+        }
+
+        return $foundModules;
     }
 
     /**
@@ -133,7 +183,7 @@ class SeedCommand extends BaseCommand
     protected function dbSeed($className)
     {
         if ($option = $this->option('class')) {
-            $params['--class'] = Str::finish(substr($className, 0, strrpos($className, '\\')), '\\').$option;
+            $params['--class'] = Str::finish(substr($className, 0, strrpos($className, '\\')), '\\') . $option;
         } else {
             $params = ['--class' => $className];
         }
@@ -150,42 +200,18 @@ class SeedCommand extends BaseCommand
     }
 
     /**
-     * Get master database seeder name for the specified module.
+     * Get the console command options.
      *
-     * @param  string  $name
-     * @return string
+     * @return array
      */
-    public function getSeederName($name)
+    protected function getOptions()
     {
-        $name = Str::studly($name);
-
-        $namespace = $this->laravel['modules']->config('namespace');
-        $config = GenerateConfigReader::read('seeder');
-        $seederPath = str_replace('/', '\\', $config->getPath());
-
-        return $namespace.'\\'.$name.'\\'.$seederPath.'\\'.$name.'DatabaseSeeder';
-    }
-
-    /**
-     * Get master database seeder name for the specified module under a different namespace than Modules.
-     *
-     * @param  string  $name
-     * @return array $foundModules array containing namespace paths
-     */
-    public function getSeederNames($name)
-    {
-        $name = Str::studly($name);
-
-        $seederPath = GenerateConfigReader::read('seeder');
-        $seederPath = str_replace('/', '\\', $seederPath->getPath());
-
-        $foundModules = [];
-        foreach ($this->laravel['modules']->config('scan.paths') as $path) {
-            $namespace = array_slice(explode('/', $path), -1)[0];
-            $foundModules[] = $namespace.'\\'.$name.'\\'.$seederPath.'\\'.$name.'DatabaseSeeder';
-        }
-
-        return $foundModules;
+        return [
+            ['direction', 'd', InputOption::VALUE_OPTIONAL, 'The direction of ordering.', 'asc'],
+            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
+            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed.'],
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+        ];
     }
 
     /**
@@ -209,20 +235,5 @@ class SeedCommand extends BaseCommand
     protected function reportException(\Exception $e)
     {
         $this->laravel[ExceptionHandler::class]->report($e);
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['direction', 'd', InputOption::VALUE_OPTIONAL, 'The direction of ordering.', 'asc'],
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed.'],
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
-        ];
     }
 }

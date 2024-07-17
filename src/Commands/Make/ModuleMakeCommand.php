@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -12,18 +23,17 @@ use Symfony\Component\Console\Input\InputOption;
 class ModuleMakeCommand extends Command
 {
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a new module.';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make';
 
     /**
      * Execute the console command.
@@ -43,7 +53,7 @@ class ModuleMakeCommand extends Command
                 ->setComponent($this->components)
                 ->setForce($this->option('force'))
                 ->setType($this->getModuleType())
-                ->setActive(! $this->option('disabled'))
+                ->setActive(!$this->option('disabled'))
                 ->setVendor($this->option('author-vendor'))
                 ->setAuthor($this->option('author-name'), $this->option('author-email'))
                 ->generate();

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -20,23 +31,36 @@ class MiddlewareMakeCommand extends GeneratorCommand
     protected $argumentName = 'name';
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-middleware';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a new middleware class for the specified module.';
 
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-middleware';
+
     public function getDefaultNamespace(): string
     {
         return config('modules.paths.generator.filter.namespace')
             ?? ltrim(config('modules.paths.generator.filter.path', 'Http/Middleware'), config('modules.paths.app_folder', ''));
+    }
+
+    /**
+     * Run the command.
+     */
+    public function handle(): int
+    {
+
+        $this->components->info('Creating middleware...');
+
+        parent::handle();
+
+        return 0;
     }
 
     /**
@@ -55,26 +79,26 @@ class MiddlewareMakeCommand extends GeneratorCommand
     /**
      * @return mixed
      */
-    protected function getTemplateContents()
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub('/middleware.stub', [
-            'NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClass(),
-        ]))->render();
-    }
-
-    /**
-     * @return mixed
-     */
     protected function getDestinationFilePath()
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
         $middlewarePath = GenerateConfigReader::read('filter');
 
-        return $path.$middlewarePath->getPath().'/'.$this->getFileName().'.php';
+        return $path . $middlewarePath->getPath() . '/' . $this->getFileName() . '.php';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTemplateContents()
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub('/middleware.stub', [
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS'     => $this->getClass(),
+        ]))->render();
     }
 
     /**
@@ -83,18 +107,5 @@ class MiddlewareMakeCommand extends GeneratorCommand
     private function getFileName()
     {
         return Str::studly($this->argument('name'));
-    }
-
-    /**
-     * Run the command.
-     */
-    public function handle(): int
-    {
-
-        $this->components->info('Creating middleware...');
-
-        parent::handle();
-
-        return 0;
     }
 }

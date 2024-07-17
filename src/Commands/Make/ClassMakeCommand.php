@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -11,6 +22,13 @@ class ClassMakeCommand extends GeneratorCommand
 {
     use ModuleCommandTrait;
 
+    protected $argumentName = 'name';
+
+    /**
+     * The console command description.
+     */
+    protected $description = 'Create a new class';
+
     /**
      * The name and signature of the console command.
      */
@@ -22,18 +40,27 @@ class ClassMakeCommand extends GeneratorCommand
         {name : The name of the class}
         {module : The targeted module}';
 
-    /**
-     * The console command description.
-     */
-    protected $description = 'Create a new class';
+    public function getDefaultNamespace(): string
+    {
+        $type = $this->type();
 
-    protected $argumentName = 'name';
+        return config("modules.paths.generator.{$type}.namespace", 'Classes');
+    }
+
+    public function getDestinationFilePath(): string
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $filePath = GenerateConfigReader::read('class')->getPath() ?? config('modules.paths.app_folder') . 'Classes';
+
+        return $this->typePath($path . $filePath . '/' . $this->getFileName() . '.php');
+    }
 
     public function getTemplateContents(): string
     {
         return (new Stub($this->stub(), [
             'NAMESPACE' => $this->getClassNamespace($this->module()),
-            'CLASS' => $this->typeClass(),
+            'CLASS'     => $this->typeClass(),
         ]))->render();
     }
 
@@ -42,13 +69,9 @@ class ClassMakeCommand extends GeneratorCommand
         return $this->option('invokable') ? '/class-invoke.stub' : '/class.stub';
     }
 
-    public function getDestinationFilePath(): string
+    public function typeClass(): string
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $filePath = GenerateConfigReader::read('class')->getPath() ?? config('modules.paths.app_folder').'Classes';
-
-        return $this->typePath($path.$filePath.'/'.$this->getFileName().'.php');
+        return Str::of($this->getFileName())->basename()->studly();
     }
 
     protected function getFileName(): string
@@ -75,17 +98,5 @@ class ClassMakeCommand extends GeneratorCommand
     protected function typePath(string $path): string
     {
         return ($this->type() === 'class') ? $path : Str::of($path)->replaceLast('Classes', Str::of($this->type())->plural()->studly());
-    }
-
-    public function typeClass(): string
-    {
-        return Str::of($this->getFileName())->basename()->studly();
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        $type = $this->type();
-
-        return config("modules.paths.generator.{$type}.namespace", 'Classes');
     }
 }

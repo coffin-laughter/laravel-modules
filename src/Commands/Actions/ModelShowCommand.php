@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Actions;
 
@@ -9,18 +20,17 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class ModelShowCommand extends ShowModelCommand
 {
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:model-show';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Show information about an Eloquent model in modules';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:model-show';
 
     /**
      * The console command signature.
@@ -45,12 +55,12 @@ class ModelShowCommand extends ShowModelCommand
 
         $rootNamespace = config('modules.namespace');
 
-        $modelPath = glob($rootNamespace.DIRECTORY_SEPARATOR.
-            '*'.DIRECTORY_SEPARATOR.
-            config('modules.paths.generator.model.path').DIRECTORY_SEPARATOR.
+        $modelPath = glob($rootNamespace . DIRECTORY_SEPARATOR .
+            '*' . DIRECTORY_SEPARATOR .
+            config('modules.paths.generator.model.path') . DIRECTORY_SEPARATOR .
             "$model.php");
 
-        if (! count($modelPath)) {
+        if (!count($modelPath)) {
             return $model;
         }
 

@@ -1,5 +1,15 @@
 <?php
-
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 use Nwidart\Modules\Activators\FileActivator;
 use Nwidart\Modules\Providers\ConsoleServiceProvider;
 
@@ -25,28 +35,28 @@ return [
     */
     'stubs' => [
         'enabled' => false,
-        'path' => base_path('vendor/nwidart/laravel-modules/src/Commands/stubs'),
-        'files' => [
-            'routes/web' => 'routes/web.php',
-            'routes/api' => 'routes/api.php',
-            'views/index' => 'resources/views/index.blade.php',
-            'views/master' => 'resources/views/layouts/master.blade.php',
+        'path'    => base_path('vendor/nwidart/laravel-modules/src/Commands/stubs'),
+        'files'   => [
+            'routes/web'      => 'routes/web.php',
+            'routes/api'      => 'routes/api.php',
+            'views/index'     => 'resources/views/index.blade.php',
+            'views/master'    => 'resources/views/layouts/master.blade.php',
             'scaffold/config' => 'config/config.php',
-            'composer' => 'composer.json',
-            'assets/js/app' => 'resources/assets/js/app.js',
+            'composer'        => 'composer.json',
+            'assets/js/app'   => 'resources/assets/js/app.js',
             'assets/sass/app' => 'resources/assets/sass/app.scss',
-            'vite' => 'vite.config.js',
-            'package' => 'package.json',
+            'vite'            => 'vite.config.js',
+            'package'         => 'package.json',
         ],
         'replacements' => [
-            'routes/web' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'CONTROLLER_NAMESPACE'],
-            'routes/api' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'CONTROLLER_NAMESPACE'],
-            'vite' => ['LOWER_NAME', 'STUDLY_NAME'],
-            'json' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'PROVIDER_NAMESPACE'],
-            'views/index' => ['LOWER_NAME'],
-            'views/master' => ['LOWER_NAME', 'STUDLY_NAME'],
+            'routes/web'      => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'CONTROLLER_NAMESPACE'],
+            'routes/api'      => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'CONTROLLER_NAMESPACE'],
+            'vite'            => ['LOWER_NAME', 'STUDLY_NAME'],
+            'json'            => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'PROVIDER_NAMESPACE'],
+            'views/index'     => ['LOWER_NAME'],
+            'views/master'    => ['LOWER_NAME', 'STUDLY_NAME'],
             'scaffold/config' => ['STUDLY_NAME'],
-            'composer' => [
+            'composer'        => [
                 'LOWER_NAME',
                 'STUDLY_NAME',
                 'VENDOR',
@@ -111,60 +121,60 @@ return [
         */
         'generator' => [
             // app/
-            'actions' => ['path' => 'app/Actions', 'generate' => false],
-            'casts' => ['path' => 'app/Casts', 'generate' => false],
-            'channels' => ['path' => 'app/Broadcasting', 'generate' => false],
-            'class' => ['path' => 'app/Classes', 'generate' => false],
-            'command' => ['path' => 'app/Console', 'generate' => false],
+            'actions'         => ['path' => 'app/Actions', 'generate' => false],
+            'casts'           => ['path' => 'app/Casts', 'generate' => false],
+            'channels'        => ['path' => 'app/Broadcasting', 'generate' => false],
+            'class'           => ['path' => 'app/Classes', 'generate' => false],
+            'command'         => ['path' => 'app/Console', 'generate' => false],
             'component-class' => ['path' => 'app/View/Components', 'generate' => false],
-            'emails' => ['path' => 'app/Emails', 'generate' => false],
-            'event' => ['path' => 'app/Events', 'generate' => false],
-            'enums' => ['path' => 'app/Enums', 'generate' => false],
-            'exceptions' => ['path' => 'app/Exceptions', 'generate' => false],
-            'jobs' => ['path' => 'app/Jobs', 'generate' => false],
-            'helpers' => ['path' => 'app/Helpers', 'generate' => false],
-            'interfaces' => ['path' => 'app/Interfaces', 'generate' => false],
-            'listener' => ['path' => 'app/Listeners', 'generate' => false],
-            'model' => ['path' => 'app/Models', 'generate' => false],
-            'notifications' => ['path' => 'app/Notifications', 'generate' => false],
-            'observer' => ['path' => 'app/Observers', 'generate' => false],
-            'policies' => ['path' => 'app/Policies', 'generate' => false],
-            'provider' => ['path' => 'app/Providers', 'generate' => true],
-            'repository' => ['path' => 'app/Repositories', 'generate' => false],
-            'resource' => ['path' => 'app/Transformers', 'generate' => false],
-            'route-provider' => ['path' => 'app/Providers', 'generate' => true],
-            'rules' => ['path' => 'app/Rules', 'generate' => false],
-            'services' => ['path' => 'app/Services', 'generate' => false],
-            'scopes' => ['path' => 'app/Models/Scopes', 'generate' => false],
-            'traits' => ['path' => 'app/Traits', 'generate' => false],
+            'emails'          => ['path' => 'app/Emails', 'generate' => false],
+            'event'           => ['path' => 'app/Events', 'generate' => false],
+            'enums'           => ['path' => 'app/Enums', 'generate' => false],
+            'exceptions'      => ['path' => 'app/Exceptions', 'generate' => false],
+            'jobs'            => ['path' => 'app/Jobs', 'generate' => false],
+            'helpers'         => ['path' => 'app/Helpers', 'generate' => false],
+            'interfaces'      => ['path' => 'app/Interfaces', 'generate' => false],
+            'listener'        => ['path' => 'app/Listeners', 'generate' => false],
+            'model'           => ['path' => 'app/Models', 'generate' => false],
+            'notifications'   => ['path' => 'app/Notifications', 'generate' => false],
+            'observer'        => ['path' => 'app/Observers', 'generate' => false],
+            'policies'        => ['path' => 'app/Policies', 'generate' => false],
+            'provider'        => ['path' => 'app/Providers', 'generate' => true],
+            'repository'      => ['path' => 'app/Repositories', 'generate' => false],
+            'resource'        => ['path' => 'app/Transformers', 'generate' => false],
+            'route-provider'  => ['path' => 'app/Providers', 'generate' => true],
+            'rules'           => ['path' => 'app/Rules', 'generate' => false],
+            'services'        => ['path' => 'app/Services', 'generate' => false],
+            'scopes'          => ['path' => 'app/Models/Scopes', 'generate' => false],
+            'traits'          => ['path' => 'app/Traits', 'generate' => false],
 
             // app/Http/
             'controller' => ['path' => 'app/Http/Controllers', 'generate' => true],
-            'filter' => ['path' => 'app/Http/Middleware', 'generate' => false],
-            'request' => ['path' => 'app/Http/Requests', 'generate' => false],
+            'filter'     => ['path' => 'app/Http/Middleware', 'generate' => false],
+            'request'    => ['path' => 'app/Http/Requests', 'generate' => false],
 
             // config/
             'config' => ['path' => 'config', 'generate' => true],
 
             // database/
-            'factory' => ['path' => 'database/factories', 'generate' => true],
+            'factory'   => ['path' => 'database/factories', 'generate' => true],
             'migration' => ['path' => 'database/migrations', 'generate' => true],
-            'seeder' => ['path' => 'database/seeders', 'generate' => true],
+            'seeder'    => ['path' => 'database/seeders', 'generate' => true],
 
             // lang/
             'lang' => ['path' => 'lang', 'generate' => false],
 
             // resource/
-            'assets' => ['path' => 'resources/assets', 'generate' => true],
+            'assets'         => ['path' => 'resources/assets', 'generate' => true],
             'component-view' => ['path' => 'resources/views/components', 'generate' => false],
-            'views' => ['path' => 'resources/views', 'generate' => true],
+            'views'          => ['path' => 'resources/views', 'generate' => true],
 
             // routes/
             'routes' => ['path' => 'routes', 'generate' => true],
 
             // tests/
             'test-feature' => ['path' => 'tests/Feature', 'generate' => true],
-            'test-unit' => ['path' => 'tests/Unit', 'generate' => true],
+            'test-unit'    => ['path' => 'tests/Unit', 'generate' => true],
         ],
     ],
 
@@ -193,7 +203,7 @@ return [
     */
     'scan' => [
         'enabled' => false,
-        'paths' => [
+        'paths'   => [
             base_path('vendor/*/*'),
         ],
     ],
@@ -209,7 +219,7 @@ return [
     'composer' => [
         'vendor' => env('MODULE_VENDOR', 'nwidart'),
         'author' => [
-            'name' => env('MODULE_AUTHOR_NAME', 'Nicolas Widart'),
+            'name'  => env('MODULE_AUTHOR_NAME', 'Nicolas Widart'),
             'email' => env('MODULE_AUTHOR_EMAIL', 'n.widart@gmail.com'),
         ],
         'composer-output' => false,
@@ -224,9 +234,9 @@ return [
     |
     */
     'cache' => [
-        'enabled' => env('MODULES_CACHE_ENABLED', false),
-        'driver' => env('MODULES_CACHE_DRIVER', 'file'),
-        'key' => env('MODULES_CACHE_KEY', 'laravel-modules'),
+        'enabled'  => env('MODULES_CACHE_ENABLED', false),
+        'driver'   => env('MODULES_CACHE_DRIVER', 'file'),
+        'key'      => env('MODULES_CACHE_KEY', 'laravel-modules'),
         'lifetime' => env('MODULES_CACHE_LIFETIME', 60),
     ],
 
@@ -256,9 +266,9 @@ return [
     */
     'activators' => [
         'file' => [
-            'class' => FileActivator::class,
-            'statuses-file' => base_path('modules_statuses.json'),
-            'cache-key' => 'activator.installed',
+            'class'          => FileActivator::class,
+            'statuses-file'  => base_path('modules_statuses.json'),
+            'cache-key'      => 'activator.installed',
             'cache-lifetime' => 604800,
         ],
     ],

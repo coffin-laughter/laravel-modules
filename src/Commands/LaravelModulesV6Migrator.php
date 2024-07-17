@@ -1,6 +1,17 @@
 <?php
 
 declare(strict_types=1);
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands;
 
@@ -10,9 +21,8 @@ use Nwidart\Modules\Module;
 
 class LaravelModulesV6Migrator extends Command
 {
-    protected $name = 'module:v6:migrate';
-
     protected $description = 'Migrate laravel-modules v5 modules statuses to v6.';
+    protected $name = 'module:v6:migrate';
 
     public function handle(): int
     {

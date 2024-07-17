@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -21,6 +32,13 @@ class ModelMakeCommand extends GeneratorCommand
     protected $argumentName = 'model';
 
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new model for the specified module.';
+
+    /**
      * The console command name.
      *
      * @var string
@@ -28,11 +46,13 @@ class ModelMakeCommand extends GeneratorCommand
     protected $name = 'module:make-model';
 
     /**
-     * The console command description.
-     *
-     * @var string
+     * Get default namespace.
      */
-    protected $description = 'Create a new model for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.model.namespace')
+            ?? ltrim(config('modules.paths.generator.model.path', 'Models'), config('modules.paths.app_folder', ''));
+    }
 
     public function handle(): int
     {
@@ -50,29 +70,6 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Create a proper migration name:
-     * ProductDetail: product_details
-     * Product: products
-     *
-     * @return string
-     */
-    private function createMigrationName()
-    {
-        $pieces = preg_split('/(?=[A-Z])/', $this->argument('model'), -1, PREG_SPLIT_NO_EMPTY);
-
-        $string = '';
-        foreach ($pieces as $i => $piece) {
-            if ($i + 1 < count($pieces)) {
-                $string .= strtolower($piece).'_';
-            } else {
-                $string .= Str::plural(strtolower($piece));
-            }
-        }
-
-        return $string;
-    }
-
-    /**
      * Get the console command arguments.
      *
      * @return array
@@ -83,6 +80,18 @@ class ModelMakeCommand extends GeneratorCommand
             ['model', InputArgument::REQUIRED, 'The name of model will be created.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $modelPath = GenerateConfigReader::read('model');
+
+        return $path . $modelPath->getPath() . '/' . $this->getModelName() . '.php';
     }
 
     /**
@@ -103,46 +112,22 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Create the migration file with the given model if migration flag was used
+     * @return mixed
      */
-    private function handleOptionalMigrationOption()
+    protected function getTemplateContents()
     {
-        if ($this->option('migration') === true) {
-            $migrationName = 'create_'.$this->createMigrationName().'_table';
-            $this->call('module:make-migration', ['name' => $migrationName, 'module' => $this->argument('module')]);
-        }
-    }
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
-    /**
-     * Create the controller file for the given model if controller flag was used
-     */
-    private function handleOptionalControllerOption()
-    {
-        if ($this->option('controller') === true) {
-            $controllerName = "{$this->getModelName()}Controller";
-
-            $this->call('module:make-controller', array_filter([
-                'controller' => $controllerName,
-                'module' => $this->argument('module'),
-            ]));
-        }
-    }
-
-    /**
-     * Create a seeder file for the model.
-     *
-     * @return void
-     */
-    protected function handleOptionalSeedOption()
-    {
-        if ($this->option('seed') === true) {
-            $seedName = "{$this->getModelName()}Seeder";
-
-            $this->call('module:make-seed', array_filter([
-                'name' => $seedName,
-                'module' => $this->argument('module'),
-            ]));
-        }
+        return (new Stub('/model.stub', [
+            'NAME'             => $this->getModelName(),
+            'FILLABLE'         => $this->getFillable(),
+            'NAMESPACE'        => $this->getClassNamespace($module),
+            'CLASS'            => $this->getClass(),
+            'LOWER_NAME'       => $module->getLowerName(),
+            'MODULE'           => $this->getModuleName(),
+            'STUDLY_NAME'      => $module->getStudlyName(),
+            'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
+        ]))->render();
     }
 
     /**
@@ -154,7 +139,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         if ($this->option('factory') === true) {
             $this->call('module:make-factory', array_filter([
-                'name' => $this->getModelName(),
+                'name'   => $this->getModelName(),
                 'module' => $this->argument('module'),
             ]));
         }
@@ -171,41 +156,66 @@ class ModelMakeCommand extends GeneratorCommand
             $requestName = "{$this->getModelName()}Request";
 
             $this->call('module:make-request', array_filter([
-                'name' => $requestName,
+                'name'   => $requestName,
                 'module' => $this->argument('module'),
             ]));
         }
     }
 
     /**
-     * @return mixed
+     * Create a seeder file for the model.
+     *
+     * @return void
      */
-    protected function getTemplateContents()
+    protected function handleOptionalSeedOption()
     {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+        if ($this->option('seed') === true) {
+            $seedName = "{$this->getModelName()}Seeder";
 
-        return (new Stub('/model.stub', [
-            'NAME' => $this->getModelName(),
-            'FILLABLE' => $this->getFillable(),
-            'NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClass(),
-            'LOWER_NAME' => $module->getLowerName(),
-            'MODULE' => $this->getModuleName(),
-            'STUDLY_NAME' => $module->getStudlyName(),
-            'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
-        ]))->render();
+            $this->call('module:make-seed', array_filter([
+                'name'   => $seedName,
+                'module' => $this->argument('module'),
+            ]));
+        }
     }
 
     /**
-     * @return mixed
+     * Create a proper migration name:
+     * ProductDetail: product_details
+     * Product: products
+     *
+     * @return string
      */
-    protected function getDestinationFilePath()
+    private function createMigrationName()
     {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+        $pieces = preg_split('/(?=[A-Z])/', $this->argument('model'), -1, PREG_SPLIT_NO_EMPTY);
 
-        $modelPath = GenerateConfigReader::read('model');
+        $string = '';
+        foreach ($pieces as $i => $piece) {
+            if ($i + 1 < count($pieces)) {
+                $string .= strtolower($piece) . '_';
+            } else {
+                $string .= Str::plural(strtolower($piece));
+            }
+        }
 
-        return $path.$modelPath->getPath().'/'.$this->getModelName().'.php';
+        return $string;
+    }
+
+    /**
+     * @return string
+     */
+    private function getFillable()
+    {
+        $fillable = $this->option('fillable');
+
+        if (!is_null($fillable)) {
+            $arrays = explode(',', $fillable);
+
+            return json_encode($arrays);
+        }
+
+        return '[]';
     }
 
     /**
@@ -217,27 +227,28 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * @return string
+     * Create the controller file for the given model if controller flag was used
      */
-    private function getFillable()
+    private function handleOptionalControllerOption()
     {
-        $fillable = $this->option('fillable');
+        if ($this->option('controller') === true) {
+            $controllerName = "{$this->getModelName()}Controller";
 
-        if (! is_null($fillable)) {
-            $arrays = explode(',', $fillable);
-
-            return json_encode($arrays);
+            $this->call('module:make-controller', array_filter([
+                'controller' => $controllerName,
+                'module'     => $this->argument('module'),
+            ]));
         }
-
-        return '[]';
     }
 
     /**
-     * Get default namespace.
+     * Create the migration file with the given model if migration flag was used
      */
-    public function getDefaultNamespace(): string
+    private function handleOptionalMigrationOption()
     {
-        return config('modules.paths.generator.model.namespace')
-            ?? ltrim(config('modules.paths.generator.model.path', 'Models'), config('modules.paths.app_folder', ''));
+        if ($this->option('migration') === true) {
+            $migrationName = 'create_' . $this->createMigrationName() . '_table';
+            $this->call('module:make-migration', ['name' => $migrationName, 'module' => $this->argument('module')]);
+        }
     }
 }

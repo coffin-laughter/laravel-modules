@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Support\Config;
 
@@ -8,11 +19,11 @@ class GeneratorPath
 {
     use PathNamespace;
 
-    private $path;
-
     private $generate;
 
     private $namespace;
+
+    private $path;
 
     public function __construct($config)
     {
@@ -29,11 +40,6 @@ class GeneratorPath
         $this->namespace = $this->path_namespace(ltrim($config, config('modules.paths.app_folder', '')));
     }
 
-    public function getPath()
-    {
-        return $this->path;
-    }
-
     public function generate(): bool
     {
         return $this->generate;
@@ -42,5 +48,10 @@ class GeneratorPath
     public function getNamespace()
     {
         return $this->studly_namespace($this->namespace);
+    }
+
+    public function getPath()
+    {
+        return $this->path;
     }
 }

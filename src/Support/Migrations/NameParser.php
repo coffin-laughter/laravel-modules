@@ -1,23 +1,20 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Support\Migrations;
 
 class NameParser
 {
-    /**
-     * The migration name.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The array data.
-     *
-     * @var array
-     */
-    protected $data = [];
-
     /**
      * The available schema actions.
      *
@@ -45,6 +42,19 @@ class NameParser
     ];
 
     /**
+     * The array data.
+     *
+     * @var array
+     */
+    protected $data = [];
+    /**
+     * The migration name.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * The constructor.
      *
      * @param  string  $name
@@ -53,16 +63,6 @@ class NameParser
     {
         $this->name = $name;
         $this->data = $this->fetchData();
-    }
-
-    /**
-     * Get original migration name.
-     *
-     * @return string
-     */
-    public function getOriginalName()
-    {
-        return $this->name;
     }
 
     /**
@@ -76,15 +76,13 @@ class NameParser
     }
 
     /**
-     * Get the table will be used.
+     * Get the array data.
      *
-     * @return string
+     * @return array
      */
-    public function getTableName()
+    public function getData()
     {
-        $matches = array_reverse($this->getMatches());
-
-        return array_shift($matches);
+        return $this->data;
     }
 
     /**
@@ -97,6 +95,16 @@ class NameParser
         preg_match($this->getPattern(), $this->name, $matches);
 
         return $matches;
+    }
+
+    /**
+     * Get original migration name.
+     *
+     * @return string
+     */
+    public function getOriginalName()
+    {
+        return $this->name;
     }
 
     /**
@@ -130,23 +138,15 @@ class NameParser
     }
 
     /**
-     * Fetch the migration name to an array data.
+     * Get the table will be used.
      *
-     * @return array
+     * @return string
      */
-    protected function fetchData()
+    public function getTableName()
     {
-        return explode('_', $this->name);
-    }
+        $matches = array_reverse($this->getMatches());
 
-    /**
-     * Get the array data.
-     *
-     * @return array
-     */
-    public function getData()
-    {
-        return $this->data;
+        return array_shift($matches);
     }
 
     /**
@@ -171,16 +171,6 @@ class NameParser
     }
 
     /**
-     * Determine whether the current schema action is a deleting action.
-     *
-     * @return bool
-     */
-    public function isDelete()
-    {
-        return in_array($this->getAction(), $this->actions['delete']);
-    }
-
-    /**
      * Determine whether the current schema action is a creating action.
      *
      * @return bool
@@ -191,6 +181,16 @@ class NameParser
     }
 
     /**
+     * Determine whether the current schema action is a deleting action.
+     *
+     * @return bool
+     */
+    public function isDelete()
+    {
+        return in_array($this->getAction(), $this->actions['delete']);
+    }
+
+    /**
      * Determine whether the current schema action is a dropping action.
      *
      * @return bool
@@ -198,5 +198,15 @@ class NameParser
     public function isDrop()
     {
         return in_array($this->getAction(), $this->actions['drop']);
+    }
+
+    /**
+     * Fetch the migration name to an array data.
+     *
+     * @return array
+     */
+    protected function fetchData()
+    {
+        return explode('_', $this->name);
     }
 }

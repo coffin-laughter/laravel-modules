@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -15,27 +26,22 @@ class ServiceMakeCommand extends GeneratorCommand
 
     protected $argumentName = 'name';
 
+    protected $description = 'Create a new service class for the specified module.';
+
     protected $name = 'module:make-service';
 
-    protected $description = 'Create a new service class for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.services.namespace', 'Services');
+    }
 
     public function getDestinationFilePath(): string
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
-        $filePath = GenerateConfigReader::read('services')->getPath() ?? config('modules.paths.app_folder').'Services';
+        $filePath = GenerateConfigReader::read('services')->getPath() ?? config('modules.paths.app_folder') . 'Services';
 
-        return $path.$filePath.'/'.$this->getServiceName().'.php';
-    }
-
-    protected function getTemplateContents(): string
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClassNameWithoutNamespace(),
-        ]))->render();
+        return $path . $filePath . '/' . $this->getServiceName() . '.php';
     }
 
     protected function getArguments(): array
@@ -59,18 +65,23 @@ class ServiceMakeCommand extends GeneratorCommand
         return Str::studly($this->argument('name'));
     }
 
-    private function getClassNameWithoutNamespace(): array|string
-    {
-        return class_basename($this->getServiceName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.services.namespace', 'Services');
-    }
-
     protected function getStubName(): string
     {
         return $this->option('invokable') === true ? '/service-invoke.stub' : '/service.stub';
+    }
+
+    protected function getTemplateContents(): string
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS'           => $this->getClassNameWithoutNamespace(),
+        ]))->render();
+    }
+
+    private function getClassNameWithoutNamespace(): array|string
+    {
+        return class_basename($this->getServiceName());
     }
 }

@@ -1,18 +1,28 @@
 <?php
-
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 
-if (! function_exists('module_path')) {
+if (!function_exists('module_path')) {
     function module_path($name, $path = '')
     {
         $module = app('modules')->find($name);
 
-        return $module->getPath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $module->getPath() . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 }
 
-if (! function_exists('config_path')) {
+if (!function_exists('config_path')) {
     /**
      * Get the configuration path.
      *
@@ -21,11 +31,11 @@ if (! function_exists('config_path')) {
      */
     function config_path($path = '')
     {
-        return app()->basePath().'/config'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->basePath() . '/config' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 }
 
-if (! function_exists('public_path')) {
+if (!function_exists('public_path')) {
     /**
      * Get the path to the public folder.
      *
@@ -34,11 +44,11 @@ if (! function_exists('public_path')) {
      */
     function public_path($path = '')
     {
-        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
+        return app()->make('path.public') . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : $path);
     }
 }
 
-if (! function_exists('module_vite')) {
+if (!function_exists('module_vite')) {
     /**
      * support for vite
      */

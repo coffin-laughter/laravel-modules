@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Database;
 
@@ -10,25 +21,24 @@ use Symfony\Component\Console\Input\InputOption;
 class MigrateCommand extends BaseCommand
 {
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:migrate';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Migrate the migrations from the specified module or from all modules.';
 
+    protected Collection $migration_list;
+
     /**
      * The migrator instance.
      */
     protected Migrator $migrator;
-
-    protected Collection $migration_list;
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:migrate';
 
     public function __construct()
     {
@@ -50,10 +60,10 @@ class MigrateCommand extends BaseCommand
             ->filter(fn ($path) => str_starts_with($path, $module_path));
 
         $this->call('migrate', array_filter([
-            '--path' => $paths->toArray(),
+            '--path'     => $paths->toArray(),
             '--database' => $this->option('database'),
-            '--pretend' => $this->option('pretend'),
-            '--force' => $this->option('force'),
+            '--pretend'  => $this->option('pretend'),
+            '--force'    => $this->option('force'),
             '--realpath' => true,
         ]));
 

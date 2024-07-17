@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -15,27 +26,22 @@ class EnumMakeCommand extends GeneratorCommand
 
     protected $argumentName = 'name';
 
+    protected $description = 'Create a new enum class for the specified module.';
+
     protected $name = 'module:make-enum';
 
-    protected $description = 'Create a new enum class for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.enums.namespace', 'Enums');
+    }
 
     public function getDestinationFilePath(): string
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
-        $filePath = GenerateConfigReader::read('enums')->getPath() ?? config('modules.paths.app_folder').'Enums';
+        $filePath = GenerateConfigReader::read('enums')->getPath() ?? config('modules.paths.app_folder') . 'Enums';
 
-        return $path.$filePath.'/'.$this->getEnumName().'.php';
-    }
-
-    protected function getTemplateContents(): string
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClassNameWithoutNamespace(),
-        ]))->render();
+        return $path . $filePath . '/' . $this->getEnumName() . '.php';
     }
 
     protected function getArguments(): array
@@ -46,6 +52,11 @@ class EnumMakeCommand extends GeneratorCommand
         ];
     }
 
+    protected function getEnumName(): array|string
+    {
+        return Str::studly($this->argument('name'));
+    }
+
     protected function getOptions(): array
     {
         return [
@@ -53,23 +64,23 @@ class EnumMakeCommand extends GeneratorCommand
         ];
     }
 
-    protected function getEnumName(): array|string
+    protected function getStubName(): string
     {
-        return Str::studly($this->argument('name'));
+        return '/enum.stub';
+    }
+
+    protected function getTemplateContents(): string
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS'           => $this->getClassNameWithoutNamespace(),
+        ]))->render();
     }
 
     private function getClassNameWithoutNamespace(): array|string
     {
         return class_basename($this->getEnumName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.enums.namespace', 'Enums');
-    }
-
-    protected function getStubName(): string
-    {
-        return '/enum.stub';
     }
 }

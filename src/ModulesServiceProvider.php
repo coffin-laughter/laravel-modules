@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules;
 
@@ -14,6 +25,16 @@ abstract class ModulesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [Contracts\RepositoryInterface::class, 'modules'];
     }
 
     /**
@@ -36,8 +57,8 @@ abstract class ModulesServiceProvider extends ServiceProvider
      */
     protected function registerNamespaces()
     {
-        $configPath = __DIR__.'/../config/config.php';
-        $stubsPath = dirname(__DIR__).'/src/Commands/stubs';
+        $configPath = __DIR__ . '/../config/config.php';
+        $stubsPath = dirname(__DIR__) . '/src/Commands/stubs';
 
         $this->publishes([
             $configPath => config_path('modules.php'),
@@ -48,23 +69,8 @@ abstract class ModulesServiceProvider extends ServiceProvider
         ], 'stubs');
 
         $this->publishes([
-            __DIR__.'/../scripts/vite-module-loader.js' => base_path('vite-module-loader.js'),
+            __DIR__ . '/../scripts/vite-module-loader.js' => base_path('vite-module-loader.js'),
         ], 'vite');
-    }
-
-    /**
-     * Register the service provider.
-     */
-    abstract protected function registerServices();
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [Contracts\RepositoryInterface::class, 'modules'];
     }
 
     /**
@@ -75,4 +81,9 @@ abstract class ModulesServiceProvider extends ServiceProvider
         $this->app->register(ConsoleServiceProvider::class);
         $this->app->register(ContractsServiceProvider::class);
     }
+
+    /**
+     * Register the service provider.
+     */
+    abstract protected function registerServices();
 }

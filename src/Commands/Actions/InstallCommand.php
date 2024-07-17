@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Actions;
 
@@ -11,18 +22,17 @@ use Symfony\Component\Console\Input\InputOption;
 class InstallCommand extends Command
 {
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:install';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Install the specified module by given package name (vendor/name).';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:install';
 
     /**
      * Create a new command instance.
@@ -52,31 +62,32 @@ class InstallCommand extends Command
     }
 
     /**
-     * Install modules from modules.json file.
+     * Get the console command arguments.
+     *
+     * @return array
      */
-    protected function installFromFile(): int
+    protected function getArguments()
     {
-        if (! file_exists($path = base_path('modules.json'))) {
-            $this->error("File 'modules.json' does not exist in your project root.");
+        return [
+            ['name', InputArgument::OPTIONAL, 'The name of module will be installed.'],
+            ['version', InputArgument::OPTIONAL, 'The version of module will be installed.'],
+        ];
+    }
 
-            return E_ERROR;
-        }
-
-        $modules = Json::make($path);
-
-        $dependencies = $modules->get('require', []);
-
-        foreach ($dependencies as $module) {
-            $module = collect($module);
-
-            $this->install(
-                $module->get('name'),
-                $module->get('version'),
-                $module->get('type')
-            );
-        }
-
-        return 0;
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The process timeout.', null],
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The installation path.', null],
+            ['type', null, InputOption::VALUE_OPTIONAL, 'The type of installation.', null],
+            ['tree', null, InputOption::VALUE_NONE, 'Install the module as a git subtree', null],
+            ['no-update', null, InputOption::VALUE_NONE, 'Disables the automatic update of the dependencies.', null],
+        ];
     }
 
     /**
@@ -110,7 +121,7 @@ class InstallCommand extends Command
 
         $installer->run();
 
-        if (! $this->option('no-update')) {
+        if (!$this->option('no-update')) {
             $this->call('module:update', [
                 'module' => $installer->getModuleName(),
             ]);
@@ -118,31 +129,30 @@ class InstallCommand extends Command
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
+     * Install modules from modules.json file.
      */
-    protected function getArguments()
+    protected function installFromFile(): int
     {
-        return [
-            ['name', InputArgument::OPTIONAL, 'The name of module will be installed.'],
-            ['version', InputArgument::OPTIONAL, 'The version of module will be installed.'],
-        ];
-    }
+        if (!file_exists($path = base_path('modules.json'))) {
+            $this->error("File 'modules.json' does not exist in your project root.");
 
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The process timeout.', null],
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The installation path.', null],
-            ['type', null, InputOption::VALUE_OPTIONAL, 'The type of installation.', null],
-            ['tree', null, InputOption::VALUE_NONE, 'Install the module as a git subtree', null],
-            ['no-update', null, InputOption::VALUE_NONE, 'Disables the automatic update of the dependencies.', null],
-        ];
+            return E_ERROR;
+        }
+
+        $modules = Json::make($path);
+
+        $dependencies = $modules->get('require', []);
+
+        foreach ($dependencies as $module) {
+            $module = collect($module);
+
+            $this->install(
+                $module->get('name'),
+                $module->get('version'),
+                $module->get('type')
+            );
+        }
+
+        return 0;
     }
 }

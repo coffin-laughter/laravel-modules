@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Actions;
 
@@ -7,15 +18,6 @@ use Nwidart\Modules\Commands\BaseCommand;
 
 class CheckLangCommand extends BaseCommand
 {
-    private $langPath;
-
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:lang';
-
     /**
      * The console command description.
      *
@@ -23,11 +25,19 @@ class CheckLangCommand extends BaseCommand
      */
     protected $description = 'Check missing language keys in the specified module.';
 
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:lang';
+    private $langPath;
+
     public function __construct()
     {
         parent::__construct();
 
-        $this->langPath = DIRECTORY_SEPARATOR.config('modules.paths.generator.lang.path', 'Resources/lang');
+        $this->langPath = DIRECTORY_SEPARATOR . config('modules.paths.generator.lang.path', 'Resources/lang');
     }
 
     public function executeAction($name): void
@@ -36,7 +46,7 @@ class CheckLangCommand extends BaseCommand
 
         $directories = $this->getDirectories($module);
 
-        if (! $directories) {
+        if (!$directories) {
             return;
         }
 
@@ -49,51 +59,6 @@ class CheckLangCommand extends BaseCommand
     public function getInfo(): ?string
     {
         return 'Checking languages ...';
-    }
-
-    private function getLangFiles($module)
-    {
-        $files = [];
-        $path = $module->getPath().$this->langPath;
-        if (is_dir($path)) {
-            $files = array_merge($files, $this->laravel['files']->all($path));
-        }
-
-        return $files;
-    }
-
-    private function getDirectories($module)
-    {
-        $moduleName = $module->getStudlyName();
-        $path = $module->getPath().$this->langPath;
-        $directories = [];
-        if (is_dir($path)) {
-            $directories = $this->laravel['files']->directories($path);
-            $directories = array_map(function ($directory) use ($moduleName) {
-                return [
-                    'name' => basename($directory),
-                    'module' => $moduleName,
-                    'path' => $directory,
-                    'files' => array_map(function ($file) {
-                        return basename($file);
-                    }, \File::glob($directory.DIRECTORY_SEPARATOR.'*')),
-                ];
-            }, $directories);
-        }
-
-        if (count($directories) == 0) {
-            $this->components->info("No language files found in module $moduleName");
-
-            return false;
-        }
-
-        if (count($directories) == 1) {
-            $this->components->warn("Only one language file found in module $moduleName");
-
-            return false;
-        }
-
-        return collect($directories);
     }
 
     private function checkMissingFiles(Collection $directories)
@@ -143,7 +108,7 @@ class CheckLangCommand extends BaseCommand
         $directories->each(function ($directory) use ($uniqeLangFiles, $langDirectories, &$missingKeysMessage) {
 
             $uniqeLangFiles->each(function ($file) use ($directory, $langDirectories, &$missingKeysMessage) {
-                $langKeys = $this->getLangKeys($directory['path'].DIRECTORY_SEPARATOR.$file);
+                $langKeys = $this->getLangKeys($directory['path'] . DIRECTORY_SEPARATOR . $file);
 
                 if ($langKeys == false) {
                     return;
@@ -155,7 +120,7 @@ class CheckLangCommand extends BaseCommand
 
                         $basePath = str_replace($directory['name'], $langDirectory, $directory['path']);
 
-                        $otherLangKeys = $this->getLangKeys($basePath.DIRECTORY_SEPARATOR.$file);
+                        $otherLangKeys = $this->getLangKeys($basePath . DIRECTORY_SEPARATOR . $file);
 
                         if ($otherLangKeys == false) {
                             return;
@@ -187,6 +152,51 @@ class CheckLangCommand extends BaseCommand
                 $this->newLine();
             });
         }
+    }
+
+    private function getDirectories($module)
+    {
+        $moduleName = $module->getStudlyName();
+        $path = $module->getPath() . $this->langPath;
+        $directories = [];
+        if (is_dir($path)) {
+            $directories = $this->laravel['files']->directories($path);
+            $directories = array_map(function ($directory) use ($moduleName) {
+                return [
+                    'name'   => basename($directory),
+                    'module' => $moduleName,
+                    'path'   => $directory,
+                    'files'  => array_map(function ($file) {
+                        return basename($file);
+                    }, \File::glob($directory . DIRECTORY_SEPARATOR . '*')),
+                ];
+            }, $directories);
+        }
+
+        if (count($directories) == 0) {
+            $this->components->info("No language files found in module $moduleName");
+
+            return false;
+        }
+
+        if (count($directories) == 1) {
+            $this->components->warn("Only one language file found in module $moduleName");
+
+            return false;
+        }
+
+        return collect($directories);
+    }
+
+    private function getLangFiles($module)
+    {
+        $files = [];
+        $path = $module->getPath() . $this->langPath;
+        if (is_dir($path)) {
+            $files = array_merge($files, $this->laravel['files']->all($path));
+        }
+
+        return $files;
     }
 
     private function getLangKeys($file)

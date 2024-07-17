@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -21,18 +32,24 @@ class ControllerMakeCommand extends GeneratorCommand
     protected $argumentName = 'controller';
 
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Generate new restful controller for the specified module.';
+
+    /**
      * The console command name.
      *
      * @var string
      */
     protected $name = 'module:make-controller';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Generate new restful controller for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.controller.namespace')
+            ?? ltrim(config('modules.paths.generator.controller.path', 'Http/Controllers'), config('modules.paths.app_folder'));
+    }
 
     /**
      * Get controller name.
@@ -45,28 +62,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         $controllerPath = GenerateConfigReader::read('controller');
 
-        return $path.$controllerPath->getPath().'/'.$this->getControllerName().'.php';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getTemplateContents()
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'MODULENAME' => $module->getStudlyName(),
-            'CONTROLLERNAME' => $this->getControllerName(),
-            'NAMESPACE' => $module->getStudlyName(),
-            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getControllerNameWithoutNamespace(),
-            'LOWER_NAME' => $module->getLowerName(),
-            'MODULE' => $this->getModuleName(),
-            'NAME' => $this->getModuleName(),
-            'STUDLY_NAME' => $module->getStudlyName(),
-            'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
-        ]))->render();
+        return $path . $controllerPath->getPath() . '/' . $this->getControllerName() . '.php';
     }
 
     /**
@@ -79,18 +75,6 @@ class ControllerMakeCommand extends GeneratorCommand
         return [
             ['controller', InputArgument::REQUIRED, 'The name of the controller class.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['plain', 'p', InputOption::VALUE_NONE, 'Generate a plain controller', null],
-            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
-            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class'],
         ];
     }
 
@@ -109,17 +93,15 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * @return array|string
+     * @return array
      */
-    private function getControllerNameWithoutNamespace()
+    protected function getOptions()
     {
-        return class_basename($this->getControllerName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.controller.namespace')
-            ?? ltrim(config('modules.paths.generator.controller.path', 'Http/Controllers'), config('modules.paths.app_folder'));
+        return [
+            ['plain', 'p', InputOption::VALUE_NONE, 'Generate a plain controller', null],
+            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
+            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class'],
+        ];
     }
 
     /**
@@ -140,5 +122,34 @@ class ControllerMakeCommand extends GeneratorCommand
         }
 
         return $stub;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTemplateContents()
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'MODULENAME'       => $module->getStudlyName(),
+            'CONTROLLERNAME'   => $this->getControllerName(),
+            'NAMESPACE'        => $module->getStudlyName(),
+            'CLASS_NAMESPACE'  => $this->getClassNamespace($module),
+            'CLASS'            => $this->getControllerNameWithoutNamespace(),
+            'LOWER_NAME'       => $module->getLowerName(),
+            'MODULE'           => $this->getModuleName(),
+            'NAME'             => $this->getModuleName(),
+            'STUDLY_NAME'      => $module->getStudlyName(),
+            'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
+        ]))->render();
+    }
+
+    /**
+     * @return array|string
+     */
+    private function getControllerNameWithoutNamespace()
+    {
+        return class_basename($this->getControllerName());
     }
 }

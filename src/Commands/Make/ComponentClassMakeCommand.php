@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -20,18 +31,24 @@ class ComponentClassMakeCommand extends GeneratorCommand
     protected $argumentName = 'name';
 
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new component-class for the specified module.';
+
+    /**
      * The console command name.
      *
      * @var string
      */
     protected $name = 'module:make-component';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Create a new component-class for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.component-class.namespace')
+            ?? ltrim(config('modules.paths.generator.component-class.path', 'View/Component'), config('modules.paths.app_folder', ''));
+    }
 
     public function handle(): int
     {
@@ -41,22 +58,6 @@ class ComponentClassMakeCommand extends GeneratorCommand
         $this->writeComponentViewTemplate();
 
         return 0;
-    }
-
-    /**
-     * Write the view template for the component.
-     *
-     * @return void
-     */
-    protected function writeComponentViewTemplate()
-    {
-        $this->call('module:make-component-view', ['name' => $this->argument('name'), 'module' => $this->argument('module')]);
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.component-class.namespace')
-            ?? ltrim(config('modules.paths.generator.component-class.path', 'View/Component'), config('modules.paths.app_folder', ''));
     }
 
     /**
@@ -75,27 +76,37 @@ class ComponentClassMakeCommand extends GeneratorCommand
     /**
      * @return mixed
      */
-    protected function getTemplateContents()
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub('/component-class.stub', [
-            'NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClass(),
-            'LOWER_NAME' => $module->getLowerName(),
-            'COMPONENT_NAME' => 'components.'.Str::lower($this->argument('name')),
-        ]))->render();
-    }
-
-    /**
-     * @return mixed
-     */
     protected function getDestinationFilePath()
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
         $factoryPath = GenerateConfigReader::read('component-class');
 
-        return $path.$factoryPath->getPath().'/'.$this->getFileName();
+        return $path . $factoryPath->getPath() . '/' . $this->getFileName();
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTemplateContents()
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub('/component-class.stub', [
+            'NAMESPACE'      => $this->getClassNamespace($module),
+            'CLASS'          => $this->getClass(),
+            'LOWER_NAME'     => $module->getLowerName(),
+            'COMPONENT_NAME' => 'components.' . Str::lower($this->argument('name')),
+        ]))->render();
+    }
+
+    /**
+     * Write the view template for the component.
+     *
+     * @return void
+     */
+    protected function writeComponentViewTemplate()
+    {
+        $this->call('module:make-component-view', ['name' => $this->argument('name'), 'module' => $this->argument('module')]);
     }
 
     /**
@@ -103,6 +114,6 @@ class ComponentClassMakeCommand extends GeneratorCommand
      */
     private function getFileName()
     {
-        return Str::studly($this->argument('name')).'.php';
+        return Str::studly($this->argument('name')) . '.php';
     }
 }

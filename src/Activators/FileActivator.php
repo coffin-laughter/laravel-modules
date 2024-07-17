@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Activators;
 
@@ -20,11 +31,14 @@ class FileActivator implements ActivatorInterface
     private $cache;
 
     /**
-     * Laravel Filesystem instance
-     *
-     * @var Filesystem
+     * @var string
      */
-    private $files;
+    private $cacheKey;
+
+    /**
+     * @var string
+     */
+    private $cacheLifetime;
 
     /**
      * Laravel config instance
@@ -34,14 +48,11 @@ class FileActivator implements ActivatorInterface
     private $config;
 
     /**
-     * @var string
+     * Laravel Filesystem instance
+     *
+     * @var Filesystem
      */
-    private $cacheKey;
-
-    /**
-     * @var string
-     */
-    private $cacheLifetime;
+    private $files;
 
     /**
      * Array of modules activation statuses
@@ -69,31 +80,16 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * Get the path of the file where statuses are stored
-     */
-    public function getStatusesFilePath(): string
-    {
-        return $this->statusesFile;
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public function reset(): void
+    public function delete(Module $module): void
     {
-        if ($this->files->exists($this->statusesFile)) {
-            $this->files->delete($this->statusesFile);
+        if (!isset($this->modulesStatuses[$module->getName()])) {
+            return;
         }
-        $this->modulesStatuses = [];
+        unset($this->modulesStatuses[$module->getName()]);
+        $this->writeJson();
         $this->flushCache();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function enable(Module $module): void
-    {
-        $this->setActiveByName($module->getName(), true);
     }
 
     /**
@@ -107,13 +103,41 @@ class FileActivator implements ActivatorInterface
     /**
      * {@inheritDoc}
      */
+    public function enable(Module $module): void
+    {
+        $this->setActiveByName($module->getName(), true);
+    }
+
+    /**
+     * Get the path of the file where statuses are stored
+     */
+    public function getStatusesFilePath(): string
+    {
+        return $this->statusesFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function hasStatus(Module $module, bool $status): bool
     {
-        if (! isset($this->modulesStatuses[$module->getName()])) {
+        if (!isset($this->modulesStatuses[$module->getName()])) {
             return $status === false;
         }
 
         return $this->modulesStatuses[$module->getName()] === $status;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset(): void
+    {
+        if ($this->files->exists($this->statusesFile)) {
+            $this->files->delete($this->statusesFile);
+        }
+        $this->modulesStatuses = [];
+        $this->flushCache();
     }
 
     /**
@@ -135,38 +159,21 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function delete(Module $module): void
-    {
-        if (! isset($this->modulesStatuses[$module->getName()])) {
-            return;
-        }
-        unset($this->modulesStatuses[$module->getName()]);
-        $this->writeJson();
-        $this->flushCache();
-    }
-
-    /**
-     * Writes the activation statuses in a file, as json
-     */
-    private function writeJson(): void
-    {
-        $this->files->put($this->statusesFile, json_encode($this->modulesStatuses, JSON_PRETTY_PRINT));
-    }
-
-    /**
-     * Reads the json file that contains the activation statuses.
+     * Reads a config parameter under the 'activators.file' key
      *
-     * @throws FileNotFoundException
+     * @return mixed
      */
-    private function readJson(): array
+    private function config(string $key, $default = null)
     {
-        if (! $this->files->exists($this->statusesFile)) {
-            return [];
-        }
+        return $this->config->get('modules.activators.file.' . $key, $default);
+    }
 
-        return json_decode($this->files->get($this->statusesFile), true);
+    /**
+     * Flushes the modules activation statuses cache
+     */
+    private function flushCache(): void
+    {
+        $this->cache->store($this->config->get('modules.cache.driver'))->forget($this->cacheKey);
     }
 
     /**
@@ -177,7 +184,7 @@ class FileActivator implements ActivatorInterface
      */
     private function getModulesStatuses(): array
     {
-        if (! $this->config->get('modules.cache.enabled')) {
+        if (!$this->config->get('modules.cache.enabled')) {
             return $this->readJson();
         }
 
@@ -187,20 +194,24 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * Reads a config parameter under the 'activators.file' key
+     * Reads the json file that contains the activation statuses.
      *
-     * @return mixed
+     * @throws FileNotFoundException
      */
-    private function config(string $key, $default = null)
+    private function readJson(): array
     {
-        return $this->config->get('modules.activators.file.'.$key, $default);
+        if (!$this->files->exists($this->statusesFile)) {
+            return [];
+        }
+
+        return json_decode($this->files->get($this->statusesFile), true);
     }
 
     /**
-     * Flushes the modules activation statuses cache
+     * Writes the activation statuses in a file, as json
      */
-    private function flushCache(): void
+    private function writeJson(): void
     {
-        $this->cache->store($this->config->get('modules.cache.driver'))->forget($this->cacheKey);
+        $this->files->put($this->statusesFile, json_encode($this->modulesStatuses, JSON_PRETTY_PRINT));
     }
 }

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -12,12 +23,7 @@ class MailMakeCommand extends GeneratorCommand
 {
     use ModuleCommandTrait;
 
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-mail';
+    protected $argumentName = 'name';
 
     /**
      * The console command description.
@@ -26,7 +32,12 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected $description = 'Create a new email class for the specified module';
 
-    protected $argumentName = 'name';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-mail';
 
     public function getDefaultNamespace(): string
     {
@@ -48,21 +59,6 @@ class MailMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get template contents.
-     *
-     * @return string
-     */
-    protected function getTemplateContents()
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub('/mail.stub', [
-            'NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClass(),
-        ]))->render();
-    }
-
-    /**
      * Get the destination file path.
      *
      * @return string
@@ -73,7 +69,22 @@ class MailMakeCommand extends GeneratorCommand
 
         $mailPath = GenerateConfigReader::read('emails');
 
-        return $path.$mailPath->getPath().'/'.$this->getFileName().'.php';
+        return $path . $mailPath->getPath() . '/' . $this->getFileName() . '.php';
+    }
+
+    /**
+     * Get template contents.
+     *
+     * @return string
+     */
+    protected function getTemplateContents()
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub('/mail.stub', [
+            'NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS'     => $this->getClass(),
+        ]))->render();
     }
 
     /**

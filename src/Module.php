@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules;
 
@@ -23,6 +34,11 @@ abstract class Module
     protected $app;
 
     /**
+     * @var array of cached Json objects, keyed by filename
+     */
+    protected $moduleJson = [];
+
+    /**
      * The module name.
      */
     protected $name;
@@ -35,9 +51,9 @@ abstract class Module
     protected $path;
 
     /**
-     * @var array of cached Json objects, keyed by filename
+     * @var ActivatorInterface
      */
-    protected $moduleJson = [];
+    private $activator;
 
     /**
      * @var CacheManager
@@ -55,11 +71,6 @@ abstract class Module
     private $translator;
 
     /**
-     * @var ActivatorInterface
-     */
-    private $activator;
-
-    /**
      * The constructor.
      */
     public function __construct(Container $app, string $name, $path)
@@ -71,6 +82,89 @@ abstract class Module
         $this->translator = $app['translator'];
         $this->activator = $app[ActivatorInterface::class];
         $this->app = $app;
+    }
+
+    /**
+     * Handle call __toString.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getStudlyName();
+    }
+
+    /**
+     * Bootstrap the application events.
+     */
+    public function boot(): void
+    {
+        if (config('modules.register.translations', true) === true) {
+            $this->registerTranslation();
+        }
+
+        if ($this->isLoadFilesOnBoot()) {
+            $this->registerFiles();
+        }
+
+        $this->fireEvent('boot');
+    }
+
+    /**
+     * Delete the current module.
+     */
+    public function delete(): bool
+    {
+        $this->activator->delete($this);
+
+        return $this->json()->getFilesystem()->deleteDirectory($this->getPath());
+    }
+
+    /**
+     * Disable the current module.
+     */
+    public function disable(): void
+    {
+        $this->fireEvent('disabling');
+
+        $this->activator->disable($this);
+        $this->flushCache();
+
+        $this->fireEvent('disabled');
+    }
+
+    /**
+     * Enable the current module.
+     */
+    public function enable(): void
+    {
+        $this->fireEvent('enabling');
+
+        $this->activator->enable($this);
+        $this->flushCache();
+
+        $this->fireEvent('enabled');
+    }
+
+    /**
+     * Get a specific data from json file by given the key.
+     *
+     * @param  null  $default
+     * @return mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        return $this->json()->get($key, $default);
+    }
+
+    /**
+     * Get app path.
+     */
+    public function getAppPath(): string
+    {
+        $app_path = rtrim($this->getExtraPath(config('modules.paths.app_folder', '')), '/');
+
+        return is_dir($app_path) ? $app_path : $this->getPath();
     }
 
     /**
@@ -101,35 +195,19 @@ abstract class Module
     }
 
     /**
-     * Get name.
+     * Get the path to the cached *_module.php file.
      */
-    public function getName(): string
-    {
-        return $this->name;
-    }
+    abstract public function getCachedServicesPath(): string;
 
     /**
-     * Get name in lower case.
+     * Get a specific data from composer.json file by given the key.
+     *
+     * @param  null  $default
+     * @return mixed
      */
-    public function getLowerName(): string
+    public function getComposerAttr($key, $default = null)
     {
-        return strtolower($this->name);
-    }
-
-    /**
-     * Get name in studly case.
-     */
-    public function getStudlyName(): string
-    {
-        return Str::studly($this->name);
-    }
-
-    /**
-     * Get name in snake case.
-     */
-    public function getSnakeName(): string
-    {
-        return Str::snake($this->name);
+        return $this->json('composer.json')->get($key, $default);
     }
 
     /**
@@ -141,11 +219,27 @@ abstract class Module
     }
 
     /**
-     * Get priority.
+     * Get extra path.
      */
-    public function getPriority(): string
+    public function getExtraPath(string $path): string
     {
-        return $this->get('priority');
+        return $this->getPath() . '/' . $path;
+    }
+
+    /**
+     * Get name in lower case.
+     */
+    public function getLowerName(): string
+    {
+        return strtolower($this->name);
+    }
+
+    /**
+     * Get name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
@@ -157,56 +251,51 @@ abstract class Module
     }
 
     /**
-     * Get app path.
+     * Get priority.
      */
-    public function getAppPath(): string
+    public function getPriority(): string
     {
-        $app_path = rtrim($this->getExtraPath(config('modules.paths.app_folder', '')), '/');
-
-        return is_dir($app_path) ? $app_path : $this->getPath();
+        return $this->get('priority');
     }
 
     /**
-     * Set path.
-     *
-     * @param  string  $path
-     * @return $this
+     * Get name in snake case.
      */
-    public function setPath($path): Module
+    public function getSnakeName(): string
     {
-        $this->path = $path;
-
-        return $this;
+        return Str::snake($this->name);
     }
 
     /**
-     * Bootstrap the application events.
+     * Get name in studly case.
      */
-    public function boot(): void
+    public function getStudlyName(): string
     {
-        if (config('modules.register.translations', true) === true) {
-            $this->registerTranslation();
-        }
-
-        if ($this->isLoadFilesOnBoot()) {
-            $this->registerFiles();
-        }
-
-        $this->fireEvent('boot');
+        return Str::studly($this->name);
     }
 
     /**
-     * Register module's translation.
+     *  Determine whether the current module not disabled.
      */
-    protected function registerTranslation(): void
+    public function isDisabled(): bool
     {
-        $lowerName = $this->getLowerName();
+        return !$this->isEnabled();
+    }
 
-        $langPath = $this->getPath().'/Resources/lang';
+    /**
+     * Determine whether the current module activated.
+     */
+    public function isEnabled(): bool
+    {
+        return $this->activator->hasStatus($this, true);
+    }
 
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $lowerName);
-        }
+    /**
+     * Determine whether the given status same with the current module status.
+     */
+    public function isStatus(bool $status): bool
+    {
+        return $this->activator->hasStatus($this, $status);
     }
 
     /**
@@ -221,30 +310,8 @@ abstract class Module
         }
 
         return Arr::get($this->moduleJson, $file, function () use ($file) {
-            return $this->moduleJson[$file] = new Json($this->getPath().'/'.$file, $this->files);
+            return $this->moduleJson[$file] = new Json($this->getPath() . '/' . $file, $this->files);
         });
-    }
-
-    /**
-     * Get a specific data from json file by given the key.
-     *
-     * @param  null  $default
-     * @return mixed
-     */
-    public function get(string $key, $default = null)
-    {
-        return $this->json()->get($key, $default);
-    }
-
-    /**
-     * Get a specific data from composer.json file by given the key.
-     *
-     * @param  null  $default
-     * @return mixed
-     */
-    public function getComposerAttr($key, $default = null)
-    {
-        return $this->json('composer.json')->get($key, $default);
     }
 
     /**
@@ -264,16 +331,6 @@ abstract class Module
     }
 
     /**
-     * Register the module event.
-     *
-     * @param  string  $event
-     */
-    protected function fireEvent($event): void
-    {
-        $this->app['events']->dispatch(sprintf('modules.%s.'.$event, $this->getLowerName()), [$this]);
-    }
-
-    /**
      * Register the aliases from this module.
      */
     abstract public function registerAliases(): void;
@@ -284,55 +341,6 @@ abstract class Module
     abstract public function registerProviders(): void;
 
     /**
-     * Get the path to the cached *_module.php file.
-     */
-    abstract public function getCachedServicesPath(): string;
-
-    /**
-     * Register the files from this module.
-     */
-    protected function registerFiles(): void
-    {
-        foreach ($this->get('files', []) as $file) {
-            include $this->path.'/'.$file;
-        }
-    }
-
-    /**
-     * Handle call __toString.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getStudlyName();
-    }
-
-    /**
-     * Determine whether the given status same with the current module status.
-     */
-    public function isStatus(bool $status): bool
-    {
-        return $this->activator->hasStatus($this, $status);
-    }
-
-    /**
-     * Determine whether the current module activated.
-     */
-    public function isEnabled(): bool
-    {
-        return $this->activator->hasStatus($this, true);
-    }
-
-    /**
-     *  Determine whether the current module not disabled.
-     */
-    public function isDisabled(): bool
-    {
-        return ! $this->isEnabled();
-    }
-
-    /**
      * Set active state for current module.
      */
     public function setActive(bool $active): void
@@ -341,47 +349,26 @@ abstract class Module
     }
 
     /**
-     * Disable the current module.
+     * Set path.
+     *
+     * @param  string  $path
+     * @return $this
      */
-    public function disable(): void
+    public function setPath($path): Module
     {
-        $this->fireEvent('disabling');
+        $this->path = $path;
 
-        $this->activator->disable($this);
-        $this->flushCache();
-
-        $this->fireEvent('disabled');
+        return $this;
     }
 
     /**
-     * Enable the current module.
+     * Register the module event.
+     *
+     * @param  string  $event
      */
-    public function enable(): void
+    protected function fireEvent($event): void
     {
-        $this->fireEvent('enabling');
-
-        $this->activator->enable($this);
-        $this->flushCache();
-
-        $this->fireEvent('enabled');
-    }
-
-    /**
-     * Delete the current module.
-     */
-    public function delete(): bool
-    {
-        $this->activator->delete($this);
-
-        return $this->json()->getFilesystem()->deleteDirectory($this->getPath());
-    }
-
-    /**
-     * Get extra path.
-     */
-    public function getExtraPath(string $path): string
-    {
-        return $this->getPath().'/'.$path;
+        $this->app['events']->dispatch(sprintf('modules.%s.' . $event, $this->getLowerName()), [$this]);
     }
 
     /**
@@ -391,7 +378,31 @@ abstract class Module
     {
         return config('modules.register.files', 'register') === 'boot' &&
             // force register method if option == boot && app is AsgardCms
-            ! class_exists('\Modules\Core\Foundation\AsgardCms');
+            !class_exists('\Modules\Core\Foundation\AsgardCms');
+    }
+
+    /**
+     * Register the files from this module.
+     */
+    protected function registerFiles(): void
+    {
+        foreach ($this->get('files', []) as $file) {
+            include $this->path . '/' . $file;
+        }
+    }
+
+    /**
+     * Register module's translation.
+     */
+    protected function registerTranslation(): void
+    {
+        $lowerName = $this->getLowerName();
+
+        $langPath = $this->getPath() . '/Resources/lang';
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $lowerName);
+        }
     }
 
     private function flushCache(): void

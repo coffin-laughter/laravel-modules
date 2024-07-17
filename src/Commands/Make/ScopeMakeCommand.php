@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -15,27 +26,27 @@ class ScopeMakeCommand extends GeneratorCommand
 
     protected $argumentName = 'name';
 
+    protected $description = 'Create a new scope class for the specified module.';
+
     protected $name = 'module:make-scope';
 
-    protected $description = 'Create a new scope class for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        $namespace = config('modules.paths.generator.model.path');
+
+        $parts = explode('/', $namespace);
+        $models = end($parts);
+
+        return $models . '\Scopes';
+    }
 
     public function getDestinationFilePath(): string
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
-        $filePath = GenerateConfigReader::read('scopes')->getPath() ?? config('modules.paths.generator.model.path').'/Scopes';
+        $filePath = GenerateConfigReader::read('scopes')->getPath() ?? config('modules.paths.generator.model.path') . '/Scopes';
 
-        return $path.$filePath.'/'.$this->getScopeName().'.php';
-    }
-
-    protected function getTemplateContents(): string
-    {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClassNameWithoutNamespace(),
-        ]))->render();
+        return $path . $filePath . '/' . $this->getScopeName() . '.php';
     }
 
     protected function getArguments(): array
@@ -58,23 +69,23 @@ class ScopeMakeCommand extends GeneratorCommand
         return Str::studly($this->argument('name'));
     }
 
-    private function getClassNameWithoutNamespace(): array|string
-    {
-        return class_basename($this->getScopeName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        $namespace = config('modules.paths.generator.model.path');
-
-        $parts = explode('/', $namespace);
-        $models = end($parts);
-
-        return $models.'\Scopes';
-    }
-
     protected function getStubName(): string
     {
         return '/scope.stub';
+    }
+
+    protected function getTemplateContents(): string
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS'           => $this->getClassNameWithoutNamespace(),
+        ]))->render();
+    }
+
+    private function getClassNameWithoutNamespace(): array|string
+    {
+        return class_basename($this->getScopeName());
     }
 }

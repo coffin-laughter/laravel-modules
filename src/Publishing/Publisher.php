@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Publishing;
 
@@ -9,6 +20,19 @@ use Nwidart\Modules\Module;
 
 abstract class Publisher implements PublisherInterface
 {
+    /**
+     * The laravel console instance.
+     *
+     * @var \Illuminate\Console\Command
+     */
+    protected $console;
+
+    /**
+     * The error message will displayed at console.
+     *
+     * @var string
+     */
+    protected $error = '';
     /**
      * The name of module will used.
      *
@@ -24,11 +48,11 @@ abstract class Publisher implements PublisherInterface
     protected $repository;
 
     /**
-     * The laravel console instance.
+     * Determine whether the result message will shown in the console.
      *
-     * @var \Illuminate\Console\Command
+     * @var bool
      */
-    protected $console;
+    protected $showMessage = true;
 
     /**
      * The success message will displayed at console.
@@ -36,20 +60,6 @@ abstract class Publisher implements PublisherInterface
      * @var string
      */
     protected $success;
-
-    /**
-     * The error message will displayed at console.
-     *
-     * @var string
-     */
-    protected $error = '';
-
-    /**
-     * Determine whether the result message will shown in the console.
-     *
-     * @var bool
-     */
-    protected $showMessage = true;
 
     /**
      * The constructor.
@@ -60,16 +70,58 @@ abstract class Publisher implements PublisherInterface
     }
 
     /**
-     * Show the result message.
+     * Get console instance.
      *
-     * @return self
+     * @return \Illuminate\Console\Command
      */
-    public function showMessage()
+    public function getConsole()
     {
-        $this->showMessage = true;
-
-        return $this;
+        return $this->console;
     }
+
+    /**
+     * Get destination path.
+     *
+     * @return string
+     */
+    abstract public function getDestinationPath();
+
+    /**
+     * Get laravel filesystem instance.
+     *
+     * @return \Illuminate\Filesystem\Filesystem
+     */
+    public function getFilesystem()
+    {
+        return $this->repository->getFiles();
+    }
+
+    /**
+     * Get module instance.
+     *
+     * @return \Nwidart\Modules\Module
+     */
+    public function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * Get modules repository instance.
+     *
+     * @return RepositoryInterface
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Get source path.
+     *
+     * @return string
+     */
+    abstract public function getSourcePath();
 
     /**
      * Hide the result message.
@@ -84,35 +136,32 @@ abstract class Publisher implements PublisherInterface
     }
 
     /**
-     * Get module instance.
-     *
-     * @return \Nwidart\Modules\Module
+     * Publish something.
      */
-    public function getModule()
+    public function publish()
     {
-        return $this->module;
-    }
+        if (!$this->console instanceof Command) {
+            $message = "The 'console' property must instance of \\Illuminate\\Console\\Command.";
 
-    /**
-     * Set modules repository instance.
-     *
-     * @return $this
-     */
-    public function setRepository(RepositoryInterface $repository)
-    {
-        $this->repository = $repository;
+            throw new \RuntimeException($message);
+        }
 
-        return $this;
-    }
+        if (!$this->getFilesystem()->isDirectory($sourcePath = $this->getSourcePath())) {
+            return;
+        }
 
-    /**
-     * Get modules repository instance.
-     *
-     * @return RepositoryInterface
-     */
-    public function getRepository()
-    {
-        return $this->repository;
+        if (!$this->getFilesystem()->isDirectory($destinationPath = $this->getDestinationPath())) {
+            $this->getFilesystem()->makeDirectory($destinationPath, 0775, true);
+        }
+
+        if ($this->getFilesystem()->copyDirectory($sourcePath, $destinationPath)) {
+            if ($this->showMessage === true) {
+                $this->console->components->task($this->module->getStudlyName(), fn () => true);
+            }
+        } else {
+            $this->console->components->task($this->module->getStudlyName(), fn () => false);
+            $this->console->components->error($this->error);
+        }
     }
 
     /**
@@ -129,65 +178,26 @@ abstract class Publisher implements PublisherInterface
     }
 
     /**
-     * Get console instance.
+     * Set modules repository instance.
      *
-     * @return \Illuminate\Console\Command
+     * @return $this
      */
-    public function getConsole()
+    public function setRepository(RepositoryInterface $repository)
     {
-        return $this->console;
+        $this->repository = $repository;
+
+        return $this;
     }
 
     /**
-     * Get laravel filesystem instance.
+     * Show the result message.
      *
-     * @return \Illuminate\Filesystem\Filesystem
+     * @return self
      */
-    public function getFilesystem()
+    public function showMessage()
     {
-        return $this->repository->getFiles();
-    }
+        $this->showMessage = true;
 
-    /**
-     * Get destination path.
-     *
-     * @return string
-     */
-    abstract public function getDestinationPath();
-
-    /**
-     * Get source path.
-     *
-     * @return string
-     */
-    abstract public function getSourcePath();
-
-    /**
-     * Publish something.
-     */
-    public function publish()
-    {
-        if (! $this->console instanceof Command) {
-            $message = "The 'console' property must instance of \\Illuminate\\Console\\Command.";
-
-            throw new \RuntimeException($message);
-        }
-
-        if (! $this->getFilesystem()->isDirectory($sourcePath = $this->getSourcePath())) {
-            return;
-        }
-
-        if (! $this->getFilesystem()->isDirectory($destinationPath = $this->getDestinationPath())) {
-            $this->getFilesystem()->makeDirectory($destinationPath, 0775, true);
-        }
-
-        if ($this->getFilesystem()->copyDirectory($sourcePath, $destinationPath)) {
-            if ($this->showMessage === true) {
-                $this->console->components->task($this->module->getStudlyName(), fn () => true);
-            }
-        } else {
-            $this->console->components->task($this->module->getStudlyName(), fn () => false);
-            $this->console->components->error($this->error);
-        }
+        return $this;
     }
 }

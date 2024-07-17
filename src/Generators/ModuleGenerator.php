@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Generators;
 
@@ -17,32 +28,18 @@ class ModuleGenerator extends Generator
     use PathNamespace;
 
     /**
-     * The module name will created.
+     * The activator instance
      *
-     * @var string
+     * @var ActivatorInterface
      */
-    protected $name;
+    protected $activator;
 
     /**
-     * The laravel config instance.
-     *
-     * @var Config
+     * Module author
      */
-    protected $config;
-
-    /**
-     * The laravel filesystem instance.
-     *
-     * @var Filesystem
-     */
-    protected $filesystem;
-
-    /**
-     * The laravel console instance.
-     *
-     * @var Console
-     */
-    protected $console;
+    protected array $author = [
+        'name', 'email',
+    ];
 
     /**
      * The laravel component Factory instance.
@@ -52,18 +49,25 @@ class ModuleGenerator extends Generator
     protected $component;
 
     /**
-     * The activator instance
+     * The laravel config instance.
      *
-     * @var ActivatorInterface
+     * @var Config
      */
-    protected $activator;
+    protected $config;
 
     /**
-     * The module instance.
+     * The laravel console instance.
      *
-     * @var \Nwidart\Modules\Module
+     * @var Console
      */
-    protected $module;
+    protected $console;
+
+    /**
+     * The laravel filesystem instance.
+     *
+     * @var Filesystem
+     */
+    protected $filesystem;
 
     /**
      * Force status.
@@ -73,13 +77,6 @@ class ModuleGenerator extends Generator
     protected $force = false;
 
     /**
-     * set default module type.
-     *
-     * @var string
-     */
-    protected $type = 'web';
-
-    /**
      * Enables the module.
      *
      * @var bool
@@ -87,11 +84,25 @@ class ModuleGenerator extends Generator
     protected $isActive = false;
 
     /**
-     * Module author
+     * The module instance.
+     *
+     * @var \Nwidart\Modules\Module
      */
-    protected array $author = [
-        'name', 'email',
-    ];
+    protected $module;
+
+    /**
+     * The module name will created.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * set default module type.
+     *
+     * @var string
+     */
+    protected $type = 'web';
 
     /**
      * Vendor name
@@ -115,217 +126,6 @@ class ModuleGenerator extends Generator
         $this->console = $console;
         $this->module = $module;
         $this->activator = $activator;
-    }
-
-    /**
-     * Set type.
-     *
-     * @param  string  $type
-     * @return $this
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Set active flag.
-     *
-     *
-     * @return $this
-     */
-    public function setActive(bool $active)
-    {
-        $this->isActive = $active;
-
-        return $this;
-    }
-
-    /**
-     * Get the name of module will created. By default in studly case.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return Str::studly($this->name);
-    }
-
-    /**
-     * Get the laravel config instance.
-     *
-     * @return Config
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * Set the laravel config instance.
-     *
-     * @param  Config  $config
-     * @return $this
-     */
-    public function setConfig($config)
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
-     * Set the modules activator
-     *
-     *
-     * @return $this
-     */
-    public function setActivator(ActivatorInterface $activator)
-    {
-        $this->activator = $activator;
-
-        return $this;
-    }
-
-    /**
-     * Get the laravel filesystem instance.
-     *
-     * @return Filesystem
-     */
-    public function getFilesystem()
-    {
-        return $this->filesystem;
-    }
-
-    /**
-     * Set the laravel filesystem instance.
-     *
-     * @param  Filesystem  $filesystem
-     * @return $this
-     */
-    public function setFilesystem($filesystem)
-    {
-        $this->filesystem = $filesystem;
-
-        return $this;
-    }
-
-    /**
-     * Get the laravel console instance.
-     *
-     * @return Console
-     */
-    public function getConsole()
-    {
-        return $this->console;
-    }
-
-    /**
-     * Set the laravel console instance.
-     *
-     * @param  Console  $console
-     * @return $this
-     */
-    public function setConsole($console)
-    {
-        $this->console = $console;
-
-        return $this;
-    }
-
-    public function getComponent(): \Illuminate\Console\View\Components\Factory
-    {
-        return $this->component;
-    }
-
-    public function setComponent(\Illuminate\Console\View\Components\Factory $component): self
-    {
-        $this->component = $component;
-
-        return $this;
-    }
-
-    /**
-     * Get the module instance.
-     *
-     * @return \Nwidart\Modules\Module
-     */
-    public function getModule()
-    {
-        return $this->module;
-    }
-
-    /**
-     * Set the module instance.
-     *
-     * @param  mixed  $module
-     * @return $this
-     */
-    public function setModule($module)
-    {
-        $this->module = $module;
-
-        return $this;
-    }
-
-    /**
-     * Setting the author from the command
-     *
-     * @return $this
-     */
-    public function setAuthor(?string $name = null, ?string $email = null)
-    {
-        $this->author['name'] = $name;
-        $this->author['email'] = $email;
-
-        return $this;
-    }
-
-    /**
-     * Installing vendor from the command
-     *
-     * @return $this
-     */
-    public function setVendor(?string $vendor = null)
-    {
-        $this->vendor = $vendor;
-
-        return $this;
-    }
-
-    /**
-     * Get the list of folders will created.
-     *
-     * @return array
-     */
-    public function getFolders()
-    {
-        return $this->module->config('paths.generator');
-    }
-
-    /**
-     * Get the list of files will created.
-     *
-     * @return array
-     */
-    public function getFiles()
-    {
-        return $this->module->config('stubs.files');
-    }
-
-    /**
-     * Set force status.
-     *
-     * @param  bool|int  $force
-     * @return $this
-     */
-    public function setForce($force)
-    {
-        $this->force = $force;
-
-        return $this;
     }
 
     /**
@@ -369,6 +169,24 @@ class ModuleGenerator extends Generator
     }
 
     /**
+     * Generate the files.
+     */
+    public function generateFiles()
+    {
+        foreach ($this->getFiles() as $stub => $file) {
+            $path = $this->module->getModulePath($this->getName()) . $file;
+
+            $this->component->task("Generating file {$path}", function () use ($stub, $path) {
+                if (!$this->filesystem->isDirectory($dir = dirname($path))) {
+                    $this->filesystem->makeDirectory($dir, 0775, true);
+                }
+
+                $this->filesystem->put($path, $this->getStubContents($stub));
+            });
+        }
+    }
+
+    /**
      * Generate the folders.
      */
     public function generateFolders()
@@ -380,7 +198,7 @@ class ModuleGenerator extends Generator
                 continue;
             }
 
-            $path = $this->module->getModulePath($this->getName()).'/'.$folder->getPath();
+            $path = $this->module->getModulePath($this->getName()) . '/' . $folder->getPath();
 
             $this->filesystem->ensureDirectoryExists($path, 0755, true);
             if (config('modules.stubs.gitkeep')) {
@@ -396,25 +214,7 @@ class ModuleGenerator extends Generator
      */
     public function generateGitKeep($path)
     {
-        $this->filesystem->put($path.'/.gitkeep', '');
-    }
-
-    /**
-     * Generate the files.
-     */
-    public function generateFiles()
-    {
-        foreach ($this->getFiles() as $stub => $file) {
-            $path = $this->module->getModulePath($this->getName()).$file;
-
-            $this->component->task("Generating file {$path}", function () use ($stub, $path) {
-                if (! $this->filesystem->isDirectory($dir = dirname($path))) {
-                    $this->filesystem->makeDirectory($dir, 0775, true);
-                }
-
-                $this->filesystem->put($path, $this->getStubContents($stub));
-            });
-        }
+        $this->filesystem->put($path . '/.gitkeep', '');
     }
 
     /**
@@ -424,8 +224,8 @@ class ModuleGenerator extends Generator
     {
         if (GenerateConfigReader::read('seeder')->generate() === true) {
             $this->console->call('module:make-seed', [
-                'name' => $this->getName(),
-                'module' => $this->getName(),
+                'name'     => $this->getName(),
+                'module'   => $this->getName(),
                 '--master' => true,
             ]);
         }
@@ -433,13 +233,13 @@ class ModuleGenerator extends Generator
         $providerGenerator = GenerateConfigReader::read('provider');
         if ($providerGenerator->generate() === true) {
             $this->console->call('module:make-provider', [
-                'name' => $this->getName().'ServiceProvider',
-                'module' => $this->getName(),
+                'name'     => $this->getName() . 'ServiceProvider',
+                'module'   => $this->getName(),
                 '--master' => true,
             ]);
         } else {
             // delete register ServiceProvider on module.json
-            $path = $this->module->getModulePath($this->getName()).DIRECTORY_SEPARATOR.'module.json';
+            $path = $this->module->getModulePath($this->getName()) . DIRECTORY_SEPARATOR . 'module.json';
             $module_file = $this->filesystem->get($path);
             $this->filesystem->put(
                 $path,
@@ -450,7 +250,7 @@ class ModuleGenerator extends Generator
         $eventGeneratorConfig = GenerateConfigReader::read('event-provider');
         if (
             (is_null($eventGeneratorConfig->getPath()) && $providerGenerator->generate())
-            || (! is_null($eventGeneratorConfig->getPath()) && $eventGeneratorConfig->generate())
+            || (!is_null($eventGeneratorConfig->getPath()) && $eventGeneratorConfig->generate())
         ) {
             $this->console->call('module:make-event-provider', [
                 'module' => $this->getName(),
@@ -461,7 +261,7 @@ class ModuleGenerator extends Generator
                 $this->filesystem->replaceInFile(
                     '$this->app->register(Event',
                     '// $this->app->register(Event',
-                    $this->module->getModulePath($this->getName()).DIRECTORY_SEPARATOR.$providerGenerator->getPath().DIRECTORY_SEPARATOR.sprintf('%sServiceProvider.php', $this->getName())
+                    $this->module->getModulePath($this->getName()) . DIRECTORY_SEPARATOR . $providerGenerator->getPath() . DIRECTORY_SEPARATOR . sprintf('%sServiceProvider.php', $this->getName())
                 );
             }
         }
@@ -469,7 +269,7 @@ class ModuleGenerator extends Generator
         $routeGeneratorConfig = GenerateConfigReader::read('route-provider');
         if (
             (is_null($routeGeneratorConfig->getPath()) && $providerGenerator->generate())
-            || (! is_null($routeGeneratorConfig->getPath()) && $routeGeneratorConfig->generate())
+            || (!is_null($routeGeneratorConfig->getPath()) && $routeGeneratorConfig->generate())
         ) {
             $this->console->call('module:route-provider', [
                 'module' => $this->getName(),
@@ -480,7 +280,7 @@ class ModuleGenerator extends Generator
                 $this->filesystem->replaceInFile(
                     '$this->app->register(Route',
                     '// $this->app->register(Route',
-                    $this->module->getModulePath($this->getName()).DIRECTORY_SEPARATOR.$providerGenerator->getPath().DIRECTORY_SEPARATOR.sprintf('%sServiceProvider.php', $this->getName())
+                    $this->module->getModulePath($this->getName()) . DIRECTORY_SEPARATOR . $providerGenerator->getPath() . DIRECTORY_SEPARATOR . sprintf('%sServiceProvider.php', $this->getName())
                 );
             }
         }
@@ -488,25 +288,85 @@ class ModuleGenerator extends Generator
         if (GenerateConfigReader::read('controller')->generate() === true) {
             $options = $this->type == 'api' ? ['--api' => true] : [];
             $this->console->call('module:make-controller', [
-                'controller' => $this->getName().'Controller',
-                'module' => $this->getName(),
+                'controller' => $this->getName() . 'Controller',
+                'module'     => $this->getName(),
             ] + $options);
         }
     }
 
+    public function getComponent(): \Illuminate\Console\View\Components\Factory
+    {
+        return $this->component;
+    }
+
     /**
-     * Get the contents of the specified stub file by given stub name.
+     * Get the laravel config instance.
      *
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Get the laravel console instance.
+     *
+     * @return Console
+     */
+    public function getConsole()
+    {
+        return $this->console;
+    }
+
+    /**
+     * Get the list of files will created.
+     *
+     * @return array
+     */
+    public function getFiles()
+    {
+        return $this->module->config('stubs.files');
+    }
+
+    /**
+     * Get the laravel filesystem instance.
+     *
+     * @return Filesystem
+     */
+    public function getFilesystem()
+    {
+        return $this->filesystem;
+    }
+
+    /**
+     * Get the list of folders will created.
+     *
+     * @return array
+     */
+    public function getFolders()
+    {
+        return $this->module->config('paths.generator');
+    }
+
+    /**
+     * Get the module instance.
+     *
+     * @return \Nwidart\Modules\Module
+     */
+    public function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * Get the name of module will created. By default in studly case.
      *
      * @return string
      */
-    protected function getStubContents($stub)
+    public function getName()
     {
-        return (new Stub(
-            '/'.$stub.'.stub',
-            $this->getReplacement($stub)
-        )
-        )->render();
+        return Str::studly($this->name);
     }
 
     /**
@@ -515,6 +375,197 @@ class ModuleGenerator extends Generator
     public function getReplacements()
     {
         return $this->module->config('stubs.replacements');
+    }
+
+    /**
+     * Set the modules activator
+     *
+     *
+     * @return $this
+     */
+    public function setActivator(ActivatorInterface $activator)
+    {
+        $this->activator = $activator;
+
+        return $this;
+    }
+
+    /**
+     * Set active flag.
+     *
+     *
+     * @return $this
+     */
+    public function setActive(bool $active)
+    {
+        $this->isActive = $active;
+
+        return $this;
+    }
+
+    /**
+     * Setting the author from the command
+     *
+     * @return $this
+     */
+    public function setAuthor(?string $name = null, ?string $email = null)
+    {
+        $this->author['name'] = $name;
+        $this->author['email'] = $email;
+
+        return $this;
+    }
+
+    public function setComponent(\Illuminate\Console\View\Components\Factory $component): self
+    {
+        $this->component = $component;
+
+        return $this;
+    }
+
+    /**
+     * Set the laravel config instance.
+     *
+     * @param  Config  $config
+     * @return $this
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
+     * Set the laravel console instance.
+     *
+     * @param  Console  $console
+     * @return $this
+     */
+    public function setConsole($console)
+    {
+        $this->console = $console;
+
+        return $this;
+    }
+
+    /**
+     * Set the laravel filesystem instance.
+     *
+     * @param  Filesystem  $filesystem
+     * @return $this
+     */
+    public function setFilesystem($filesystem)
+    {
+        $this->filesystem = $filesystem;
+
+        return $this;
+    }
+
+    /**
+     * Set force status.
+     *
+     * @param  bool|int  $force
+     * @return $this
+     */
+    public function setForce($force)
+    {
+        $this->force = $force;
+
+        return $this;
+    }
+
+    /**
+     * Set the module instance.
+     *
+     * @param  mixed  $module
+     * @return $this
+     */
+    public function setModule($module)
+    {
+        $this->module = $module;
+
+        return $this;
+    }
+
+    /**
+     * Set type.
+     *
+     * @param  string  $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Installing vendor from the command
+     *
+     * @return $this
+     */
+    public function setVendor(?string $vendor = null)
+    {
+        $this->vendor = $vendor;
+
+        return $this;
+    }
+
+    /**
+     * Get replacement for $APP_FOLDER_NAME$.
+     *
+     * @return string
+     */
+    protected function getAppFolderNameReplacement()
+    {
+        return $this->module->config('paths.app_folder');
+    }
+
+    /**
+     * Get replacement for $AUTHOR_EMAIL$.
+     *
+     * @return string
+     */
+    protected function getAuthorEmailReplacement()
+    {
+        return $this->author['email'] ?: $this->module->config('composer.author.email');
+    }
+
+    /**
+     * Get replacement for $AUTHOR_NAME$.
+     *
+     * @return string
+     */
+    protected function getAuthorNameReplacement()
+    {
+        return $this->author['name'] ?: $this->module->config('composer.author.name');
+    }
+
+    /**
+     * Get the module name in lower case.
+     *
+     * @return string
+     */
+    protected function getLowerNameReplacement()
+    {
+        return strtolower($this->getName());
+    }
+
+    /**
+     * Get replacement for $MODULE_NAMESPACE$.
+     *
+     * @return string
+     */
+    protected function getModuleNamespaceReplacement()
+    {
+        return str_replace('\\', '\\\\', $this->module->config('namespace') ?? $this->path_namespace($this->module->config('paths.modules')));
+    }
+
+    protected function getProviderNamespaceReplacement(): string
+    {
+        return str_replace('\\', '\\\\', GenerateConfigReader::read('provider')->getNamespace());
     }
 
     /**
@@ -527,11 +578,11 @@ class ModuleGenerator extends Generator
     {
         $replacements = $this->module->config('stubs.replacements');
 
-        if (! isset($replacements['composer']['APP_FOLDER_NAME'])) {
+        if (!isset($replacements['composer']['APP_FOLDER_NAME'])) {
             $replacements['composer'][] = 'APP_FOLDER_NAME';
         }
 
-        if (! isset($replacements[$stub])) {
+        if (!isset($replacements[$stub])) {
             return [];
         }
 
@@ -545,7 +596,7 @@ class ModuleGenerator extends Generator
             }
         }
         foreach ($keys as $key) {
-            if (method_exists($this, $method = 'get'.ucfirst(Str::studly(strtolower($key))).'Replacement')) {
+            if (method_exists($this, $method = 'get' . ucfirst(Str::studly(strtolower($key))) . 'Replacement')) {
                 $replaces[$key] = $this->$method();
             } else {
                 $replaces[$key] = null;
@@ -556,48 +607,18 @@ class ModuleGenerator extends Generator
     }
 
     /**
-     * Generate the module.json file
-     */
-    private function generateModuleJsonFile()
-    {
-        $path = $this->module->getModulePath($this->getName()).'module.json';
-
-        $this->component->task("Generating file $path", function () use ($path) {
-            if (! $this->filesystem->isDirectory($dir = dirname($path))) {
-                $this->filesystem->makeDirectory($dir, 0775, true);
-            }
-
-            $this->filesystem->put($path, $this->getStubContents('json'));
-        });
-    }
-
-    /**
-     * Remove the default service provider that was added in the module.json file
-     * This is needed when a --plain module was created
-     */
-    private function cleanModuleJsonFile()
-    {
-        $path = $this->module->getModulePath($this->getName()).'module.json';
-
-        $content = $this->filesystem->get($path);
-        $namespace = $this->getModuleNamespaceReplacement();
-        $studlyName = $this->getStudlyNameReplacement();
-
-        $provider = '"'.$namespace.'\\\\'.$studlyName.'\\\\Providers\\\\'.$studlyName.'ServiceProvider"';
-
-        $content = str_replace($provider, '', $content);
-
-        $this->filesystem->put($path, $content);
-    }
-
-    /**
-     * Get the module name in lower case.
+     * Get the contents of the specified stub file by given stub name.
+     *
      *
      * @return string
      */
-    protected function getLowerNameReplacement()
+    protected function getStubContents($stub)
     {
-        return strtolower($this->getName());
+        return (new Stub(
+            '/' . $stub . '.stub',
+            $this->getReplacement($stub)
+        )
+        )->render();
     }
 
     /**
@@ -621,13 +642,38 @@ class ModuleGenerator extends Generator
     }
 
     /**
-     * Get replacement for $MODULE_NAMESPACE$.
-     *
-     * @return string
+     * Remove the default service provider that was added in the module.json file
+     * This is needed when a --plain module was created
      */
-    protected function getModuleNamespaceReplacement()
+    private function cleanModuleJsonFile()
     {
-        return str_replace('\\', '\\\\', $this->module->config('namespace') ?? $this->path_namespace($this->module->config('paths.modules')));
+        $path = $this->module->getModulePath($this->getName()) . 'module.json';
+
+        $content = $this->filesystem->get($path);
+        $namespace = $this->getModuleNamespaceReplacement();
+        $studlyName = $this->getStudlyNameReplacement();
+
+        $provider = '"' . $namespace . '\\\\' . $studlyName . '\\\\Providers\\\\' . $studlyName . 'ServiceProvider"';
+
+        $content = str_replace($provider, '', $content);
+
+        $this->filesystem->put($path, $content);
+    }
+
+    /**
+     * Generate the module.json file
+     */
+    private function generateModuleJsonFile()
+    {
+        $path = $this->module->getModulePath($this->getName()) . 'module.json';
+
+        $this->component->task("Generating file $path", function () use ($path) {
+            if (!$this->filesystem->isDirectory($dir = dirname($path))) {
+                $this->filesystem->makeDirectory($dir, 0775, true);
+            }
+
+            $this->filesystem->put($path, $this->getStubContents('json'));
+        });
     }
 
     /**
@@ -640,40 +686,5 @@ class ModuleGenerator extends Generator
         } else {
             return $this->path_namespace(ltrim($this->module->config('paths.generator.controller.path', 'app/Http/Controllers'), config('modules.paths.app_folder')));
         }
-    }
-
-    /**
-     * Get replacement for $AUTHOR_NAME$.
-     *
-     * @return string
-     */
-    protected function getAuthorNameReplacement()
-    {
-        return $this->author['name'] ?: $this->module->config('composer.author.name');
-    }
-
-    /**
-     * Get replacement for $AUTHOR_EMAIL$.
-     *
-     * @return string
-     */
-    protected function getAuthorEmailReplacement()
-    {
-        return $this->author['email'] ?: $this->module->config('composer.author.email');
-    }
-
-    /**
-     * Get replacement for $APP_FOLDER_NAME$.
-     *
-     * @return string
-     */
-    protected function getAppFolderNameReplacement()
-    {
-        return $this->module->config('paths.app_folder');
-    }
-
-    protected function getProviderNamespaceReplacement(): string
-    {
-        return str_replace('\\', '\\\\', GenerateConfigReader::read('provider')->getNamespace());
     }
 }

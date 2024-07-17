@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -22,18 +33,18 @@ class ProviderMakeCommand extends GeneratorCommand
     protected $argumentName = 'name';
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:make-provider';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a new service provider class for the specified module.';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:make-provider';
 
     public function getDefaultNamespace(): string
     {
@@ -52,6 +63,18 @@ class ProviderMakeCommand extends GeneratorCommand
             ['name', InputArgument::REQUIRED, 'The service provider name.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be used.'],
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getDestinationFilePath()
+    {
+        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
+
+        $generatorPath = GenerateConfigReader::read('provider');
+
+        return $path . $generatorPath->getPath() . '/' . $this->getFileName() . '.php';
     }
 
     /**
@@ -76,32 +99,20 @@ class ProviderMakeCommand extends GeneratorCommand
         /** @var Module $module */
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
-        return (new Stub('/'.$stub.'.stub', [
-            'NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClass(),
-            'LOWER_NAME' => $module->getLowerName(),
-            'MODULE' => $this->getModuleName(),
-            'NAME' => $this->getFileName(),
-            'STUDLY_NAME' => $module->getStudlyName(),
+        return (new Stub('/' . $stub . '.stub', [
+            'NAMESPACE'        => $this->getClassNamespace($module),
+            'CLASS'            => $this->getClass(),
+            'LOWER_NAME'       => $module->getLowerName(),
+            'MODULE'           => $this->getModuleName(),
+            'NAME'             => $this->getFileName(),
+            'STUDLY_NAME'      => $module->getStudlyName(),
             'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
-            'PATH_VIEWS' => GenerateConfigReader::read('views')->getPath(),
-            'PATH_LANG' => GenerateConfigReader::read('lang')->getPath(),
-            'PATH_CONFIG' => GenerateConfigReader::read('config')->getPath(),
-            'MIGRATIONS_PATH' => GenerateConfigReader::read('migration')->getPath(),
-            'FACTORIES_PATH' => GenerateConfigReader::read('factory')->getPath(),
+            'PATH_VIEWS'       => GenerateConfigReader::read('views')->getPath(),
+            'PATH_LANG'        => GenerateConfigReader::read('lang')->getPath(),
+            'PATH_CONFIG'      => GenerateConfigReader::read('config')->getPath(),
+            'MIGRATIONS_PATH'  => GenerateConfigReader::read('migration')->getPath(),
+            'FACTORIES_PATH'   => GenerateConfigReader::read('factory')->getPath(),
         ]))->render();
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getDestinationFilePath()
-    {
-        $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-
-        $generatorPath = GenerateConfigReader::read('provider');
-
-        return $path.$generatorPath->getPath().'/'.$this->getFileName().'.php';
     }
 
     /**

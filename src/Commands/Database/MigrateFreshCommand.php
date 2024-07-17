@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Database;
 
@@ -10,25 +21,24 @@ use Symfony\Component\Console\Input\InputOption;
 class MigrateFreshCommand extends BaseCommand
 {
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:migrate-fresh';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Reset all database tables and re-run the modules migrations.';
 
+    protected Collection $migration_paths;
+
     /**
      * The migrator instance.
      */
     protected Migrator $migrator;
-
-    protected Collection $migration_paths;
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'module:migrate-fresh';
 
     public function __construct()
     {
@@ -38,14 +48,26 @@ class MigrateFreshCommand extends BaseCommand
         $this->migration_paths = collect($this->migrator->paths());
     }
 
+    public function executeAction($name): void
+    {
+        $module = $this->getModuleModel($name);
+
+        $this->call('module:migrate', array_filter([
+            'module'     => $module->getStudlyName(),
+            '--database' => $this->option('database'),
+            '--force'    => $this->option('force'),
+            '--seed'     => $this->option('seed'),
+        ]));
+    }
+
     public function handle(): void
     {
         // drop tables
         $this->components->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
-            '--database' => $this->option('database'),
+            '--database'   => $this->option('database'),
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
-            '--force' => true,
+            '--force'      => true,
         ])) == 0);
 
         // create migration table
@@ -61,27 +83,15 @@ class MigrateFreshCommand extends BaseCommand
             $this->components->twoColumnDetail('Running Migration of <fg=cyan;options=bold>Root</>');
 
             $this->call('migrate', array_filter([
-                '--path' => $root_paths->toArray(),
+                '--path'     => $root_paths->toArray(),
                 '--database' => $this->option('database'),
-                '--pretend' => $this->option('pretend'),
-                '--force' => $this->option('force'),
+                '--pretend'  => $this->option('pretend'),
+                '--force'    => $this->option('force'),
                 '--realpath' => true,
             ]));
         }
 
         parent::handle();
-    }
-
-    public function executeAction($name): void
-    {
-        $module = $this->getModuleModel($name);
-
-        $this->call('module:migrate', array_filter([
-            'module' => $module->getStudlyName(),
-            '--database' => $this->option('database'),
-            '--force' => $this->option('force'),
-            '--seed' => $this->option('seed'),
-        ]));
     }
 
     /**

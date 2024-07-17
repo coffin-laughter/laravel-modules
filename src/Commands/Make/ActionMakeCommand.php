@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Make;
 
@@ -15,27 +26,27 @@ class ActionMakeCommand extends GeneratorCommand
 
     protected $argumentName = 'name';
 
+    protected $description = 'Create a new action class for the specified module.';
+
     protected $name = 'module:make-action';
 
-    protected $description = 'Create a new action class for the specified module.';
+    public function getDefaultNamespace(): string
+    {
+        return config('modules.paths.generator.actions.namespace', 'Actions');
+    }
 
     public function getDestinationFilePath(): string
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
-        $filePath = GenerateConfigReader::read('actions')->getPath() ?? config('modules.paths.app_folder').'Actions';
+        $filePath = GenerateConfigReader::read('actions')->getPath() ?? config('modules.paths.app_folder') . 'Actions';
 
-        return $path.$filePath.'/'.$this->getActionName().'.php';
+        return $path . $filePath . '/' . $this->getActionName() . '.php';
     }
 
-    protected function getTemplateContents(): string
+    protected function getActionName(): array|string
     {
-        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-
-        return (new Stub($this->getStubName(), [
-            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
-            'CLASS' => $this->getClassNameWithoutNamespace(),
-        ]))->render();
+        return Str::studly($this->argument('name'));
     }
 
     protected function getArguments(): array
@@ -54,23 +65,23 @@ class ActionMakeCommand extends GeneratorCommand
         ];
     }
 
-    protected function getActionName(): array|string
+    protected function getStubName(): string
     {
-        return Str::studly($this->argument('name'));
+        return $this->option('invokable') === true ? '/action-invoke.stub' : '/action.stub';
+    }
+
+    protected function getTemplateContents(): string
+    {
+        $module = $this->laravel['modules']->findOrFail($this->getModuleName());
+
+        return (new Stub($this->getStubName(), [
+            'CLASS_NAMESPACE' => $this->getClassNamespace($module),
+            'CLASS'           => $this->getClassNameWithoutNamespace(),
+        ]))->render();
     }
 
     private function getClassNameWithoutNamespace(): array|string
     {
         return class_basename($this->getActionName());
-    }
-
-    public function getDefaultNamespace(): string
-    {
-        return config('modules.paths.generator.actions.namespace', 'Actions');
-    }
-
-    protected function getStubName(): string
-    {
-        return $this->option('invokable') === true ? '/action-invoke.stub' : '/action.stub';
     }
 }

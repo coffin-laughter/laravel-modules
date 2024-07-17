@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Commands\Actions;
 
@@ -18,6 +29,13 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
 {
     public const ALL = 'All';
 
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Prune models by module that are no longer needed';
+
     protected $name = 'module:prune';
 
     /**
@@ -34,11 +52,58 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
                                 {--pretend : Display the number of prunable records found instead of deleting them}';
 
     /**
-     * The console command description.
-     *
-     * @var string
+     * Determine the models that should be pruned.
      */
-    protected $description = 'Prune models by module that are no longer needed';
+    protected function models(): Collection
+    {
+        if (!empty($models = $this->option('model'))) {
+            return collect($models)->filter(function ($model) {
+                return class_exists($model);
+            })->values();
+        }
+
+        $except = $this->option('except');
+
+        if (!empty($models) && !empty($except)) {
+            throw new InvalidArgumentException('The --models and --except options cannot be combined.');
+        }
+
+        if ($this->argument('module') == [self::ALL]) {
+            $path = sprintf(
+                '%s/*/%s',
+                config('modules.paths.modules'),
+                config('modules.paths.generator.model.path')
+            );
+        } else {
+            $path = sprintf(
+                '%s/{%s}/%s',
+                config('modules.paths.modules'),
+                collect($this->argument('module'))->implode(','),
+                config('modules.paths.generator.model.path')
+            );
+        }
+
+        return collect(Finder::create()->in($path)->files()->name('*.php'))
+            ->map(function ($model) {
+
+                $namespace = config('modules.namespace');
+
+                return $namespace . str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    Str::after($model->getRealPath(), realpath(config('modules.paths.modules')))
+                );
+            })->values()
+            ->when(!empty($except), function ($models) use ($except) {
+                return $models->reject(function ($model) use ($except) {
+                    return in_array($model, $except);
+                });
+            })->filter(function ($model) {
+                return class_exists($model);
+            })->filter(function ($model) {
+                return $this->isPrunable($model);
+            })->values();
+    }
 
     protected function promptForMissingArguments(InputInterface $input, OutputInterface $output): void
     {
@@ -63,59 +128,5 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
                 ? [self::ALL]
                 : $selected_item
         );
-    }
-
-    /**
-     * Determine the models that should be pruned.
-     */
-    protected function models(): Collection
-    {
-        if (! empty($models = $this->option('model'))) {
-            return collect($models)->filter(function ($model) {
-                return class_exists($model);
-            })->values();
-        }
-
-        $except = $this->option('except');
-
-        if (! empty($models) && ! empty($except)) {
-            throw new InvalidArgumentException('The --models and --except options cannot be combined.');
-        }
-
-        if ($this->argument('module') == [self::ALL]) {
-            $path = sprintf(
-                '%s/*/%s',
-                config('modules.paths.modules'),
-                config('modules.paths.generator.model.path')
-            );
-        } else {
-            $path = sprintf(
-                '%s/{%s}/%s',
-                config('modules.paths.modules'),
-                collect($this->argument('module'))->implode(','),
-                config('modules.paths.generator.model.path')
-            );
-        }
-
-        return collect(Finder::create()->in($path)->files()->name('*.php'))
-            ->map(function ($model) {
-
-                $namespace = config('modules.namespace');
-
-                return $namespace.str_replace(
-                    ['/', '.php'],
-                    ['\\', ''],
-                    Str::after($model->getRealPath(), realpath(config('modules.paths.modules')))
-                );
-            })->values()
-            ->when(! empty($except), function ($models) use ($except) {
-                return $models->reject(function ($model) use ($except) {
-                    return in_array($model, $except);
-                });
-            })->filter(function ($model) {
-                return class_exists($model);
-            })->filter(function ($model) {
-                return $this->isPrunable($model);
-            })->values();
     }
 }
