@@ -24,6 +24,7 @@ use Nwidart\Modules\Exceptions\Handler;
 use Nwidart\Modules\Exceptions\InvalidActivatorClass;
 use Nwidart\Modules\Support\Db\Query;
 use Nwidart\Modules\Support\Macros\MacrosRegister;
+use Nwidart\Modules\Support\Sanctum\PersonalAccessToken;
 use Nwidart\Modules\Support\Stub;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -66,6 +67,13 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
         $this->registerExceptionHandler();
 
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'modules');
+    }
+
+    public function registerSanctumCache(): void
+    {
+        if(class_exists(\Laravel\Sanctum\Sanctum::class) && $this->app['config']->get('modules.auth_sanctum_cache')) {
+            \Laravel\Sanctum\Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        }
     }
 
     /**

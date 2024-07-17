@@ -307,7 +307,8 @@ return [
    | admin auth model
    |--------------------------------------------------------------------------
    */
-    'auth_model' => \Modules\User\Models\User::class,
+    'auth_model'         => \Modules\User\Models\User::class,
+    'auth_sanctum_cache' => true,
 
     'route' => [
         'prefix' => 'api',
