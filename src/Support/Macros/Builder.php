@@ -29,6 +29,12 @@ class Builder
         $this->tree();
     }
 
+
+    /**
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-07-17 上午10:25
+     */
     public function quickSearch(): void
     {
         LaravelBuilder::macro(__FUNCTION__, function (array $params = []) {
@@ -40,7 +46,7 @@ class Builder
 
             // filter null & empty string
             $params = array_filter($params, function ($value) {
-                return (is_string($value) && strlen($value)) || is_numeric($value);
+                return (is_string($value) && strlen($value)) || is_numeric($value) || (is_array($value) && !empty($value));
             });
 
             $wheres = [];
@@ -66,10 +72,12 @@ class Builder
                         }
 
                         if ($operate->exactly('rlike')) {
+                            $op = 'like';
                             $value = $searchValue . '%';
                         }
 
                         if ($operate->exactly('llike')) {
+                            $op = 'like';
                             $value = '%' . $searchValue;
                         }
 
@@ -97,6 +105,11 @@ class Builder
         });
     }
 
+    /**
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-07-17 上午10:25
+     */
     public function tree(): void
     {
         LaravelBuilder::macro(__FUNCTION__, function (string $id, string $parentId, ...$fields) {
@@ -106,6 +119,11 @@ class Builder
         });
     }
 
+    /**
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-07-17 上午10:24
+     */
     public function whereLike(): void
     {
         LaravelBuilder::macro(__FUNCTION__, function ($filed, $value) {
