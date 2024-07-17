@@ -20,6 +20,7 @@ class Runner implements RunableInterface
 {
     /**
      * The module instance.
+     *
      * @var RepositoryInterface
      */
     protected $module;
@@ -32,7 +33,7 @@ class Runner implements RunableInterface
     /**
      * Run the given command.
      *
-     * @param string $command
+     * @param  string  $command
      */
     public function run($command)
     {

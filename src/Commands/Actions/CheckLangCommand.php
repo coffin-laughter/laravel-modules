@@ -56,7 +56,7 @@ class CheckLangCommand extends BaseCommand
 
     }
 
-    public function getInfo(): string|null
+    public function getInfo(): ?string
     {
         return 'Checking languages ...';
     }

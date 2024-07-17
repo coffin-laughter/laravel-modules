@@ -30,8 +30,8 @@ use Nwidart\Modules\Traits\Db\WithAttributes;
 abstract class CoffinModel extends Model
 {
     use BaseOperate;
-    use ScopeTrait;
     use ScopeTenantData;
+    use ScopeTrait;
     use SoftDeletes;
     use Trans;
     use WithAttributes;

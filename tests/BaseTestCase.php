@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Tests;
 
@@ -18,24 +29,15 @@ abstract class BaseTestCase extends OrchestraTestCase
         // $this->setUpDatabase();
     }
 
-    private function resetDatabase()
+    protected function createModule(string $moduleName = 'Blog'): int
     {
-        $this->artisan('migrate:reset', [
-            '--database' => 'sqlite',
-        ]);
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [
-            LaravelModulesServiceProvider::class,
-        ];
+        return $this->artisan('module:make', ['name' => [$moduleName]]);
     }
 
     /**
      * Set up the environment.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -67,16 +69,6 @@ abstract class BaseTestCase extends OrchestraTestCase
         $app['config']->set('modules.commands', ConsoleServiceProvider::defaultCommands()->toArray());
     }
 
-    protected function setUpDatabase()
-    {
-        $this->resetDatabase();
-    }
-
-    protected function createModule(string $moduleName = 'Blog'): int
-    {
-        return $this->artisan('module:make', ['name' => [$moduleName]]);
-    }
-
     protected function getModuleAppPath(string $moduleName = 'Blog'): string
     {
         return base_path("modules/$moduleName/") . rtrim(config('modules.paths.app_folder'), '/');
@@ -85,5 +77,24 @@ abstract class BaseTestCase extends OrchestraTestCase
     protected function getModuleBasePath(string $moduleName = 'Blog'): string
     {
         return base_path("modules/$moduleName");
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            LaravelModulesServiceProvider::class,
+        ];
+    }
+
+    protected function setUpDatabase()
+    {
+        $this->resetDatabase();
+    }
+
+    private function resetDatabase()
+    {
+        $this->artisan('migrate:reset', [
+            '--database' => 'sqlite',
+        ]);
     }
 }

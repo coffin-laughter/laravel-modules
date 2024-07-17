@@ -25,7 +25,9 @@ class EventProviderMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'module';
+
     protected $description = 'Create a new event service provider class for the specified module.';
+
     protected $name = 'module:make-event-provider';
 
     public function getDefaultNamespace(): string
@@ -56,9 +58,6 @@ class EventProviderMakeCommand extends GeneratorCommand
         return Str::studly('EventServiceProvider');
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

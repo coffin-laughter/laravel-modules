@@ -46,8 +46,6 @@ class FactoryMakeCommand extends GeneratorCommand
 
     /**
      * Get default namespace.
-     *
-     * @return string
      */
     public function getDefaultNamespace(): string
     {
@@ -57,8 +55,6 @@ class FactoryMakeCommand extends GeneratorCommand
 
     /**
      * Get model namespace.
-     *
-     * @return string
      */
     public function getModelNamespace(): string
     {

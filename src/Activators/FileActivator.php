@@ -80,7 +80,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete(Module $module): void
     {
@@ -93,7 +93,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function disable(Module $module): void
     {
@@ -101,7 +101,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function enable(Module $module): void
     {
@@ -110,8 +110,6 @@ class FileActivator implements ActivatorInterface
 
     /**
      * Get the path of the file where statuses are stored
-     *
-     * @return string
      */
     public function getStatusesFilePath(): string
     {
@@ -119,7 +117,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function hasStatus(Module $module, bool $status): bool
     {
@@ -131,7 +129,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function reset(): void
     {
@@ -143,7 +141,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setActive(Module $module, bool $active): void
     {
@@ -151,7 +149,7 @@ class FileActivator implements ActivatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setActiveByName(string $name, bool $status): void
     {
@@ -163,8 +161,6 @@ class FileActivator implements ActivatorInterface
     /**
      * Reads a config parameter under the 'activators.file' key
      *
-     * @param string $key
-     * @param        $default
      * @return mixed
      */
     private function config(string $key, $default = null)
@@ -183,7 +179,7 @@ class FileActivator implements ActivatorInterface
     /**
      * Get modules statuses, either from the cache or from
      * the json statuses file if the cache is disabled.
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     private function getModulesStatuses(): array
@@ -199,7 +195,7 @@ class FileActivator implements ActivatorInterface
 
     /**
      * Reads the json file that contains the activation statuses.
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     private function readJson(): array

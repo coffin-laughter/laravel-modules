@@ -37,6 +37,7 @@ class FileGenerator extends Generator
      * @var string
      */
     protected $path;
+
     /**
      * @var bool
      */
@@ -45,9 +46,7 @@ class FileGenerator extends Generator
     /**
      * The constructor.
      *
-     * @param      $path
-     * @param      $contents
-     * @param null $filesystem
+     * @param  null  $filesystem
      */
     public function __construct($path, $contents, $filesystem = null)
     {
@@ -105,8 +104,7 @@ class FileGenerator extends Generator
     /**
      * Set contents.
      *
-     * @param mixed $contents
-     *
+     * @param  mixed  $contents
      * @return $this
      */
     public function setContents($contents)
@@ -119,7 +117,6 @@ class FileGenerator extends Generator
     /**
      * Set filesystem.
      *
-     * @param Filesystem $filesystem
      *
      * @return $this
      */
@@ -133,8 +130,7 @@ class FileGenerator extends Generator
     /**
      * Set path.
      *
-     * @param mixed $path
-     *
+     * @param  mixed  $path
      * @return $this
      */
     public function setPath($path)

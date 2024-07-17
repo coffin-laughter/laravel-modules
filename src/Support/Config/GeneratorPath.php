@@ -20,6 +20,7 @@ class GeneratorPath
     use PathNamespace;
 
     private $generate;
+
     private $namespace;
 
     private $path;
@@ -35,7 +36,7 @@ class GeneratorPath
         }
 
         $this->path = $config;
-        $this->generate = (bool)$config;
+        $this->generate = (bool) $config;
         $this->namespace = $this->path_namespace(ltrim($config, config('modules.paths.app_folder', '')));
     }
 

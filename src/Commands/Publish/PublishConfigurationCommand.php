@@ -41,14 +41,11 @@ class PublishConfigurationCommand extends BaseCommand
         ]);
     }
 
-    public function getInfo(): string|null
+    public function getInfo(): ?string
     {
         return 'Publishing module config files ...';
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [
@@ -57,8 +54,7 @@ class PublishConfigurationCommand extends BaseCommand
     }
 
     /**
-     * @param string $module
-     * @return string
+     * @param  string  $module
      */
     private function getServiceProviderForModule($module): string
     {

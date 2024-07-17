@@ -25,7 +25,9 @@ class ExceptionMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new exception class for the specified module.';
+
     protected $name = 'module:make-exception';
 
     public function getDefaultNamespace(): string
@@ -56,9 +58,6 @@ class ExceptionMakeCommand extends GeneratorCommand
         return Str::studly($this->argument('name'));
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

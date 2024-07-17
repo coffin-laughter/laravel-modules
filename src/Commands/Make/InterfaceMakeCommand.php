@@ -25,7 +25,9 @@ class InterfaceMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new interface class for the specified module.';
+
     protected $name = 'module:make-interface';
 
     public function getDefaultNamespace(): string
@@ -56,9 +58,6 @@ class InterfaceMakeCommand extends GeneratorCommand
         return Str::studly($this->argument('name'));
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

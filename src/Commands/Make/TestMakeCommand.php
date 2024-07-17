@@ -25,7 +25,9 @@ class TestMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new test class for the specified module.';
+
     protected $name = 'module:make-test';
 
     public function getDefaultNamespace(): string

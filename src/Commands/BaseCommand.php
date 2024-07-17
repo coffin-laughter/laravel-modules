@@ -14,8 +14,10 @@
 namespace Nwidart\Modules\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
-
+use Nwidart\Modules\Contracts\ConfirmableCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +28,9 @@ use function Laravel\Prompts\multiselect;
 
 abstract class BaseCommand extends Command implements PromptsForMissingInput
 {
+    use ConfirmableTrait;
+    use Prohibitable;
+
     public const ALL = 'All';
 
     /**
@@ -48,11 +53,20 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
             InputArgument::IS_ARRAY,
             'The name of module will be used.',
         ));
+
+        if ($this instanceof ConfirmableCommand) {
+            $this->configureConfirmable();
+        }
     }
 
     abstract public function executeAction($name);
 
-    public function getInfo(): string|null
+    public function getConfirmableLabel(): ?string
+    {
+        return 'Warning';
+    }
+
+    public function getInfo(): ?string
     {
         return null;
     }
@@ -60,8 +74,14 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle()
     {
+        if ($this instanceof ConfirmableCommand) {
+            if ($this->isProhibited() || !$this->confirmToProceed($this->getConfirmableLabel(), fn () => true)) {
+                return 1;
+            }
+        }
+
         if (!is_null($info = $this->getInfo())) {
             $this->components->info($info);
         }
@@ -113,4 +133,14 @@ abstract class BaseCommand extends Command implements PromptsForMissingInput
         );
     }
 
+    private function configureConfirmable(): void
+    {
+        $this->getDefinition()
+            ->addOption(new InputOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Force the operation to run without confirmation.',
+            ));
+    }
 }

@@ -93,17 +93,6 @@ class ControllerMakeCommand extends GeneratorCommand
         return $controller;
     }
 
-    protected function getControllerNameWithOutController()
-    {
-        $controller = Str::studly($this->argument('controller'));
-
-        if (Str::contains(strtolower($controller), 'controller')) {
-            return Str::ucfirst(Str::rtrim($controller, 'controller'));
-        }
-
-        return Str::ucfirst($controller);
-    }
-
     /**
      * @return array
      */
@@ -118,6 +107,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
     /**
      * Get the stub file name based on the options
+     *
      * @return string
      */
     protected function getStubName()
@@ -148,7 +138,6 @@ class ControllerMakeCommand extends GeneratorCommand
             'NAMESPACE'        => $module->getStudlyName(),
             'CLASS_NAMESPACE'  => $this->getClassNamespace($module),
             'CLASS'            => $this->getControllerNameWithoutNamespace(),
-            'CLASSNAME'        => $this->getControllerNameWithOutController(),
             'LOWER_NAME'       => $module->getLowerName(),
             'MODULE'           => $this->getModuleName(),
             'NAME'             => $this->getModuleName(),

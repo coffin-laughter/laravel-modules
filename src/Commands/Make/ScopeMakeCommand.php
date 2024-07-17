@@ -25,7 +25,9 @@ class ScopeMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new scope class for the specified module.';
+
     protected $name = 'module:make-scope';
 
     public function getDefaultNamespace(): string
@@ -56,9 +58,6 @@ class ScopeMakeCommand extends GeneratorCommand
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

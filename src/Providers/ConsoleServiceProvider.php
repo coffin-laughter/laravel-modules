@@ -21,8 +21,6 @@ class ConsoleServiceProvider extends ServiceProvider
 {
     /**
      * Get the package default commands.
-     *
-     * @return Collection
      */
     public static function defaultCommands(): Collection
     {
@@ -76,6 +74,7 @@ class ConsoleServiceProvider extends ServiceProvider
             Commands\Make\ObserverMakeCommand::class,
             Commands\Make\PolicyMakeCommand::class,
             Commands\Make\ProviderMakeCommand::class,
+            Commands\Make\RepositoryMakeCommand::class,
             Commands\Make\RequestMakeCommand::class,
             Commands\Make\ResourceMakeCommand::class,
             Commands\Make\RouteProviderMakeCommand::class,
@@ -106,7 +105,6 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         return self::defaultCommands()->toArray();
     }
-
     public function register(): void
     {
         $this->commands(config('modules.commands', self::defaultCommands()->toArray()));

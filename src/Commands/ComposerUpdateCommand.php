@@ -63,7 +63,7 @@ class ComposerUpdateCommand extends BaseCommand
         });
     }
 
-    public function getInfo(): string|null
+    public function getInfo(): ?string
     {
         return 'Updating Composer.json of modules...';
     }

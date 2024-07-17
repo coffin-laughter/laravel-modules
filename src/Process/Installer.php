@@ -42,6 +42,7 @@ class Installer
 
     /**
      * The module repository instance.
+     *
      * @var \Nwidart\Modules\Contracts\RepositoryInterface
      */
     protected $repository;
@@ -59,6 +60,7 @@ class Installer
      * @var string
      */
     protected $version;
+
     /**
      * @var bool
      */
@@ -69,12 +71,17 @@ class Installer
     private $type;
 
     /**
+     * @var null|string
+     */
+    private $type;
+
+    /**
      * The constructor.
      *
-     * @param string $name
-     * @param string $version
-     * @param string $type
-     * @param bool   $tree
+     * @param  string  $name
+     * @param  string  $version
+     * @param  string  $type
+     * @param  bool  $tree
      */
     public function __construct($name, $version = null, $type = null, $tree = false)
     {
@@ -264,7 +271,6 @@ class Installer
     /**
      * Set console command instance.
      *
-     * @param \Illuminate\Console\Command $console
      *
      * @return $this
      */
@@ -278,8 +284,7 @@ class Installer
     /**
      * Set destination path.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return $this
      */
     public function setPath($path)
@@ -291,7 +296,7 @@ class Installer
 
     /**
      * Set the module repository instance.
-     * @param \Nwidart\Modules\Contracts\RepositoryInterface $repository
+     *
      * @return $this
      */
     public function setRepository(RepositoryInterface $repository)
@@ -304,8 +309,7 @@ class Installer
     /**
      * Set process timeout.
      *
-     * @param int $timeout
-     *
+     * @param  int  $timeout
      * @return $this
      */
     public function setTimeout($timeout)

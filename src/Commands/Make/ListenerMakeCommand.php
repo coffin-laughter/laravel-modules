@@ -106,9 +106,6 @@ class ListenerMakeCommand extends GeneratorCommand
         return class_basename($this->option('event'));
     }
 
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         if ($this->option('queued')) {

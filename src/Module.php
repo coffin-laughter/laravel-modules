@@ -40,8 +40,6 @@ abstract class Module
 
     /**
      * The module name.
-     *
-     * @var
      */
     protected $name;
 
@@ -55,14 +53,17 @@ abstract class Module
      * @var ActivatorInterface
      */
     private $activator;
+
     /**
      * @var CacheManager
      */
     private $cache;
+
     /**
      * @var Filesystem
      */
     private $files;
+
     /**
      * @var Translator
      */
@@ -70,9 +71,6 @@ abstract class Module
 
     /**
      * The constructor.
-     * @param Container $app
-     * @param           $name
-     * @param           $path
      */
     public function __construct(Container $app, string $name, $path)
     {
@@ -96,25 +94,7 @@ abstract class Module
     }
 
     /**
-     * Bootstrap the application events.
-     */
-    public function boot(): void
-    {
-        if (config('modules.register.translations', true) === true) {
-            $this->registerTranslation();
-        }
-
-        if ($this->isLoadFilesOnBoot()) {
-            $this->registerFiles();
-        }
-
-        $this->fireEvent('boot');
-    }
-
-    /**
      * Delete the current module.
-     *
-     * @return bool
      */
     public function delete(): bool
     {
@@ -152,9 +132,7 @@ abstract class Module
     /**
      * Get a specific data from json file by given the key.
      *
-     * @param string $key
-     * @param null   $default
-     *
+     * @param  null  $default
      * @return mixed
      */
     public function get(string $key, $default = null)
@@ -164,8 +142,6 @@ abstract class Module
 
     /**
      * Get app path.
-     *
-     * @return string
      */
     public function getAppPath(): string
     {
@@ -176,8 +152,6 @@ abstract class Module
 
     /**
      * Returns an array of assets
-     *
-     * @return array
      */
     public static function getAssets(): array
     {
@@ -205,17 +179,13 @@ abstract class Module
 
     /**
      * Get the path to the cached *_module.php file.
-     *
-     * @return string
      */
     abstract public function getCachedServicesPath(): string;
 
     /**
      * Get a specific data from composer.json file by given the key.
      *
-     * @param      $key
-     * @param null $default
-     *
+     * @param  null  $default
      * @return mixed
      */
     public function getComposerAttr($key, $default = null)
@@ -225,8 +195,6 @@ abstract class Module
 
     /**
      * Get description.
-     *
-     * @return string
      */
     public function getDescription(): string
     {
@@ -234,21 +202,7 @@ abstract class Module
     }
 
     /**
-     * Get extra path.
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getExtraPath(string $path): string
-    {
-        return $this->getPath() . '/' . $path;
-    }
-
-    /**
      * Get name in lower case.
-     *
-     * @return string
      */
     public function getLowerName(): string
     {
@@ -257,8 +211,6 @@ abstract class Module
 
     /**
      * Get name.
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -267,8 +219,6 @@ abstract class Module
 
     /**
      * Get path.
-     *
-     * @return string
      */
     public function getPath(): string
     {
@@ -277,8 +227,6 @@ abstract class Module
 
     /**
      * Get priority.
-     *
-     * @return string
      */
     public function getPriority(): string
     {
@@ -287,8 +235,6 @@ abstract class Module
 
     /**
      * Get name in snake case.
-     *
-     * @return string
      */
     public function getSnakeName(): string
     {
@@ -306,9 +252,15 @@ abstract class Module
     }
 
     /**
+     * Get name in studly case.
+     */
+    public function getStudlyName(): string
+    {
+        return Str::studly($this->name);
+    }
+
+    /**
      *  Determine whether the current module not disabled.
-     *
-     * @return bool
      */
     public function isDisabled(): bool
     {
@@ -317,8 +269,6 @@ abstract class Module
 
     /**
      * Determine whether the current module activated.
-     *
-     * @return bool
      */
     public function isEnabled(): bool
     {
@@ -327,10 +277,6 @@ abstract class Module
 
     /**
      * Determine whether the given status same with the current module status.
-     *
-     * @param bool $status
-     *
-     * @return bool
      */
     public function isStatus(bool $status): bool
     {
@@ -340,9 +286,7 @@ abstract class Module
     /**
      * Get json contents from the cache, setting as needed.
      *
-     * @param string $file
-     *
-     * @return Json
+     * @param  string  $file
      */
     public function json($file = null): Json
     {
@@ -383,10 +327,6 @@ abstract class Module
 
     /**
      * Set active state for current module.
-     *
-     * @param bool $active
-     *
-     * @return void
      */
     public function setActive(bool $active): void
     {
@@ -394,10 +334,19 @@ abstract class Module
     }
 
     /**
+     * Get extra path.
+     */
+    public function setPath($path): Module
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
      * Set path.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return $this
      */
     public function setPath($path): Module
@@ -418,9 +367,17 @@ abstract class Module
     }
 
     /**
-     * Check if can load files of module on boot method.
+     * Register the module event.
      *
-     * @return bool
+     * @param  string  $event
+     */
+    protected function fireEvent($event): void
+    {
+        $this->app['events']->dispatch(sprintf('modules.%s.' . $event, $this->getLowerName()), [$this]);
+    }
+
+    /**
+     * Check if can load files of module on boot method.
      */
     protected function isLoadFilesOnBoot(): bool
     {
@@ -441,8 +398,6 @@ abstract class Module
 
     /**
      * Register module's translation.
-     *
-     * @return void
      */
     protected function registerTranslation(): void
     {
@@ -464,10 +419,6 @@ abstract class Module
 
     /**
      * Register a translation file namespace.
-     *
-     * @param string $path
-     * @param string $namespace
-     * @return void
      */
     private function loadTranslationsFrom(string $path, string $namespace): void
     {

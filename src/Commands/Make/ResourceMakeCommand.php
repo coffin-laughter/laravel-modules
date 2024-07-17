@@ -25,7 +25,9 @@ class ResourceMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new resource class for the specified module.';
+
     protected $name = 'module:make-resource';
 
     public function getDefaultNamespace(): string
@@ -36,8 +38,6 @@ class ResourceMakeCommand extends GeneratorCommand
 
     /**
      * Determine if the command is generating a resource collection.
-     *
-     * @return bool
      */
     protected function collection(): bool
     {
@@ -78,9 +78,6 @@ class ResourceMakeCommand extends GeneratorCommand
         ];
     }
 
-    /**
-     * @return string
-     */
     protected function getStubName(): string
     {
         if ($this->collection()) {

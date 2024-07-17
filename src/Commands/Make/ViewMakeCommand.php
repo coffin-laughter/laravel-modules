@@ -25,7 +25,9 @@ class ViewMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new view for the specified module.';
+
     protected $name = 'module:make-view';
 
     protected function getArguments(): array
@@ -50,9 +52,6 @@ class ViewMakeCommand extends GeneratorCommand
         return (new Stub('/view.stub', ['QUOTE' => Inspiring::quotes()->random()]))->render();
     }
 
-    /**
-     * @return string
-     */
     private function getFileName(): string
     {
         return Str::lower($this->argument('name')) . '.blade.php';

@@ -59,8 +59,6 @@ class MigrateRefreshCommand extends BaseCommand
 
     /**
      * Get the console command options.
-     *
-     * @return array
      */
     protected function getOptions(): array
     {

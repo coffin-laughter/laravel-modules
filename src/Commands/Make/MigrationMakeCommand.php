@@ -79,19 +79,18 @@ class MigrationMakeCommand extends GeneratorCommand
      *
      * @return array
      */
-    protected function getArguments(): array
+    protected function getArguments()
     {
         return [
             ['name', InputArgument::REQUIRED, 'The migration name will be created.'],
             ['module', InputArgument::OPTIONAL, 'The name of module will be created.'],
-            ['dir', InputArgument::OPTIONAL, 'The name of module\'s directory.'],
         ];
     }
 
     /**
      * @return mixed
      */
-    protected function getDestinationFilePath(): mixed
+    protected function getDestinationFilePath()
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
 
@@ -105,7 +104,7 @@ class MigrationMakeCommand extends GeneratorCommand
      *
      * @return array
      */
-    protected function getOptions(): array
+    protected function getOptions()
     {
         return [
             ['fields', null, InputOption::VALUE_OPTIONAL, 'The specified fields table.', null],
@@ -115,10 +114,10 @@ class MigrationMakeCommand extends GeneratorCommand
 
     /**
      * @return mixed
-     * @throws \InvalidArgumentException
      *
+     * @throws \InvalidArgumentException
      */
-    protected function getTemplateContents(): mixed
+    protected function getTemplateContents()
     {
         $parser = new NameParser($this->argument('name'));
 

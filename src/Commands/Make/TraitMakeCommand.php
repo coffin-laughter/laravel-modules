@@ -25,7 +25,9 @@ class TraitMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new trait class for the specified module.';
+
     protected $name = 'module:make-trait';
 
     public function getDefaultNamespace(): string
@@ -51,9 +53,6 @@ class TraitMakeCommand extends GeneratorCommand
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

@@ -36,8 +36,6 @@ class ModuleGenerator extends Generator
 
     /**
      * Module author
-     *
-     * @var array
      */
     protected array $author = [
         'name', 'email',
@@ -108,26 +106,19 @@ class ModuleGenerator extends Generator
 
     /**
      * Vendor name
-     *
-     * @var string
      */
     protected ?string $vendor = null;
 
     /**
      * The constructor.
-     * @param                $name
-     * @param FileRepository $module
-     * @param Config         $config
-     * @param Filesystem     $filesystem
-     * @param Console        $console
      */
     public function __construct(
         $name,
-        FileRepository $module = null,
-        Config $config = null,
-        Filesystem $filesystem = null,
-        Console $console = null,
-        ActivatorInterface $activator = null
+        ?FileRepository $module = null,
+        ?Config $config = null,
+        ?Filesystem $filesystem = null,
+        ?Console $console = null,
+        ?ActivatorInterface $activator = null
     ) {
         $this->name = $name;
         $this->config = $config;
@@ -219,7 +210,7 @@ class ModuleGenerator extends Generator
     /**
      * Generate git keep to the specified path.
      *
-     * @param string $path
+     * @param  string  $path
      */
     public function generateGitKeep($path)
     {
@@ -303,9 +294,6 @@ class ModuleGenerator extends Generator
         }
     }
 
-    /**
-     * @return \Illuminate\Console\View\Components\Factory
-     */
     public function getComponent(): \Illuminate\Console\View\Components\Factory
     {
         return $this->component;
@@ -392,7 +380,6 @@ class ModuleGenerator extends Generator
     /**
      * Set the modules activator
      *
-     * @param ActivatorInterface $activator
      *
      * @return $this
      */
@@ -406,7 +393,6 @@ class ModuleGenerator extends Generator
     /**
      * Set active flag.
      *
-     * @param bool $active
      *
      * @return $this
      */
@@ -420,11 +406,9 @@ class ModuleGenerator extends Generator
     /**
      * Setting the author from the command
      *
-     * @param string|null $name
-     * @param string|null $email
      * @return $this
      */
-    public function setAuthor(string $name = null, string $email = null)
+    public function setAuthor(?string $name = null, ?string $email = null)
     {
         $this->author['name'] = $name;
         $this->author['email'] = $email;
@@ -432,9 +416,6 @@ class ModuleGenerator extends Generator
         return $this;
     }
 
-    /**
-     * @param \Illuminate\Console\View\Components\Factory $component
-     */
     public function setComponent(\Illuminate\Console\View\Components\Factory $component): self
     {
         $this->component = $component;
@@ -445,8 +426,7 @@ class ModuleGenerator extends Generator
     /**
      * Set the laravel config instance.
      *
-     * @param Config $config
-     *
+     * @param  Config  $config
      * @return $this
      */
     public function setConfig($config)
@@ -459,8 +439,7 @@ class ModuleGenerator extends Generator
     /**
      * Set the laravel console instance.
      *
-     * @param Console $console
-     *
+     * @param  Console  $console
      * @return $this
      */
     public function setConsole($console)
@@ -473,8 +452,7 @@ class ModuleGenerator extends Generator
     /**
      * Set the laravel filesystem instance.
      *
-     * @param Filesystem $filesystem
-     *
+     * @param  Filesystem  $filesystem
      * @return $this
      */
     public function setFilesystem($filesystem)
@@ -487,8 +465,7 @@ class ModuleGenerator extends Generator
     /**
      * Set force status.
      *
-     * @param bool|int $force
-     *
+     * @param  bool|int  $force
      * @return $this
      */
     public function setForce($force)
@@ -501,8 +478,7 @@ class ModuleGenerator extends Generator
     /**
      * Set the module instance.
      *
-     * @param mixed $module
-     *
+     * @param  mixed  $module
      * @return $this
      */
     public function setModule($module)
@@ -515,8 +491,7 @@ class ModuleGenerator extends Generator
     /**
      * Set type.
      *
-     * @param string $type
-     *
+     * @param  string  $type
      * @return $this
      */
     public function setType($type)
@@ -529,10 +504,9 @@ class ModuleGenerator extends Generator
     /**
      * Installing vendor from the command
      *
-     * @param string|null $vendor
      * @return $this
      */
-    public function setVendor(string $vendor = null)
+    public function setVendor(?string $vendor = null)
     {
         $this->vendor = $vendor;
 
@@ -597,7 +571,6 @@ class ModuleGenerator extends Generator
     /**
      * Get array replacement for the specified stub.
      *
-     * @param $stub
      *
      * @return array
      */
@@ -636,7 +609,6 @@ class ModuleGenerator extends Generator
     /**
      * Get the contents of the specified stub file by given stub name.
      *
-     * @param $stub
      *
      * @return string
      */

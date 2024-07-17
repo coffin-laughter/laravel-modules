@@ -46,8 +46,6 @@ class ObserverMakeCommand extends GeneratorCommand
 
     /**
      * Get default namespace.
-     *
-     * @return string
      */
     public function getDefaultNamespace(): string
     {
@@ -57,8 +55,6 @@ class ObserverMakeCommand extends GeneratorCommand
 
     /**
      * Get model namespace.
-     *
-     * @return string
      */
     public function getModelNamespace(): string
     {

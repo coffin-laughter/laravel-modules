@@ -36,6 +36,7 @@ class Migrator
     protected $laravel;
     /**
      * Module instance.
+     *
      * @var Module
      */
     protected $module;
@@ -44,15 +45,15 @@ class Migrator
      * Optional subpath for specific migration file.
      *
      * @var string|null
+     *
      * @example subpath 2000_01_01_000000_create_example_table.php
      */
     protected $subpath = '';
 
     /**
      * Create new instance.
-     * @param Module      $module
-     * @param Application $application
-     * @param string|null $subpath
+     *
+     * @param  string|null  $subpath
      */
     public function __construct(Module $module, Application $application, $subpath = null)
     {
@@ -64,7 +65,7 @@ class Migrator
     /**
      * Run down schema from the given migration name.
      *
-     * @param string $migration
+     * @param  string  $migration
      */
     public function down($migration)
     {
@@ -74,8 +75,7 @@ class Migrator
     /**
      * Find migration data from database by given migration name.
      *
-     * @param string $migration
-     *
+     * @param  string  $migration
      * @return object
      */
     public function find($migration)
@@ -86,8 +86,7 @@ class Migrator
     /**
      * Get the last migration batch.
      *
-     * @param array $migrations
-     *
+     * @param  array  $migrations
      * @return Collection
      */
     public function getLast($migrations)
@@ -99,14 +98,14 @@ class Migrator
         $result = $query->orderBy('migration', 'desc')->get();
 
         return collect($result)->map(function ($item) {
-            return (array)$item;
+            return (array) $item;
         })->pluck('migration');
     }
 
     /**
      * Get the last migration batch number.
      *
-     * @param array|null $migrations
+     * @param  array|null  $migrations
      * @return int
      */
     public function getLastBatchNumber($migrations = null)
@@ -123,7 +122,7 @@ class Migrator
     /**
      * Get migration files.
      *
-     * @param boolean $reverse
+     * @param  bool  $reverse
      * @return array
      */
     public function getMigrations($reverse = false)
@@ -203,8 +202,7 @@ class Migrator
     /**
      * Save new migration to database.
      *
-     * @param string $migration
-     *
+     * @param  string  $migration
      * @return mixed
      */
     public function log($migration)
@@ -217,8 +215,6 @@ class Migrator
 
     /**
      * Require in all the migration files in a given path.
-     *
-     * @param array $files
      */
     public function requireFiles(array $files)
     {
@@ -259,8 +255,7 @@ class Migrator
     /**
      * Resolve a migration instance from a file.
      *
-     * @param string $file
-     *
+     * @param  string  $file
      * @return object
      */
     public function resolve($file)
@@ -307,7 +302,6 @@ class Migrator
     /**
      * Set the database connection to be used
      *
-     * @param $database
      *
      * @return $this
      */
@@ -333,7 +327,7 @@ class Migrator
     /**
      * Run up schema from the given migration name.
      *
-     * @param string $migration
+     * @param  string  $migration
      */
     public function up($migration)
     {

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Tests\Activators;
 
@@ -11,9 +22,9 @@ class FileActivatorTest extends BaseTestCase
     use MatchesSnapshots;
 
     /**
-     * @var TestModule
+     * @var FileActivator
      */
-    private $module;
+    private $activator;
 
     /**
      * @var \Illuminate\Filesystem\Filesystem
@@ -21,9 +32,9 @@ class FileActivatorTest extends BaseTestCase
     private $finder;
 
     /**
-     * @var FileActivator
+     * @var TestModule
      */
-    private $activator;
+    private $module;
 
     public function setUp(): void
     {
@@ -39,22 +50,13 @@ class FileActivatorTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_creates_valid_json_file_after_enabling()
-    {
-        $this->activator->enable($this->module);
-        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
-
-        $this->activator->setActive($this->module, true);
-        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
-    }
-
-    public function test_it_creates_valid_json_file_after_disabling()
+    public function test_it_can_check_module_disabled_status()
     {
         $this->activator->disable($this->module);
-        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+        $this->assertTrue($this->activator->hasStatus($this->module, false));
 
         $this->activator->setActive($this->module, false);
-        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+        $this->assertTrue($this->activator->hasStatus($this->module, false));
     }
 
     public function test_it_can_check_module_enabled_status()
@@ -66,18 +68,27 @@ class FileActivatorTest extends BaseTestCase
         $this->assertTrue($this->activator->hasStatus($this->module, true));
     }
 
-    public function test_it_can_check_module_disabled_status()
-    {
-        $this->activator->disable($this->module);
-        $this->assertTrue($this->activator->hasStatus($this->module, false));
-
-        $this->activator->setActive($this->module, false);
-        $this->assertTrue($this->activator->hasStatus($this->module, false));
-    }
-
     public function test_it_can_check_status_of_module_that_hasnt_been_enabled_or_disabled()
     {
         $this->assertTrue($this->activator->hasStatus($this->module, false));
+    }
+
+    public function test_it_creates_valid_json_file_after_disabling()
+    {
+        $this->activator->disable($this->module);
+        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+
+        $this->activator->setActive($this->module, false);
+        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+    }
+
+    public function test_it_creates_valid_json_file_after_enabling()
+    {
+        $this->activator->enable($this->module);
+        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+
+        $this->activator->setActive($this->module, true);
+        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
     }
 }
 

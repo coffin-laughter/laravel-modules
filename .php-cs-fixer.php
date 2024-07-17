@@ -106,10 +106,11 @@ $rules = [
 ];
 
 $finder = Finder::create()
-    ->exclude(['tests', 'vendor', 'storage'])
+    ->exclude(['vendor', 'storage'])
     ->in([
         __DIR__ . '/config',
         __DIR__ . '/src',
+        __DIR__ . '/tests',
     ])
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);

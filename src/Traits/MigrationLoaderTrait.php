@@ -24,11 +24,10 @@ trait MigrationLoaderTrait
     {
         return $this->laravel['modules']->config('paths.generator.migration');
     }
-
     /**
      * Include all migrations files from the specified module.
      *
-     * @param string $module
+     * @param  string  $module
      */
     protected function loadMigrationFiles($module)
     {

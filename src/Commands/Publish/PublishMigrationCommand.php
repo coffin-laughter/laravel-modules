@@ -44,7 +44,7 @@ class PublishMigrationCommand extends BaseCommand
         });
     }
 
-    public function getInfo(): string|null
+    public function getInfo(): ?string
     {
         return 'Publishing module migrations ...';
     }

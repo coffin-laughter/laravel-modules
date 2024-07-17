@@ -25,7 +25,9 @@ class ServiceMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new service class for the specified module.';
+
     protected $name = 'module:make-service';
 
     public function getDefaultNamespace(): string
@@ -51,9 +53,6 @@ class ServiceMakeCommand extends GeneratorCommand
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

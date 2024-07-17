@@ -44,8 +44,6 @@ class ModelShowCommand extends ShowModelCommand
     /**
      * Qualify the given model class base name.
      *
-     * @param string $model
-     * @return string
      *
      * @see \Illuminate\Console\GeneratorCommand
      */
@@ -68,5 +66,4 @@ class ModelShowCommand extends ShowModelCommand
 
         return str_replace(['/', '.php'], ['\\', ''], $modelPath[0]);
     }
-
 }

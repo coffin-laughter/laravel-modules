@@ -25,7 +25,9 @@ class ActionMakeCommand extends GeneratorCommand
     use ModuleCommandTrait;
 
     protected $argumentName = 'name';
+
     protected $description = 'Create a new action class for the specified module.';
+
     protected $name = 'module:make-action';
 
     public function getDefaultNamespace(): string
@@ -56,9 +58,6 @@ class ActionMakeCommand extends GeneratorCommand
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [

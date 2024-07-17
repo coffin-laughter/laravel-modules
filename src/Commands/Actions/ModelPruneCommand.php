@@ -18,9 +18,7 @@ use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-
 use Nwidart\Modules\Facades\Module;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -55,8 +53,6 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
 
     /**
      * Determine the models that should be pruned.
-     *
-     * @return Collection
      */
     protected function models(): Collection
     {
@@ -118,8 +114,8 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
         }
 
         $selected_item = multiselect(
-            label: 'Select Modules',
-            options: [
+            label   : 'Select Modules',
+            options : [
                 self::ALL,
                 ...array_keys(Module::all()),
             ],
@@ -133,5 +129,4 @@ class ModelPruneCommand extends PruneCommand implements PromptsForMissingInput
                 : $selected_item
         );
     }
-
 }

@@ -116,9 +116,6 @@ class RouteProviderMakeCommand extends GeneratorCommand
         return '/' . $this->laravel['modules']->config('stubs.files.routes/web', 'Routes/web.php');
     }
 
-    /**
-     * @return string
-     */
     private function getControllerNameSpace(): string
     {
         $module = $this->laravel['modules'];

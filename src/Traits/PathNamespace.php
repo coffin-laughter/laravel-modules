@@ -23,8 +23,20 @@ trait PathNamespace
     public function app_path(?string $path = null): string
     {
         $config_path = config('modules.paths.app_folder');
-        $app_path = strlen($config_path) ? trim($config_path, '/') : 'app';
-        $app_path .= strlen($path) ? '/' . $path : '';
+
+        // Get modules config app path or use Laravel default app path.
+        $app_path = strlen($config_path) ? $config_path : 'app/';
+
+        if ($path) {
+            // Replace duplicate custom|default app paths
+            $replaces = array_unique([$this->clean_path($app_path) . '/', 'app/']);
+            do {
+                $path = Str::of($path)->replaceStart($app_path, '')->replaceStart('app/', '');
+            } while (Str::of($path)->startsWith($replaces));
+
+            // Append additional path
+            $app_path .= strlen($path) ? '/' . $path : '';
+        }
 
         return $this->clean_path($app_path);
     }
@@ -63,7 +75,6 @@ trait PathNamespace
     {
         return $this->studly_path($namespace, $ds);
     }
-
     /**
      * Get a well-formatted StudlyCase representation of path components.
      */

@@ -93,10 +93,10 @@ class InstallCommand extends Command
     /**
      * Install the specified module.
      *
-     * @param string $name
-     * @param string $version
-     * @param string $type
-     * @param bool   $tree
+     * @param  string  $name
+     * @param  string  $version
+     * @param  string  $type
+     * @param  bool  $tree
      */
     protected function install($name, $version = 'dev-master', $type = 'composer', $tree = false)
     {

@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Modules\Recipe\Http\Controllers\Admin;
 
@@ -11,13 +22,13 @@ use Modules\Recipe\Repositories\RecipeRepository;
 class RecipeController extends AdminBaseController
 {
     /**
-     * @var RecipeRepository
-     */
-    private $recipe;
-    /**
      * @var FileRepository
      */
     private $file;
+    /**
+     * @var RecipeRepository
+     */
+    private $recipe;
 
     public function __construct(RecipeRepository $recipe, FileRepository $file)
     {
@@ -25,6 +36,43 @@ class RecipeController extends AdminBaseController
 
         $this->recipe = $recipe;
         $this->file = $file;
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return Response
+     */
+    public function create()
+    {
+        return view('recipe::admin.recipes.create');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return Response
+     */
+    public function destroy(Recipe $recipe)
+    {
+        $this->recipe->destroy($recipe);
+
+        flash()->success(trans('core::core.messages.resource deleted', ['name' => trans('recipe::recipes.title.recipes')]));
+
+        return redirect()->route('admin.recipe.recipe.index');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @return Response
+     */
+    public function edit(Recipe $recipe)
+    {
+        $galleryFiles = $this->file->findMultipleFilesByZoneForEntity('gallery', $recipe);
+        $featured_image = $this->file->findFileByZoneForEntity('featured_image', $recipe);
+
+        return view('recipe::admin.recipes.edit', compact('recipe', 'galleryFiles', 'featured_image'));
     }
 
     /**
@@ -40,19 +88,8 @@ class RecipeController extends AdminBaseController
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        return view('recipe::admin.recipes.create');
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
      * @return Response
      */
     public function store(Request $request)
@@ -65,24 +102,8 @@ class RecipeController extends AdminBaseController
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  Recipe $recipe
-     * @return Response
-     */
-    public function edit(Recipe $recipe)
-    {
-        $galleryFiles = $this->file->findMultipleFilesByZoneForEntity('gallery', $recipe);
-        $featured_image = $this->file->findFileByZoneForEntity('featured_image', $recipe);
-
-        return view('recipe::admin.recipes.edit', compact('recipe', 'galleryFiles', 'featured_image'));
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  Recipe $recipe
-     * @param  Request $request
      * @return Response
      */
     public function update(Recipe $recipe, Request $request)
@@ -90,21 +111,6 @@ class RecipeController extends AdminBaseController
         $this->recipe->update($recipe, $request->all());
 
         flash()->success(trans('core::core.messages.resource updated', ['name' => trans('recipe::recipes.title.recipes')]));
-
-        return redirect()->route('admin.recipe.recipe.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  Recipe $recipe
-     * @return Response
-     */
-    public function destroy(Recipe $recipe)
-    {
-        $this->recipe->destroy($recipe);
-
-        flash()->success(trans('core::core.messages.resource deleted', ['name' => trans('recipe::recipes.title.recipes')]));
 
         return redirect()->route('admin.recipe.recipe.index');
     }

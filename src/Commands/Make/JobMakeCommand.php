@@ -86,6 +86,15 @@ class JobMakeCommand extends GeneratorCommand
         ];
     }
 
+    protected function getStubName(): string
+    {
+        if ($this->option('sync')) {
+            return '/job.stub';
+        }
+
+        return '/job-queued.stub';
+    }
+
     /**
      * @return string
      */

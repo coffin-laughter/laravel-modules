@@ -70,7 +70,7 @@
         $( document ).ready(function() {
             $(document).keypressAction({
                 actions: [
-                    { key: 'b', route: "<?= route('admin.recipe.recipe.index') ?>" }
+                    { key: 'b', route: "<?php echo route('admin.recipe.recipe.index') ?>" }
                 ]
             });
         });

@@ -20,9 +20,9 @@ class Updater extends Runner
     /**
      * Update the dependencies for the specified module by given the module name.
      *
-     * @param string $module
+     * @param  string  $module
      */
-    public function update($module)
+    public function update($module): void
     {
         $module = $this->module->findOrFail($module);
 
@@ -33,10 +33,7 @@ class Updater extends Runner
         $this->copyScriptsToMainComposerJson($module);
     }
 
-    /**
-     * @param Module $module
-     */
-    private function copyScriptsToMainComposerJson(Module $module)
+    private function copyScriptsToMainComposerJson(Module $module): void
     {
         $scripts = $module->getComposerAttr('scripts', []);
 
@@ -54,9 +51,6 @@ class Updater extends Runner
         file_put_contents(base_path('composer.json'), json_encode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
     }
 
-    /**
-     * @param Module $module
-     */
     private function installDevRequires(Module $module)
     {
         $devPackages = $module->getComposerAttr('require-dev', []);
@@ -71,9 +65,6 @@ class Updater extends Runner
         }
     }
 
-    /**
-     * @param Module $module
-     */
     private function installRequires(Module $module)
     {
         $packages = $module->getComposerAttr('require', []);

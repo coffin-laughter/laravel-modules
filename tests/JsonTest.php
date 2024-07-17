@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Tests;
 
@@ -19,60 +30,31 @@ class JsonTest extends BaseTestCase
         $this->json = new Json($path, $this->app['files']);
     }
 
-    public function test_it_gets_the_file_path()
+    public function test_it_can_be_casted_to_string()
     {
-        $path = __DIR__ . '/stubs/valid/module.json';
-
-        $this->assertEquals($path, $this->json->getPath());
-    }
-
-    public function test_it_throws_an_exception_with_invalid_json()
-    {
-        $path = __DIR__ . '/stubs/InvalidJsonModule/module.json';
-
-        $this->expectException(InvalidJsonException::class);
-        $this->expectExceptionMessage('Error processing file: ' . $path . '. Error: Syntax error');
-
-        new Json($path, $this->app['files']);
-    }
-
-    public function test_it_gets_attributes_from_json_file()
-    {
-        $this->assertEquals('Order', $this->json->get('name'));
-        $this->assertEquals('order', $this->json->get('alias'));
-        $this->assertEquals('My demo module', $this->json->get('description'));
-        $this->assertEquals('0.1', $this->json->get('version'));
-        $this->assertEquals(['my', 'stub', 'module'], $this->json->get('keywords'));
-        $this->assertEquals(1, $this->json->get('active'));
-        $this->assertEquals(1, $this->json->get('order'));
-    }
-
-    public function test_it_reads_attributes_from_magic_get_method()
-    {
-        $this->assertEquals('Order', $this->json->name);
-        $this->assertEquals('order', $this->json->alias);
-        $this->assertEquals('My demo module', $this->json->description);
-        $this->assertEquals('0.1', $this->json->version);
-        $this->assertEquals(['my', 'stub', 'module'], $this->json->keywords);
-        $this->assertEquals(1, $this->json->active);
-        $this->assertEquals(1, $this->json->order);
-    }
-
-    public function test_it_makes_json_class()
-    {
-        $path = __DIR__ . '/stubs/valid/module.json';
-        $json = Json::make($path, $this->app['files']);
-
-        $this->assertInstanceOf(Json::class, $json);
-    }
-
-    public function test_it_sets_a_path()
-    {
-        $path = __DIR__ . '/stubs/valid/module.json';
-        $this->assertEquals($path, $this->json->getPath());
-
-        $this->json->setPath('some/path.json');
-        $this->assertEquals('some/path.json', $this->json->getPath());
+        $expected = '{
+    "name": "Order",
+    "alias": "order",
+    "description": "My demo module",
+    "version": "0.1",
+    "keywords": [
+        "my",
+        "stub",
+        "module"
+    ],
+    "active": 1,
+    "order": 1,
+    "providers": [
+        "Modules\\\Order\\\Providers\\\OrderServiceProvider",
+        "Modules\\\Order\\\Providers\\\EventServiceProvider",
+        "Modules\\\Order\\\Providers\\\RouteServiceProvider"
+    ],
+    "aliases":{},
+    "files": [
+    ]
+}
+';
+        $this->assertEquals($expected, (string) $this->json);
     }
 
     public function test_it_decodes_json()
@@ -100,6 +82,43 @@ class JsonTest extends BaseTestCase
         $this->assertEquals($expected, $this->json->toJsonPretty());
     }
 
+    public function test_it_gets_attributes_from_json_file()
+    {
+        $this->assertEquals('Order', $this->json->get('name'));
+        $this->assertEquals('order', $this->json->get('alias'));
+        $this->assertEquals('My demo module', $this->json->get('description'));
+        $this->assertEquals('0.1', $this->json->get('version'));
+        $this->assertEquals(['my', 'stub', 'module'], $this->json->get('keywords'));
+        $this->assertEquals(1, $this->json->get('active'));
+        $this->assertEquals(1, $this->json->get('order'));
+    }
+
+    public function test_it_gets_the_file_path()
+    {
+        $path = __DIR__ . '/stubs/valid/module.json';
+
+        $this->assertEquals($path, $this->json->getPath());
+    }
+
+    public function test_it_makes_json_class()
+    {
+        $path = __DIR__ . '/stubs/valid/module.json';
+        $json = Json::make($path, $this->app['files']);
+
+        $this->assertInstanceOf(Json::class, $json);
+    }
+
+    public function test_it_reads_attributes_from_magic_get_method()
+    {
+        $this->assertEquals('Order', $this->json->name);
+        $this->assertEquals('order', $this->json->alias);
+        $this->assertEquals('My demo module', $this->json->description);
+        $this->assertEquals('0.1', $this->json->version);
+        $this->assertEquals(['my', 'stub', 'module'], $this->json->keywords);
+        $this->assertEquals(1, $this->json->active);
+        $this->assertEquals(1, $this->json->order);
+    }
+
     public function test_it_sets_a_key_value()
     {
         $this->json->set('key', 'value');
@@ -107,30 +126,22 @@ class JsonTest extends BaseTestCase
         $this->assertEquals('value', $this->json->get('key'));
     }
 
-    public function test_it_can_be_casted_to_string()
+    public function test_it_sets_a_path()
     {
-        $expected = '{
-    "name": "Order",
-    "alias": "order",
-    "description": "My demo module",
-    "version": "0.1",
-    "keywords": [
-        "my",
-        "stub",
-        "module"
-    ],
-    "active": 1,
-    "order": 1,
-    "providers": [
-        "Modules\\\Order\\\Providers\\\OrderServiceProvider",
-        "Modules\\\Order\\\Providers\\\EventServiceProvider",
-        "Modules\\\Order\\\Providers\\\RouteServiceProvider"
-    ],
-    "aliases":{},
-    "files": [
-    ]
-}
-';
-        $this->assertEquals($expected, (string)$this->json);
+        $path = __DIR__ . '/stubs/valid/module.json';
+        $this->assertEquals($path, $this->json->getPath());
+
+        $this->json->setPath('some/path.json');
+        $this->assertEquals('some/path.json', $this->json->getPath());
+    }
+
+    public function test_it_throws_an_exception_with_invalid_json()
+    {
+        $path = __DIR__ . '/stubs/InvalidJsonModule/module.json';
+
+        $this->expectException(InvalidJsonException::class);
+        $this->expectExceptionMessage('Error processing file: ' . $path . '. Error: Syntax error');
+
+        new Json($path, $this->app['files']);
     }
 }

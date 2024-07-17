@@ -1,4 +1,15 @@
 <?php
+/**
+ *  +-------------------------------------------------------------------------------------------
+ *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
+ *  +-------------------------------------------------------------------------------------------
+ *  | This is not a free software, without any authorization is not allowed to use and spread.
+ *  +-------------------------------------------------------------------------------------------
+ *  | Copyright (c) 2006~2024 All rights reserved.
+ *  +-------------------------------------------------------------------------------------------
+ *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+ *  +-------------------------------------------------------------------------------------------
+ */
 
 namespace Nwidart\Modules\Tests;
 
@@ -35,30 +46,7 @@ class StubTest extends BaseTestCase
         ]);
 
         $this->assertTrue(Str::contains($stub->getPath(), 'src/Commands/stubs/model.stub'));
-        $this->assertEquals(['NAME' => 'Name', ], $stub->getReplaces());
-    }
-
-    public function test_it_sets_new_replaces_array()
-    {
-        $stub = new Stub('/model.stub', [
-            'NAME' => 'Name',
-        ]);
-
-        $stub->replace(['VENDOR' => 'MyVendor', ]);
-        $this->assertEquals(['VENDOR' => 'MyVendor', ], $stub->getReplaces());
-    }
-
-    public function test_it_stores_stub_to_specific_path()
-    {
-        $stub = new Stub('/command.stub', [
-            'COMMAND_NAME' => 'my:command',
-            'NAMESPACE' => 'Blog\Commands',
-            'CLASS' => 'MyCommand',
-        ]);
-
-        $stub->saveTo(base_path(), 'my-command.php');
-
-        $this->assertTrue($this->finder->exists(base_path('my-command.php')));
+        $this->assertEquals(['NAME' => 'Name'], $stub->getReplaces());
     }
 
     public function test_it_sets_new_path()
@@ -72,12 +60,35 @@ class StubTest extends BaseTestCase
         $this->assertTrue(Str::contains($stub->getPath(), 'Commands/stubs/new-path/'));
     }
 
+    public function test_it_sets_new_replaces_array()
+    {
+        $stub = new Stub('/model.stub', [
+            'NAME' => 'Name',
+        ]);
+
+        $stub->replace(['VENDOR' => 'MyVendor']);
+        $this->assertEquals(['VENDOR' => 'MyVendor'], $stub->getReplaces());
+    }
+
+    public function test_it_stores_stub_to_specific_path()
+    {
+        $stub = new Stub('/command.stub', [
+            'COMMAND_NAME' => 'my:command',
+            'NAMESPACE'    => 'Blog\Commands',
+            'CLASS'        => 'MyCommand',
+        ]);
+
+        $stub->saveTo(base_path(), 'my-command.php');
+
+        $this->assertTrue($this->finder->exists(base_path('my-command.php')));
+    }
+
     public function test_use_default_stub_if_override_not_exists()
     {
         $stub = new Stub('/command.stub', [
             'COMMAND_NAME' => 'my:command',
-            'NAMESPACE' => 'Blog\Commands',
-            'CLASS' => 'MyCommand',
+            'NAMESPACE'    => 'Blog\Commands',
+            'CLASS'        => 'MyCommand',
         ]);
 
         $stub->setBasePath(__DIR__ . '/stubs');
