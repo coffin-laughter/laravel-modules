@@ -25,10 +25,12 @@ trait ScopeTenantData
         $model = app(static::class);
         if (in_array($model->getTenantIdColumn(), $model->getFillable())) {
             $currenUser = Auth::guard(getGuardName())->user();
-            if ($currenUser->isSuperAdmin()) {
-                return $query;
-            } else {
-                return $query->where($model->getTenantIdColumn(), $currenUser->tenant_id);
+            if (! empty($currenUser)) {
+                if ($currenUser->isSuperAdmin()) {
+                    return $query;
+                } else {
+                    return $query->where($model->getTenantIdColumn(), $currenUser->tenant_id);
+                }
             }
         }
 
