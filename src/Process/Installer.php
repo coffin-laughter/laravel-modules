@@ -71,11 +71,6 @@ class Installer
     private $type;
 
     /**
-     * @var null|string
-     */
-    private $type;
-
-    /**
      * The constructor.
      *
      * @param  string  $name

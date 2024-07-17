@@ -21,10 +21,6 @@ interface ActivatorInterface
      * Deletes a module activation status
      */
     public function delete(Module $module): void;
-    /**
-     * Enables a module
-     */
-    public function delete(Module $module): void;
 
     /**
      * Disables a module

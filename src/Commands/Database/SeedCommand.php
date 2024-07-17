@@ -99,49 +99,10 @@ class SeedCommand extends BaseCommand
     }
 
     /**
-     * Get master database seeder name for the specified module.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    public function getSeederName($name)
-    {
-        $name = Str::studly($name);
-
-        $namespace = $this->laravel['modules']->config('namespace');
-        $config = GenerateConfigReader::read('seeder');
-        $seederPath = str_replace('/', '\\', $config->getPath());
-
-        return $namespace . '\\' . $name . '\\' . $seederPath . '\\' . $name . 'DatabaseSeeder';
-    }
-
-    /**
      * Get master database seeder name for the specified module under a different namespace than Modules.
      *
      * @param string $name
      *
-     * @return array $foundModules array containing namespace paths
-     */
-    public function getSeederNames($name)
-    {
-        $name = Str::studly($name);
-
-        $seederPath = GenerateConfigReader::read('seeder');
-        $seederPath = str_replace('/', '\\', $seederPath->getPath());
-
-        $foundModules = [];
-        foreach ($this->laravel['modules']->config('scan.paths') as $path) {
-            $namespace = array_slice(explode('/', $path), -1)[0];
-            $foundModules[] = $namespace . '\\' . $name . '\\' . $seederPath . '\\' . $name . 'DatabaseSeeder';
-        }
-
-        return $foundModules;
-    }
-
-    /**
-     * Get master database seeder name for the specified module under a different namespace than Modules.
-     *
-     * @param  string  $name
      * @return array $foundModules array containing namespace paths
      */
     public function getSeederNames($name)

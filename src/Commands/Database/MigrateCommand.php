@@ -39,12 +39,6 @@ class MigrateCommand extends BaseCommand
      * @var string
      */
     protected $name = 'module:migrate';
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'module:migrate';
 
     public function __construct()
     {
