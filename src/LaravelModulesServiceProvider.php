@@ -51,6 +51,8 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
         } catch (BindingResolutionException $e) {
         }
 
+        $this->registerSanctumCache();
+
         AboutCommand::add('Laravel-Modules', [
             'Version' => fn () => InstalledVersions::getPrettyVersion('coffin-laughter/laravel-modules'),
         ]);
