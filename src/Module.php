@@ -49,6 +49,7 @@ abstract class Module
      * @var string
      */
     protected $path;
+
     /**
      * @var ActivatorInterface
      */
@@ -91,6 +92,22 @@ abstract class Module
     public function __toString()
     {
         return $this->getStudlyName();
+    }
+
+    /**
+     * Bootstrap the application events.
+     */
+    public function boot(): void
+    {
+        if (config('modules.register.translations', true) === true) {
+            $this->registerTranslation();
+        }
+
+        if ($this->isLoadFilesOnBoot()) {
+            $this->registerFiles();
+        }
+
+        $this->fireEvent('boot');
     }
 
     /**
@@ -202,6 +219,14 @@ abstract class Module
     }
 
     /**
+     * Get extra path.
+     */
+    public function getExtraPath(string $path): string
+    {
+        return $this->getPath().'/'.$path;
+    }
+
+    /**
      * Get name in lower case.
      */
     public function getLowerName(): string
@@ -243,16 +268,6 @@ abstract class Module
 
     /**
      * Get name in studly case.
-     *
-     * @return string
-     */
-    public function getStudlyName(): string
-    {
-        return Str::studly($this->name);
-    }
-
-    /**
-     * Get name in studly case.
      */
     public function getStudlyName(): string
     {
@@ -264,7 +279,7 @@ abstract class Module
      */
     public function isDisabled(): bool
     {
-        return !$this->isEnabled();
+        return ! $this->isEnabled();
     }
 
     /**
@@ -295,7 +310,7 @@ abstract class Module
         }
 
         return Arr::get($this->moduleJson, $file, function () use ($file) {
-            return $this->moduleJson[$file] = new Json($this->getPath() . '/' . $file, $this->files);
+            return $this->moduleJson[$file] = new Json($this->getPath().'/'.$file, $this->files);
         });
     }
 
@@ -334,16 +349,6 @@ abstract class Module
     }
 
     /**
-     * Get extra path.
-     */
-    public function setPath($path): Module
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
      * Set path.
      *
      * @param  string  $path
@@ -359,21 +364,11 @@ abstract class Module
     /**
      * Register the module event.
      *
-     * @param string $event
-     */
-    protected function fireEvent($event): void
-    {
-        $this->app['events']->dispatch(sprintf('modules.%s.' . $event, $this->getLowerName()), [$this]);
-    }
-
-    /**
-     * Register the module event.
-     *
      * @param  string  $event
      */
     protected function fireEvent($event): void
     {
-        $this->app['events']->dispatch(sprintf('modules.%s.' . $event, $this->getLowerName()), [$this]);
+        $this->app['events']->dispatch(sprintf('modules.%s.'.$event, $this->getLowerName()), [$this]);
     }
 
     /**
@@ -383,7 +378,7 @@ abstract class Module
     {
         return config('modules.register.files', 'register') === 'boot' &&
             // force register method if option == boot && app is AsgardCms
-            !class_exists('\Modules\Core\Foundation\AsgardCms');
+            ! class_exists('\Modules\Core\Foundation\AsgardCms');
     }
 
     /**
@@ -392,7 +387,7 @@ abstract class Module
     protected function registerFiles(): void
     {
         foreach ($this->get('files', []) as $file) {
-            include $this->path . '/' . $file;
+            include $this->path.'/'.$file;
         }
     }
 
@@ -403,7 +398,7 @@ abstract class Module
     {
         $lowerName = $this->getLowerName();
 
-        $langPath = $this->getPath() . '/Resources/lang';
+        $langPath = $this->getPath().'/Resources/lang';
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $lowerName);
