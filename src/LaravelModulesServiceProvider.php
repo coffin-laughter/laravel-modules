@@ -73,7 +73,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
 
     public function registerSanctumCache(): void
     {
-        if(class_exists(\Laravel\Sanctum\Sanctum::class) && $this->app['config']->get('modules.auth_sanctum_cache')) {
+        if (class_exists(\Laravel\Sanctum\Sanctum::class) && $this->app['config']->get('modules.auth_sanctum_cache')) {
             \Laravel\Sanctum\Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
         }
     }
@@ -100,6 +100,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
      * @throws NotFoundExceptionInterface
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     *
      * @time  : 2024-05-23 上午10:07
      */
     protected function listenDBLog(): void
@@ -115,6 +116,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
 
     /**
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     *
      * @time  : 2024-05-23 上午10:07
      */
     protected function registerEvents(): void
@@ -124,6 +126,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
 
     /**
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     *
      * @time  : 2024-05-23 上午10:07
      */
     protected function registerExceptionHandler(): void
