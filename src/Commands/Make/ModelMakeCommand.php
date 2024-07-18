@@ -122,6 +122,11 @@ class ModelMakeCommand extends GeneratorCommand
         ];
     }
 
+    protected function getTableName(): string
+    {
+        return Str::of($this->argument('model'))->snake()->lcfirst()->toString();
+    }
+
     /**
      * @return mixed
      */
