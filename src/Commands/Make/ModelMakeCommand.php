@@ -94,6 +94,16 @@ class ModelMakeCommand extends GeneratorCommand
 
         return $path . $modelPath->getPath() . '/' . $this->getModelName() . '.php';
     }
+    protected function getFillableDefault(): string
+    {
+        $fillable = Str::of('');
+
+        foreach (getTableColumns($this->getTableName()) as $column) {
+            $fillable = $fillable->append("'{$column}', ");
+        }
+
+        return $fillable->trim(',')->toString();
+    }
 
     /**
      * Get the console command options.
@@ -120,14 +130,15 @@ class ModelMakeCommand extends GeneratorCommand
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         return (new Stub('/model.stub', [
-            'NAME'             => $this->getModelName(),
-            'FILLABLE'         => $this->getFillable(),
-            'NAMESPACE'        => $this->getClassNamespace($module),
-            'CLASS'            => $this->getClass(),
-            'LOWER_NAME'       => $module->getLowerName(),
-            'MODULE'           => $this->getModuleName(),
-            'STUDLY_NAME'      => $module->getStudlyName(),
-            'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
+            'NAME'              => $this->getModelName(),
+            'FILLABLE'          => $this->getFillable(),
+            'NAMESPACE'         => $this->getClassNamespace($module),
+            'CLASS'             => $this->getClass(),
+            'LOWER_NAME'        => $module->getLowerName(),
+            'MODULE'            => $this->getModuleName(),
+            'STUDLY_NAME'       => $module->getStudlyName(),
+            'MODULE_NAMESPACE'  => $this->laravel['modules']->config('namespace'),
+            'TABLE'             => $this->getTableName(),
         ]))->render();
     }
 
@@ -214,9 +225,10 @@ class ModelMakeCommand extends GeneratorCommand
             $arrays = explode(',', $fillable);
 
             return json_encode($arrays);
+        } else {
+            return '[' . $this->getFillableDefault() . ']';
         }
 
-        return '[]';
     }
 
     /**
