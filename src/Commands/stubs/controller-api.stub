@@ -4,11 +4,12 @@ namespace $CLASS_NAMESPACE$;
 
 use Nwidart\Modules\Base\CoffinController as Controller;
 use Illuminate\Http\Request;
+use Modules\$MODULENAME$\Models\$CLASSNAME$;
 
 class $CLASS$ extends Controller
 {
     public function __construct(
-        protected readonly $CLASS$ $model
+        protected readonly $CLASSNAME$ $model
     ) {
     }
 
