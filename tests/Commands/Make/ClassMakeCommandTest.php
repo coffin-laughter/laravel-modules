@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -46,39 +35,11 @@ class ClassMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_generate_a_class_in_sub_namespace_in_correct_folder()
-    {
-        $code = $this->artisan('module:make-class', ['name' => 'Api\\Demo', 'module' => 'Blog']);
-
-        $this->assertTrue(is_file($this->modulePath . '/Classes/Api/Demo.php'));
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_can_generate_a_class_in_sub_namespace_with_correct_generated_file()
-    {
-        $code = $this->artisan('module:make-class', ['name' => 'Api\\Demo', 'module' => 'Blog']);
-
-        $file = $this->finder->get($this->modulePath . '/Classes/Api/Demo.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_file_with_content()
-    {
-        $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog']);
-
-        $file = $this->finder->get($this->modulePath . '/Classes/Demo.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
     public function test_it_generates_a_new_class()
     {
         $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog']);
 
-        $this->assertTrue(is_file($this->modulePath . '/Classes/Demo.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Classes/Demo.php'));
         $this->assertSame(0, $code);
     }
 
@@ -87,7 +48,7 @@ class ClassMakeCommandTest extends BaseTestCase
         $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog']);
         $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog', '--force' => true]);
 
-        $this->assertTrue(is_file($this->modulePath . '/Classes/Demo.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Classes/Demo.php'));
         $this->assertSame(0, $code);
     }
 
@@ -95,7 +56,7 @@ class ClassMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog', '--invokable' => true]);
 
-        $this->assertTrue(is_file($this->modulePath . '/Classes/Demo.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Classes/Demo.php'));
         $this->assertSame(0, $code);
     }
 
@@ -103,7 +64,7 @@ class ClassMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog', '--suffix' => true]);
 
-        $this->assertTrue(is_file($this->modulePath . '/Classes/DemoClass.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Classes/DemoClass.php'));
         $this->assertSame(0, $code);
     }
 
@@ -111,7 +72,35 @@ class ClassMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog', '--type' => 'contract']);
 
-        $this->assertTrue(is_file($this->modulePath . '/Contracts/Demo.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Contracts/Demo.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_file_with_content()
+    {
+        $code = $this->artisan('module:make-class', ['name' => 'Demo', 'module' => 'Blog']);
+
+        $file = $this->finder->get($this->modulePath.'/Classes/Demo.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_can_generate_a_class_in_sub_namespace_in_correct_folder()
+    {
+        $code = $this->artisan('module:make-class', ['name' => 'Api\\Demo', 'module' => 'Blog']);
+
+        $this->assertTrue(is_file($this->modulePath.'/Classes/Api/Demo.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_can_generate_a_class_in_sub_namespace_with_correct_generated_file()
+    {
+        $code = $this->artisan('module:make-class', ['name' => 'Api\\Demo', 'module' => 'Blog']);
+
+        $file = $this->finder->get($this->modulePath.'/Classes/Api/Demo.php');
+
+        $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 }

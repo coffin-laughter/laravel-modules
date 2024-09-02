@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -45,6 +34,95 @@ class ListenerMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
+    public function test_it_generates_a_new_event_class()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'UserWasCreated']
+        );
+
+        $this->assertTrue(is_file($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_sync_event_with_content()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'UserWasCreated']
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_sync_event_in_a_subdirectory_with_content()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'User/WasCreated']
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_sync_duck_event_with_content()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog']
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_queued_event_with_content()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'UserWasCreated', '--queued' => true]
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_queued_event_in_a_subdirectory_with_content()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'User/WasCreated', '--queued' => true]
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_queued_duck_event_with_content()
+    {
+        $code = $this->artisan(
+            'module:make-listener',
+            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--queued' => true]
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
     public function test_it_can_change_the_default_namespace()
     {
         $this->app['config']->set('modules.paths.generator.listener.path', 'Events/Handlers');
@@ -54,7 +132,7 @@ class ListenerMakeCommandTest extends BaseTestCase
             ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog']
         );
 
-        $file = $this->finder->get($this->getModuleBasePath() . '/Events/Handlers/NotifyUsersOfANewPost.php');
+        $file = $this->finder->get($this->getModuleBasePath().'/Events/Handlers/NotifyUsersOfANewPost.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -69,98 +147,9 @@ class ListenerMakeCommandTest extends BaseTestCase
             ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog']
         );
 
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
+        $file = $this->finder->get($this->modulePath.'/Listeners/NotifyUsersOfANewPost.php');
 
         $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_queued_duck_event_with_content()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--queued' => true]
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_queued_event_in_a_subdirectory_with_content()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'User/WasCreated', '--queued' => true]
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_queued_event_with_content()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'UserWasCreated', '--queued' => true]
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_sync_duck_event_with_content()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog']
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_sync_event_in_a_subdirectory_with_content()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'User/WasCreated']
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_sync_event_with_content()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'UserWasCreated']
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generates_a_new_event_class()
-    {
-        $code = $this->artisan(
-            'module:make-listener',
-            ['name' => 'NotifyUsersOfANewPost', 'module' => 'Blog', '--event' => 'UserWasCreated']
-        );
-
-        $this->assertTrue(is_file($this->modulePath . '/Listeners/NotifyUsersOfANewPost.php'));
         $this->assertSame(0, $code);
     }
 }

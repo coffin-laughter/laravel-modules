@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Translation\Translator;
+use Nwidart\Modules\Constants\ModuleEvent;
 use Nwidart\Modules\Contracts\ActivatorInterface;
 
 abstract class Module
@@ -107,7 +108,7 @@ abstract class Module
             $this->registerFiles();
         }
 
-        $this->fireEvent('boot');
+        $this->fireEvent(ModuleEvent::BOOT);
     }
 
     /**
@@ -115,9 +116,15 @@ abstract class Module
      */
     public function delete(): bool
     {
+        $this->fireEvent(ModuleEvent::DELETING);
+
         $this->activator->delete($this);
 
-        return $this->json()->getFilesystem()->deleteDirectory($this->getPath());
+        $result = $this->json()->getFilesystem()->deleteDirectory($this->getPath());
+
+        $this->fireEvent(ModuleEvent::DELETED);
+
+        return $result;
     }
 
     /**
@@ -125,12 +132,12 @@ abstract class Module
      */
     public function disable(): void
     {
-        $this->fireEvent('disabling');
+        $this->fireEvent(ModuleEvent::DISABLING);
 
         $this->activator->disable($this);
         $this->flushCache();
 
-        $this->fireEvent('disabled');
+        $this->fireEvent(ModuleEvent::DISABLED);
     }
 
     /**
@@ -138,12 +145,20 @@ abstract class Module
      */
     public function enable(): void
     {
-        $this->fireEvent('enabling');
+        $this->fireEvent(ModuleEvent::ENABLING);
 
         $this->activator->enable($this);
         $this->flushCache();
 
-        $this->fireEvent('enabled');
+        $this->fireEvent(ModuleEvent::ENABLED);
+    }
+
+    /**
+     * fire the module event.
+     */
+    public function fireEvent(string $event): void
+    {
+        $this->app['events']->dispatch(sprintf('modules.%s.%s', $this->getLowerName(), $event), [$this]);
     }
 
     /**
@@ -223,7 +238,7 @@ abstract class Module
      */
     public function getExtraPath(string $path): string
     {
-        return $this->getPath().'/'.$path;
+        return $this->getPath() . '/' . $path;
     }
 
     /**
@@ -279,7 +294,7 @@ abstract class Module
      */
     public function isDisabled(): bool
     {
-        return ! $this->isEnabled();
+        return !$this->isEnabled();
     }
 
     /**
@@ -310,7 +325,7 @@ abstract class Module
         }
 
         return Arr::get($this->moduleJson, $file, function () use ($file) {
-            return $this->moduleJson[$file] = new Json($this->getPath().'/'.$file, $this->files);
+            return $this->moduleJson[$file] = new Json($this->getPath() . '/' . $file, $this->files);
         });
     }
 
@@ -327,7 +342,7 @@ abstract class Module
             $this->registerFiles();
         }
 
-        $this->fireEvent('register');
+        $this->fireEvent(ModuleEvent::REGISTER);
     }
 
     /**
@@ -362,23 +377,13 @@ abstract class Module
     }
 
     /**
-     * Register the module event.
-     *
-     * @param  string  $event
-     */
-    protected function fireEvent($event): void
-    {
-        $this->app['events']->dispatch(sprintf('modules.%s.'.$event, $this->getLowerName()), [$this]);
-    }
-
-    /**
      * Check if can load files of module on boot method.
      */
     protected function isLoadFilesOnBoot(): bool
     {
         return config('modules.register.files', 'register') === 'boot' &&
             // force register method if option == boot && app is AsgardCms
-            ! class_exists('\Modules\Core\Foundation\AsgardCms');
+            !class_exists('\Modules\Core\Foundation\AsgardCms');
     }
 
     /**
@@ -387,7 +392,7 @@ abstract class Module
     protected function registerFiles(): void
     {
         foreach ($this->get('files', []) as $file) {
-            include $this->path.'/'.$file;
+            include $this->path . '/' . $file;
         }
     }
 
@@ -398,7 +403,7 @@ abstract class Module
     {
         $lowerName = $this->getLowerName();
 
-        $langPath = $this->getPath().'/Resources/lang';
+        $langPath = $this->getPath() . '/Resources/lang';
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $lowerName);

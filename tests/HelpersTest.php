@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests;
 
@@ -42,13 +31,13 @@ class HelpersTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_bind_a_relative_path_to_module_path()
-    {
-        $this->assertTrue(Str::contains(module_path('Blog', 'config/config.php'), 'modules/Blog/config/config.php'));
-    }
-
     public function test_it_finds_the_module_path()
     {
         $this->assertTrue(Str::contains(module_path('Blog'), 'modules/Blog'));
+    }
+
+    public function test_it_can_bind_a_relative_path_to_module_path()
+    {
+        $this->assertTrue(Str::contains(module_path('Blog', 'config/config.php'), 'modules/Blog/config/config.php'));
     }
 }

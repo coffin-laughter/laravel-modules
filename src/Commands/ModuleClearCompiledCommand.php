@@ -1,7 +1,4 @@
 <?php
-
-declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
  *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
@@ -14,26 +11,32 @@ declare(strict_types=1);
  *  +-------------------------------------------------------------------------------------------
  */
 
-namespace Nwidart\Modules\Traits\Db;
+namespace Nwidart\Modules\Commands;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Console\Command;
+use Nwidart\Modules\ModuleManifest;
 
-trait ScopeTenantData
+class ModuleClearCompiledCommand extends Command
 {
-    public function scopeTenantData($query)
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Remove the module compiled class file';
+    /**
+     * The console command signature.
+     *
+     * @var string
+     */
+    protected $signature = 'module:clear-compiled';
+
+    public function handle(ModuleManifest $manifest): void
     {
-        $model = app(static::class);
-        if (in_array($model->getTenantIdColumn(), $model->getFillable())) {
-            $currenUser = Auth::guard(getGuardName())->user();
-            if (!empty($currenUser)) {
-                if ($currenUser->isSuperAdmin()) {
-                    return $query;
-                } else {
-                    return $query->where($model->getTenantIdColumn(), $currenUser->tenant_id);
-                }
-            }
+        if (is_file($manifest->manifestPath)) {
+            @unlink($manifest->manifestPath);
         }
 
-        return $query;
+        $this->components->info('Compiled module files removed successfully.');
     }
 }

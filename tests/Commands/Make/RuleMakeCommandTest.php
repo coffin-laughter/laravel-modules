@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -45,13 +34,35 @@ class RuleMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
+    public function test_it_makes_rule()
+    {
+        $code = $this->artisan('module:make-rule', ['name' => 'UniqueRule', 'module' => 'Blog']);
+
+        $ruleFile = $this->modulePath.'/Rules/UniqueRule.php';
+
+        $this->assertTrue(is_file($ruleFile), 'Rule file was not created.');
+        $this->assertMatchesSnapshot($this->finder->get($ruleFile));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_makes_implicit_rule()
+    {
+        $code = $this->artisan('module:make-rule', ['name' => 'ImplicitUniqueRule', 'module' => 'Blog', '--implicit' => true]);
+
+        $ruleFile = $this->modulePath.'/Rules/ImplicitUniqueRule.php';
+
+        $this->assertTrue(is_file($ruleFile), 'Rule file was not created.');
+        $this->assertMatchesSnapshot($this->finder->get($ruleFile));
+        $this->assertSame(0, $code);
+    }
+
     public function test_it_can_change_the_default_namespace()
     {
         $this->app['config']->set('modules.paths.generator.rules.path', 'SuperRules');
 
         $code = $this->artisan('module:make-rule', ['name' => 'UniqueRule', 'module' => 'Blog']);
 
-        $file = $this->finder->get($this->getModuleBasePath() . '/SuperRules/UniqueRule.php');
+        $file = $this->finder->get($this->getModuleBasePath().'/SuperRules/UniqueRule.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -63,31 +74,9 @@ class RuleMakeCommandTest extends BaseTestCase
 
         $code = $this->artisan('module:make-rule', ['name' => 'UniqueRule', 'module' => 'Blog']);
 
-        $file = $this->finder->get($this->modulePath . '/Rules/UniqueRule.php');
+        $file = $this->finder->get($this->modulePath.'/Rules/UniqueRule.php');
 
         $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_makes_implicit_rule()
-    {
-        $code = $this->artisan('module:make-rule', ['name' => 'ImplicitUniqueRule', 'module' => 'Blog', '--implicit' => true]);
-
-        $ruleFile = $this->modulePath . '/Rules/ImplicitUniqueRule.php';
-
-        $this->assertTrue(is_file($ruleFile), 'Rule file was not created.');
-        $this->assertMatchesSnapshot($this->finder->get($ruleFile));
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_makes_rule()
-    {
-        $code = $this->artisan('module:make-rule', ['name' => 'UniqueRule', 'module' => 'Blog']);
-
-        $ruleFile = $this->modulePath . '/Rules/UniqueRule.php';
-
-        $this->assertTrue(is_file($ruleFile), 'Rule file was not created.');
-        $this->assertMatchesSnapshot($this->finder->get($ruleFile));
         $this->assertSame(0, $code);
     }
 }

@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests;
 
@@ -49,17 +38,6 @@ class StubTest extends BaseTestCase
         $this->assertEquals(['NAME' => 'Name'], $stub->getReplaces());
     }
 
-    public function test_it_sets_new_path()
-    {
-        $stub = new Stub('/model.stub', [
-            'NAME' => 'Name',
-        ]);
-
-        $stub->setPath('/new-path/');
-
-        $this->assertTrue(Str::contains($stub->getPath(), 'Commands/stubs/new-path/'));
-    }
-
     public function test_it_sets_new_replaces_array()
     {
         $stub = new Stub('/model.stub', [
@@ -74,8 +52,8 @@ class StubTest extends BaseTestCase
     {
         $stub = new Stub('/command.stub', [
             'COMMAND_NAME' => 'my:command',
-            'NAMESPACE'    => 'Blog\Commands',
-            'CLASS'        => 'MyCommand',
+            'NAMESPACE' => 'Blog\Commands',
+            'CLASS' => 'MyCommand',
         ]);
 
         $stub->saveTo(base_path(), 'my-command.php');
@@ -83,15 +61,26 @@ class StubTest extends BaseTestCase
         $this->assertTrue($this->finder->exists(base_path('my-command.php')));
     }
 
+    public function test_it_sets_new_path()
+    {
+        $stub = new Stub('/model.stub', [
+            'NAME' => 'Name',
+        ]);
+
+        $stub->setPath('/new-path/');
+
+        $this->assertTrue(Str::contains($stub->getPath(), 'Commands/stubs/new-path/'));
+    }
+
     public function test_use_default_stub_if_override_not_exists()
     {
         $stub = new Stub('/command.stub', [
             'COMMAND_NAME' => 'my:command',
-            'NAMESPACE'    => 'Blog\Commands',
-            'CLASS'        => 'MyCommand',
+            'NAMESPACE' => 'Blog\Commands',
+            'CLASS' => 'MyCommand',
         ]);
 
-        $stub->setBasePath(__DIR__ . '/stubs');
+        $stub->setBasePath(__DIR__.'/stubs');
 
         $stub->saveTo(base_path(), 'stub-override-not-exists.php');
 
@@ -104,7 +93,7 @@ class StubTest extends BaseTestCase
             'NAME' => 'Name',
         ]);
 
-        $stub->setBasePath(__DIR__ . '/stubs');
+        $stub->setBasePath(__DIR__.'/stubs');
 
         $stub->saveTo(base_path(), 'stub-override-exists.php');
 

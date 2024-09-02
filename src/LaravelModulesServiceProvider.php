@@ -16,9 +16,13 @@ namespace Nwidart\Modules;
 use Composer\InstalledVersions;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
+use Nwidart\Modules\Constants\ModuleEvent;
 use Nwidart\Modules\Contracts\RepositoryInterface;
 use Nwidart\Modules\Exceptions\Handler;
 use Nwidart\Modules\Exceptions\InvalidActivatorClass;
@@ -28,6 +32,7 @@ use Nwidart\Modules\Support\Sanctum\PersonalAccessToken;
 use Nwidart\Modules\Support\Stub;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\Console\Output\NullOutput;
 
 class LaravelModulesServiceProvider extends ModulesServiceProvider
 {
@@ -37,6 +42,16 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
     public function boot(): void
     {
         $this->registerNamespaces();
+
+        $this->app->singleton(
+            ModuleManifest::class,
+            fn () => new ModuleManifest(
+                new Filesystem(),
+                app(Contracts\RepositoryInterface::class)->getScanPaths(),
+                $this->getCachedModulePath()
+            )
+        );
+
         $this->registerModules();
 
         $this->registerEvents();
@@ -67,6 +82,7 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
         $this->setupStubPath();
         $this->registerProviders();
         $this->registerExceptionHandler();
+        $this->registerMigrations();
 
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'modules');
     }
@@ -119,21 +135,32 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
      *
      * @time  : 2024-05-23 上午10:07
      */
-    protected function registerEvents(): void
-    {
-        Event::listen(RequestHandled::class, config('modules.response.request_handled_listener'));
-    }
-
-    /**
-     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     *
-     * @time  : 2024-05-23 上午10:07
-     */
     protected function registerExceptionHandler(): void
     {
         if (isRequestFromAjax()) {
             $this->app->singleton(ExceptionHandler::class, Handler::class);
         }
+    }
+
+    protected function registerMigrations(): void
+    {
+        if (!$this->app['config']->get('modules.auto-discover.migrations', true)) {
+            return;
+        }
+
+        $this->app->resolving(Migrator::class, function (Migrator $migrator) {
+            $path = implode(DIRECTORY_SEPARATOR, [
+                $this->app['config']->get('modules.paths.modules'),
+                '*',
+                '[Dd]atabase',
+                'migrations',
+            ]);
+
+            collect(glob($path, GLOB_ONLYDIR))
+                ->each(function (string $path) use ($migrator) {
+                    $migrator->path($path);
+                });
+        });
     }
 
     /**
@@ -157,5 +184,24 @@ class LaravelModulesServiceProvider extends ModulesServiceProvider
             return new $class($app);
         });
         $this->app->alias(Contracts\RepositoryInterface::class, 'modules');
+    }
+
+    /**
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 10:47
+     */
+    private function registerEvents(): void
+    {
+        Event::listen(RequestHandled::class, config('modules.response.request_handled_listener'));
+        Event::listen(
+            [
+                'modules.*.' . ModuleEvent::DELETED,
+                'modules.*.' . ModuleEvent::CREATED,
+                'modules.*.' . ModuleEvent::DISABLED,
+                'modules.*.' . ModuleEvent::ENABLED,
+            ],
+            fn () => Artisan::call('module:clear-compiled', outputBuffer: new NullOutput())
+        );
     }
 }

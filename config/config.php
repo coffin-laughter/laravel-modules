@@ -177,6 +177,28 @@ return [
             'test-unit'    => ['path' => 'tests/Unit', 'generate' => false],
         ],
     ],
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Discover of Modules
+    |--------------------------------------------------------------------------
+    |
+    | Here you configure auto discover of module
+    | This is useful for simplify module providers.
+    |
+    */
+    'auto-discover' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Migrations
+        |--------------------------------------------------------------------------
+        |
+        | This option for register migration automatically.
+        |
+        */
+        'migrations' => true,
+
+    ],
+
 
     /*
     |--------------------------------------------------------------------------

@@ -23,14 +23,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Nwidart\Modules\Enums\Status;
-use Nwidart\Modules\Exceptions\FailedException;
 
 trait BaseOperate
 {
-    use WithAttributes;
     use WithEvents;
     use WithRelations;
-    use WithSearch;
 
     /**
      * 字段别名
@@ -93,10 +90,8 @@ trait BaseOperate
             return true;
         }
 
-        if (in_array($this->getParentIdColumn(), $this->getFillable())
-            && $this->where($this->getParentIdColumn(), $model->id)->first()
-        ) {
-            throw new FailedException('请先删除子级');
+        if (in_array($this->getParentIdColumn(), $this->getFillable()) && $this->where($this->getParentIdColumn(), $model->id)->first()) {
+            throw new \Exception('请先删除子级');
         }
 
         if ($force) {
@@ -142,7 +137,29 @@ trait BaseOperate
     }
 
     /**
-     * 获取第一条数据
+     * @param bool $is
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:50
+     */
+    public function fillCreatorId(bool $is = true): static
+    {
+        $this->isFillCreatorId = $is;
+
+        return $this;
+    }
+
+    public function fillTenantId(bool $is = true): static
+    {
+        $this->isFillTenantId = $is;
+
+        return $this;
+    }
+
+
+    /**
+     * get first by ID
      *
      * @param       $value
      * @param       $field
@@ -196,14 +213,46 @@ trait BaseOperate
     }
 
     /**
+     * @return array
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:50
+     */
+    public function getForm(): array
+    {
+        if (property_exists($this, 'form') && !empty($this->form)) {
+            return $this->form;
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:50
+     */
+    public function getFormRelations(): array
+    {
+        if (property_exists($this, 'formRelations') && !empty($this->form)) {
+            return $this->formRelations;
+        }
+
+        return [];
+    }
+
+    /**
      * @return mixed
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:50
      */
     public function getList(): mixed
     {
-        $builder = static::select($this->fields)
+        $fields = property_exists($this, 'fields') ? $this->fields : ['*'];
+
+        $builder = static::select($fields)
             ->creator()
             ->quickSearch();
 
@@ -248,17 +297,27 @@ trait BaseOperate
         return $data;
     }
 
+    /**
+     * @return string
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:51
+     */
+    public function getParentIdColumn(): string
+    {
+        return $this->parentIdColumn;
+    }
     public function getTenantIdColumn(): string
     {
         return 'tenant_id';
     }
 
+
     /**
-     * 获取更新的字段
      * @return string|null
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:52
      */
     public function getUpdatedAtColumn(): ?string
     {
@@ -272,12 +331,60 @@ trait BaseOperate
     }
 
     /**
-     * 保存数据
+     * @param bool $auto
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:52
+     */
+    public function setAutoNull2EmptyString(bool $auto = true): static
+    {
+        $this->autoNull2EmptyString = $auto;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $use
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:52
+     */
+    public function setDataRange(bool $use = true): static
+    {
+        $this->dataRange = $use;
+
+        return $this;
+    }
+
+    /**
+     * @param string $parentId
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:52
+     */
+    public function setParentIdColumn(string $parentId): static
+    {
+        $this->parentIdColumn = $parentId;
+
+        return $this;
+    }
+    public function setTenantData(bool $tenantData = true): static
+    {
+        $this->tenantData = $tenantData;
+
+        return $this;
+    }
+
+
+    /**
      * @param array $data
      * @return mixed
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:52
      */
     public function storeBy(array $data): mixed
     {
@@ -293,21 +400,16 @@ trait BaseOperate
     }
 
     /**
-     * 禁用 | 启用
      * @param        $id
      * @param string $field
      * @return bool
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:52
      */
     public function toggleBy($id, string $field = 'status'): bool
     {
         $model = $this->firstBy($id);
-
-        if (empty($model)) {
-            return true;
-        }
 
         $status = $model->getAttribute($field) == Status::Enable->value() ? Status::Disable->value() : Status::Enable->value();
 
@@ -321,13 +423,12 @@ trait BaseOperate
     }
 
     /**
-     * 批量禁用|启用
      * @param array|string $ids
      * @param string       $field
      * @return bool
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:52
      */
     public function togglesBy(array|string $ids, string $field = 'status'): bool
     {
@@ -345,13 +446,12 @@ trait BaseOperate
     }
 
     /**
-     * 更新数据
      * @param       $id
      * @param array $data
      * @return mixed
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:52
      */
     public function updateBy($id, array $data): mixed
     {
@@ -366,14 +466,14 @@ trait BaseOperate
         return $updated;
     }
 
+
     /**
-     * 递归更新
      * @param mixed  $parentId
      * @param string $field
      * @param mixed  $value
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:52
      */
     public function updateChildren(mixed $parentId, string $field, mixed $value): void
     {
@@ -385,7 +485,7 @@ trait BaseOperate
 
         if ($childrenId->count()) {
             if ($this->whereIn($this->getParentIdColumn(), $parentId)->update([
-                $field => $value,
+                $field => $value
             ])) {
                 $this->updateChildren($childrenId, $field, $value);
             }
@@ -393,17 +493,31 @@ trait BaseOperate
     }
 
     /**
-     * 过滤数据,过滤空值或者空字符串
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:52
+     */
+    public function withoutForm(): static
+    {
+        if (property_exists($this, 'form') && !empty($this->form)) {
+            $this->form = [];
+        }
+
+        return $this;
+    }
+
+    /**
      * @param array $data
      * @return array
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:53
      */
     protected function filterData(array $data): array
     {
         // 表单保存的数据集合
-        $fillable = array_unique(array_merge($this->getFillable(), property_exists($this, 'form') ? $this->form : []));
+        $fillable = array_unique(array_merge($this->getFillable(), $this->getForm()));
 
         foreach ($data as $k => $val) {
             if ($this->autoNull2EmptyString && is_null($val)) {
@@ -421,11 +535,12 @@ trait BaseOperate
 
         if (Auth::guard(getGuardName())->hasUser()) {
             $user = Auth::guard(getGuardName())->user();
-            if (in_array($this->getCreatorIdColumn(), $this->getFillable())) {
-                $data['creator_id'] = $user->id;
+
+            if ($this->isFillCreatorId && in_array($this->getCreatorIdColumn(), $this->getFillable())) {
+                $data['creator_id'] = Auth::guard(getGuardName())->id();
             }
 
-            if (empty($data['tenant_id']) && in_array($this->getTenantIdColumn(), $this->getFillable())) {
+            if ($this->isFillTenantId && empty($data['tenant_id']) && in_array($this->getTenantIdColumn(), $this->getFillable())) {
                 $data['tenant_id'] = $user->tenant_id;
             }
         }
@@ -434,15 +549,42 @@ trait BaseOperate
     }
 
     /**
-     * 设置创建者字段
      * @return $this
      *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
-     * @time  : 2024-05-15 下午2:46
+     * @time  : 2024-09-02 09:54
      */
     protected function setCreatorId(): static
     {
         $this->setAttribute($this->getCreatorIdColumn(), Auth::guard(getGuardName())->id());
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isPaginate
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:55
+     */
+    protected function setPaginate(bool $isPaginate = true): static
+    {
+        $this->isPaginate = $isPaginate;
+
+        return $this;
+    }
+
+    /**
+     * @param string $sortField
+     * @return $this
+     *
+     * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     * @time  : 2024-09-02 09:55
+     */
+    protected function setSortField(string $sortField): static
+    {
+        $this->sortField = $sortField;
 
         return $this;
     }

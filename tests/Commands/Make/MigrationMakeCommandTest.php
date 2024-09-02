@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -49,21 +38,9 @@ class MigrationMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-migration', ['name' => 'create_posts_table', 'module' => 'Blog']);
 
-        $files = $this->finder->allFiles($this->modulePath . '/database/migrations');
+        $files = $this->finder->allFiles($this->modulePath.'/database/migrations');
 
         $this->assertCount(1, $files);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generates_correct_add_migration_file_content()
-    {
-        $code = $this->artisan('module:make-migration', ['name' => 'add_something_to_posts_table', 'module' => 'Blog']);
-
-        $migrations = $this->finder->allFiles($this->modulePath . '/database/migrations');
-        $fileName = $migrations[0]->getRelativePathname();
-        $file = $this->finder->get($this->modulePath . '/database/migrations/' . $fileName);
-
-        $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
@@ -71,21 +48,21 @@ class MigrationMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-migration', ['name' => 'create_posts_table', 'module' => 'Blog']);
 
-        $migrations = $this->finder->allFiles($this->modulePath . '/database/migrations');
+        $migrations = $this->finder->allFiles($this->modulePath.'/database/migrations');
         $fileName = $migrations[0]->getRelativePathname();
-        $file = $this->finder->get($this->modulePath . '/database/migrations/' . $fileName);
+        $file = $this->finder->get($this->modulePath.'/database/migrations/'.$fileName);
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
-    public function test_it_generates_correct_default_migration_file_content()
+    public function test_it_generates_correct_add_migration_file_content()
     {
-        $code = $this->artisan('module:make-migration', ['name' => 'something_random_name', 'module' => 'Blog']);
+        $code = $this->artisan('module:make-migration', ['name' => 'add_something_to_posts_table', 'module' => 'Blog']);
 
-        $migrations = $this->finder->allFiles($this->modulePath . '/database/migrations');
+        $migrations = $this->finder->allFiles($this->modulePath.'/database/migrations');
         $fileName = $migrations[0]->getRelativePathname();
-        $file = $this->finder->get($this->modulePath . '/database/migrations/' . $fileName);
+        $file = $this->finder->get($this->modulePath.'/database/migrations/'.$fileName);
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -95,9 +72,9 @@ class MigrationMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-migration', ['name' => 'delete_something_from_posts_table', 'module' => 'Blog']);
 
-        $migrations = $this->finder->allFiles($this->modulePath . '/database/migrations');
+        $migrations = $this->finder->allFiles($this->modulePath.'/database/migrations');
         $fileName = $migrations[0]->getRelativePathname();
-        $file = $this->finder->get($this->modulePath . '/database/migrations/' . $fileName);
+        $file = $this->finder->get($this->modulePath.'/database/migrations/'.$fileName);
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -107,9 +84,21 @@ class MigrationMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-migration', ['name' => 'drop_posts_table', 'module' => 'Blog']);
 
-        $migrations = $this->finder->allFiles($this->modulePath . '/database/migrations');
+        $migrations = $this->finder->allFiles($this->modulePath.'/database/migrations');
         $fileName = $migrations[0]->getRelativePathname();
-        $file = $this->finder->get($this->modulePath . '/database/migrations/' . $fileName);
+        $file = $this->finder->get($this->modulePath.'/database/migrations/'.$fileName);
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generates_correct_default_migration_file_content()
+    {
+        $code = $this->artisan('module:make-migration', ['name' => 'something_random_name', 'module' => 'Blog']);
+
+        $migrations = $this->finder->allFiles($this->modulePath.'/database/migrations');
+        $fileName = $migrations[0]->getRelativePathname();
+        $file = $this->finder->get($this->modulePath.'/database/migrations/'.$fileName);
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -119,9 +108,9 @@ class MigrationMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-migration', ['name' => 'create_posts_table', 'module' => 'Blog', '--fields' => 'belongsTo:user:id:users']);
 
-        $migrations = $this->finder->allFiles($this->modulePath . '/database/migrations');
+        $migrations = $this->finder->allFiles($this->modulePath.'/database/migrations');
         $fileName = $migrations[0]->getRelativePathname();
-        $file = $this->finder->get($this->modulePath . '/database/migrations/' . $fileName);
+        $file = $this->finder->get($this->modulePath.'/database/migrations/'.$fileName);
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);

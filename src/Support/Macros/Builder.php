@@ -29,10 +29,9 @@ class Builder
         $this->tree();
     }
 
-
     /**
-     *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     *
      * @time  : 2024-07-17 上午10:25
      */
     public function quickSearch(): void
@@ -106,8 +105,8 @@ class Builder
     }
 
     /**
-     *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     *
      * @time  : 2024-07-17 上午10:25
      */
     public function tree(): void
@@ -120,8 +119,8 @@ class Builder
     }
 
     /**
-     *
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
+     *
      * @time  : 2024-07-17 上午10:24
      */
     public function whereLike(): void

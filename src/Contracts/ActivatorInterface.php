@@ -26,6 +26,10 @@ interface ActivatorInterface
      * Disables a module
      */
     public function disable(Module $module): void;
+    /**
+     * Enables a module
+     */
+    public function enable(Module $module): void;
 
     /**
      * Determine whether the given status same with a module status.

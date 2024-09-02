@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -49,7 +38,7 @@ class ObserverMakeCommandTest extends BaseTestCase
     {
         $code = $this->artisan('module:make-observer', ['name' => 'Post', 'module' => 'Blog']);
 
-        $observerFile = $this->modulePath . '/Observers/PostObserver.php';
+        $observerFile = $this->modulePath.'/Observers/PostObserver.php';
 
         $this->assertTrue(is_file($observerFile), 'Observer file was not created.');
         $this->assertMatchesSnapshot($this->finder->get($observerFile));

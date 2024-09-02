@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Activators;
 
@@ -22,9 +11,9 @@ class FileActivatorTest extends BaseTestCase
     use MatchesSnapshots;
 
     /**
-     * @var FileActivator
+     * @var TestModule
      */
-    private $activator;
+    private $module;
 
     /**
      * @var \Illuminate\Filesystem\Filesystem
@@ -32,14 +21,14 @@ class FileActivatorTest extends BaseTestCase
     private $finder;
 
     /**
-     * @var TestModule
+     * @var FileActivator
      */
-    private $module;
+    private $activator;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->module = new TestModule($this->app, 'Recipe', __DIR__ . '/stubs/valid/Recipe');
+        $this->module = new TestModule($this->app, 'Recipe', __DIR__.'/stubs/valid/Recipe');
         $this->finder = $this->app['files'];
         $this->activator = new FileActivator($this->app);
     }
@@ -50,27 +39,13 @@ class FileActivatorTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_check_module_disabled_status()
-    {
-        $this->activator->disable($this->module);
-        $this->assertTrue($this->activator->hasStatus($this->module, false));
-
-        $this->activator->setActive($this->module, false);
-        $this->assertTrue($this->activator->hasStatus($this->module, false));
-    }
-
-    public function test_it_can_check_module_enabled_status()
+    public function test_it_creates_valid_json_file_after_enabling()
     {
         $this->activator->enable($this->module);
-        $this->assertTrue($this->activator->hasStatus($this->module, true));
+        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
 
         $this->activator->setActive($this->module, true);
-        $this->assertTrue($this->activator->hasStatus($this->module, true));
-    }
-
-    public function test_it_can_check_status_of_module_that_hasnt_been_enabled_or_disabled()
-    {
-        $this->assertTrue($this->activator->hasStatus($this->module, false));
+        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
     }
 
     public function test_it_creates_valid_json_file_after_disabling()
@@ -82,13 +57,27 @@ class FileActivatorTest extends BaseTestCase
         $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
     }
 
-    public function test_it_creates_valid_json_file_after_enabling()
+    public function test_it_can_check_module_enabled_status()
     {
         $this->activator->enable($this->module);
-        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+        $this->assertTrue($this->activator->hasStatus($this->module, true));
 
         $this->activator->setActive($this->module, true);
-        $this->assertMatchesSnapshot($this->finder->get($this->activator->getStatusesFilePath()));
+        $this->assertTrue($this->activator->hasStatus($this->module, true));
+    }
+
+    public function test_it_can_check_module_disabled_status()
+    {
+        $this->activator->disable($this->module);
+        $this->assertTrue($this->activator->hasStatus($this->module, false));
+
+        $this->activator->setActive($this->module, false);
+        $this->assertTrue($this->activator->hasStatus($this->module, false));
+    }
+
+    public function test_it_can_check_status_of_module_that_hasnt_been_enabled_or_disabled()
+    {
+        $this->assertTrue($this->activator->hasStatus($this->module, false));
     }
 }
 

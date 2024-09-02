@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -23,11 +12,6 @@ class TestMakeCommandTest extends BaseTestCase
     use MatchesSnapshots;
 
     /**
-     * @var ActivatorInterface
-     */
-    private $activator;
-
-    /**
      * @var \Illuminate\Filesystem\Filesystem
      */
     private $finder;
@@ -36,6 +20,11 @@ class TestMakeCommandTest extends BaseTestCase
      * @var string
      */
     private $modulePath;
+
+    /**
+     * @var ActivatorInterface
+     */
+    private $activator;
 
     public function setUp(): void
     {
@@ -53,25 +42,37 @@ class TestMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_change_the_default_feature_namespace()
+    public function test_it_generates_a_new_unit_test_class()
     {
-        $this->app['config']->set('modules.paths.generator.test-feature.path', 'SuperTests/Feature');
+        $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog']);
 
+        $this->assertTrue(is_file($this->modulePath.'/tests/Unit/EloquentPostRepositoryTest.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generates_a_new_feature_test_class()
+    {
         $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog', '--feature' => true]);
 
-        $file = $this->finder->get($this->modulePath . '/SuperTests/Feature/EloquentPostRepositoryTest.php');
+        $this->assertTrue(is_file($this->modulePath.'/tests/Feature/EloquentPostRepositoryTest.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_unit_file_with_content()
+    {
+        $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog']);
+
+        $file = $this->finder->get($this->modulePath.'/tests/Unit/EloquentPostRepositoryTest.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
-    public function test_it_can_change_the_default_feature_namespace_specific()
+    public function test_it_generated_correct_feature_file_with_content()
     {
-        $this->app['config']->set('modules.paths.generator.test-feature.namespace', 'SuperTests\\Feature');
-
         $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog', '--feature' => true]);
 
-        $file = $this->finder->get($this->getModuleBasePath() . '/tests/Feature/EloquentPostRepositoryTest.php');
+        $file = $this->finder->get($this->modulePath.'/tests/Feature/EloquentPostRepositoryTest.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -83,7 +84,7 @@ class TestMakeCommandTest extends BaseTestCase
 
         $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog']);
 
-        $file = $this->finder->get($this->getModuleBasePath() . '/SuperTests/Unit/EloquentPostRepositoryTest.php');
+        $file = $this->finder->get($this->getModuleBasePath().'/SuperTests/Unit/EloquentPostRepositoryTest.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -95,45 +96,33 @@ class TestMakeCommandTest extends BaseTestCase
 
         $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog']);
 
-        $file = $this->finder->get($this->modulePath . '/tests/Unit/EloquentPostRepositoryTest.php');
+        $file = $this->finder->get($this->modulePath.'/tests/Unit/EloquentPostRepositoryTest.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
-    public function test_it_generated_correct_feature_file_with_content()
+    public function test_it_can_change_the_default_feature_namespace()
     {
+        $this->app['config']->set('modules.paths.generator.test-feature.path', 'SuperTests/Feature');
+
         $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog', '--feature' => true]);
 
-        $file = $this->finder->get($this->modulePath . '/tests/Feature/EloquentPostRepositoryTest.php');
+        $file = $this->finder->get($this->modulePath.'/SuperTests/Feature/EloquentPostRepositoryTest.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
-    public function test_it_generated_correct_unit_file_with_content()
+    public function test_it_can_change_the_default_feature_namespace_specific()
     {
-        $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog']);
+        $this->app['config']->set('modules.paths.generator.test-feature.namespace', 'SuperTests\\Feature');
 
-        $file = $this->finder->get($this->modulePath . '/tests/Unit/EloquentPostRepositoryTest.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generates_a_new_feature_test_class()
-    {
         $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog', '--feature' => true]);
 
-        $this->assertTrue(is_file($this->modulePath . '/tests/Feature/EloquentPostRepositoryTest.php'));
-        $this->assertSame(0, $code);
-    }
+        $file = $this->finder->get($this->getModuleBasePath().'/tests/Feature/EloquentPostRepositoryTest.php');
 
-    public function test_it_generates_a_new_unit_test_class()
-    {
-        $code = $this->artisan('module:make-test', ['name' => 'EloquentPostRepositoryTest', 'module' => 'Blog']);
-
-        $this->assertTrue(is_file($this->modulePath . '/tests/Unit/EloquentPostRepositoryTest.php'));
+        $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 }

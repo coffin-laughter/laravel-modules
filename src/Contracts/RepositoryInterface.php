@@ -95,13 +95,6 @@ interface RepositoryInterface
     public function getByStatus($status);
 
     /**
-     * Get cached modules.
-     *
-     * @return mixed
-     */
-    public function getCached();
-
-    /**
      * @return \Illuminate\Filesystem\Filesystem
      */
     public function getFiles();

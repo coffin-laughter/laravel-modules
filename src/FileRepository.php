@@ -21,6 +21,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Nwidart\Modules\Constants\ModuleEvent;
 use Nwidart\Modules\Contracts\RepositoryInterface;
 use Nwidart\Modules\Exceptions\InvalidAssetPath;
 use Nwidart\Modules\Exceptions\ModuleNotFoundException;
@@ -72,6 +73,8 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     private $files;
 
+    private static $modules = [];
+
     /**
      * @var UrlGenerator
      */
@@ -110,11 +113,7 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     public function all(): array
     {
-        if (!$this->config('cache.enabled')) {
-            return $this->scan();
-        }
-
-        return $this->formatCached($this->getCached());
+        return $this->scan();
     }
 
     /**
@@ -235,12 +234,7 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     public function find(string $name)
     {
-        foreach ($this->all() as $module) {
-            if ($module->getLowerName() === strtolower($name)) {
-                return $module;
-            }
-        }
-
+        return $this->all()[strtolower($name)] ?? null;
     }
 
     /**
@@ -295,18 +289,6 @@ abstract class FileRepository implements Countable, RepositoryInterface
         }
 
         return $modules;
-    }
-
-    /**
-     * Get cached modules.
-     *
-     * @return array
-     */
-    public function getCached()
-    {
-        return $this->cache->store($this->config->get('modules.cache.driver'))->remember($this->config('cache.key'), $this->config('cache.lifetime'), function () {
-            return $this->toCollection()->toArray();
-        });
     }
 
     /**
@@ -443,7 +425,7 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     public function has($name): bool
     {
-        return array_key_exists($name, $this->all());
+        return array_key_exists(strtolower($name), $this->all());
     }
 
     /**
@@ -488,6 +470,13 @@ abstract class FileRepository implements Countable, RepositoryInterface
         }
     }
 
+    public function resetModules(): static
+    {
+        self::$modules = [];
+
+        return $this;
+    }
+
     /**
      * Get & scan all modules.
      *
@@ -495,6 +484,10 @@ abstract class FileRepository implements Countable, RepositoryInterface
      */
     public function scan()
     {
+        if (!empty(self::$modules) && !$this->app->runningUnitTests()) {
+            return self::$modules;
+        }
+
         $paths = $this->getScanPaths();
 
         $modules = [];
@@ -505,13 +498,16 @@ abstract class FileRepository implements Countable, RepositoryInterface
             is_array($manifests) || $manifests = [];
 
             foreach ($manifests as $manifest) {
-                $name = Json::make($manifest)->get('name');
+                $json = Json::make($manifest);
+                $name = $json->get('name');
 
-                $modules[$name] = $this->createModule($this->app, $name, dirname($manifest));
+                $modules[strtolower($name)] = $this->createModule($this->app, $name, dirname($manifest));
             }
         }
 
-        return $modules;
+        self::$modules = $modules;
+
+        return self::$modules;
     }
 
     /**
@@ -538,6 +534,8 @@ abstract class FileRepository implements Countable, RepositoryInterface
         $module = $this->findOrFail($name);
 
         $this->getFiles()->put($this->getUsedStoragePath(), $module);
+
+        $module->fireEvent(ModuleEvent::USED);
     }
 
     /**
@@ -567,23 +565,4 @@ abstract class FileRepository implements Countable, RepositoryInterface
      * @return \Nwidart\Modules\Module
      */
     abstract protected function createModule(...$args);
-
-    /**
-     * Format the cached data as array of modules.
-     *
-     * @param  array  $cached
-     * @return array
-     */
-    protected function formatCached($cached)
-    {
-        $modules = [];
-
-        foreach ($cached as $name => $module) {
-            $path = $module['path'];
-
-            $modules[$name] = $this->createModule($this->app, $name, $path);
-        }
-
-        return $modules;
-    }
 }

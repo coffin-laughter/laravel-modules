@@ -1,7 +1,4 @@
 <?php
-
-declare(strict_types=1);
-
 /**
  *  +-------------------------------------------------------------------------------------------
  *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
@@ -14,26 +11,31 @@ declare(strict_types=1);
  *  +-------------------------------------------------------------------------------------------
  */
 
-namespace Nwidart\Modules\Traits\Db;
+namespace Nwidart\Modules\Constants;
 
-use Illuminate\Support\Facades\Auth;
-
-trait ScopeTenantData
+class ModuleEvent
 {
-    public function scopeTenantData($query)
-    {
-        $model = app(static::class);
-        if (in_array($model->getTenantIdColumn(), $model->getFillable())) {
-            $currenUser = Auth::guard(getGuardName())->user();
-            if (!empty($currenUser)) {
-                if ($currenUser->isSuperAdmin()) {
-                    return $query;
-                } else {
-                    return $query->where($model->getTenantIdColumn(), $currenUser->tenant_id);
-                }
-            }
-        }
+    public const BOOT = 'boot';
 
-        return $query;
-    }
+    public const CREATED = 'created';
+
+    public const CREATING = 'creating';
+
+    public const DELETED = 'deleted';
+
+    public const DELETING = 'deleting';
+
+    public const DISABLED = 'disabled';
+
+    public const DISABLING = 'disabling';
+
+    public const ENABLED = 'enabled';
+
+    public const ENABLING = 'enabling';
+
+    public const REGISTER = 'register';
+
+    public const UNUSED = 'unused';
+
+    public const USED = 'used';
 }

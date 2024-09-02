@@ -15,6 +15,7 @@ namespace Nwidart\Modules\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Contracts\RepositoryInterface;
+use Nwidart\Modules\Laravel\LaravelFileRepository;
 
 class BootstrapServiceProvider extends ServiceProvider
 {
@@ -23,7 +24,15 @@ class BootstrapServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app[RepositoryInterface::class]->boot();
+        $this->getRepositoryInterface()->boot();
+    }
+
+    /**
+     * @return LaravelFileRepository
+     */
+    public function getRepositoryInterface()
+    {
+        return $this->app[RepositoryInterface::class];
     }
 
     /**
@@ -31,6 +40,6 @@ class BootstrapServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app[RepositoryInterface::class]->register();
+        $this->getRepositoryInterface()->register();
     }
 }

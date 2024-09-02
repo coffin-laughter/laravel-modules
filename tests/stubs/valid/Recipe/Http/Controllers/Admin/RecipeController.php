@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Modules\Recipe\Http\Controllers\Admin;
 
@@ -22,13 +11,14 @@ use Modules\Recipe\Repositories\RecipeRepository;
 class RecipeController extends AdminBaseController
 {
     /**
-     * @var FileRepository
-     */
-    private $file;
-    /**
      * @var RecipeRepository
      */
     private $recipe;
+
+    /**
+     * @var FileRepository
+     */
+    private $file;
 
     public function __construct(RecipeRepository $recipe, FileRepository $file)
     {
@@ -36,6 +26,18 @@ class RecipeController extends AdminBaseController
 
         $this->recipe = $recipe;
         $this->file = $file;
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        $recipes = $this->recipe->all();
+
+        return view('recipe::admin.recipes.index', compact('recipes'));
     }
 
     /**
@@ -49,15 +51,15 @@ class RecipeController extends AdminBaseController
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Store a newly created resource in storage.
      *
      * @return Response
      */
-    public function destroy(Recipe $recipe)
+    public function store(Request $request)
     {
-        $this->recipe->destroy($recipe);
+        $this->recipe->create($request->all());
 
-        flash()->success(trans('core::core.messages.resource deleted', ['name' => trans('recipe::recipes.title.recipes')]));
+        flash()->success(trans('core::core.messages.resource created', ['name' => trans('recipe::recipes.title.recipes')]));
 
         return redirect()->route('admin.recipe.recipe.index');
     }
@@ -76,32 +78,6 @@ class RecipeController extends AdminBaseController
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        $recipes = $this->recipe->all();
-
-        return view('recipe::admin.recipes.index', compact('recipes'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        $this->recipe->create($request->all());
-
-        flash()->success(trans('core::core.messages.resource created', ['name' => trans('recipe::recipes.title.recipes')]));
-
-        return redirect()->route('admin.recipe.recipe.index');
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @return Response
@@ -111,6 +87,20 @@ class RecipeController extends AdminBaseController
         $this->recipe->update($recipe, $request->all());
 
         flash()->success(trans('core::core.messages.resource updated', ['name' => trans('recipe::recipes.title.recipes')]));
+
+        return redirect()->route('admin.recipe.recipe.index');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return Response
+     */
+    public function destroy(Recipe $recipe)
+    {
+        $this->recipe->destroy($recipe);
+
+        flash()->success(trans('core::core.messages.resource deleted', ['name' => trans('recipe::recipes.title.recipes')]));
 
         return redirect()->route('admin.recipe.recipe.index');
     }

@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -45,13 +34,44 @@ class CommandMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
+    public function test_it_generates_a_new_console_command_class()
+    {
+        $code = $this->artisan('module:make-command', ['name' => 'MyAwesomeCommand', 'module' => 'Blog']);
+
+        $this->assertTrue(is_file($this->modulePath.'/Console/MyAwesomeCommand.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_file_with_content()
+    {
+        $code = $this->artisan('module:make-command', ['name' => 'MyAwesomeCommand', 'module' => 'Blog']);
+
+        $file = $this->finder->get($this->modulePath.'/Console/MyAwesomeCommand.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_uses_set_command_name_in_class()
+    {
+        $code = $this->artisan(
+            'module:make-command',
+            ['name' => 'MyAwesomeCommand', 'module' => 'Blog', '--command' => 'my:awesome']
+        );
+
+        $file = $this->finder->get($this->modulePath.'/Console/MyAwesomeCommand.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
     public function test_it_can_change_the_default_namespace()
     {
         $this->app['config']->set('modules.paths.generator.command.path', 'app/CustomCommands');
 
         $code = $this->artisan('module:make-command', ['name' => 'AwesomeCommand', 'module' => 'Blog']);
 
-        $file = $this->finder->get($this->modulePath . '/CustomCommands/AwesomeCommand.php');
+        $file = $this->finder->get($this->modulePath.'/CustomCommands/AwesomeCommand.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -63,38 +83,7 @@ class CommandMakeCommandTest extends BaseTestCase
 
         $code = $this->artisan('module:make-command', ['name' => 'AwesomeCommand', 'module' => 'Blog']);
 
-        $file = $this->finder->get($this->modulePath . '/Console/AwesomeCommand.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_file_with_content()
-    {
-        $code = $this->artisan('module:make-command', ['name' => 'MyAwesomeCommand', 'module' => 'Blog']);
-
-        $file = $this->finder->get($this->modulePath . '/Console/MyAwesomeCommand.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generates_a_new_console_command_class()
-    {
-        $code = $this->artisan('module:make-command', ['name' => 'MyAwesomeCommand', 'module' => 'Blog']);
-
-        $this->assertTrue(is_file($this->modulePath . '/Console/MyAwesomeCommand.php'));
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_uses_set_command_name_in_class()
-    {
-        $code = $this->artisan(
-            'module:make-command',
-            ['name' => 'MyAwesomeCommand', 'module' => 'Blog', '--command' => 'my:awesome']
-        );
-
-        $file = $this->finder->get($this->modulePath . '/Console/MyAwesomeCommand.php');
+        $file = $this->finder->get($this->modulePath.'/Console/AwesomeCommand.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);

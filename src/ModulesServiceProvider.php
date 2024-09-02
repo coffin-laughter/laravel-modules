@@ -13,8 +13,10 @@
 
 namespace Nwidart\Modules;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
-use Nwidart\Modules\Providers\BootstrapServiceProvider;
+use Illuminate\Support\Str;
 use Nwidart\Modules\Providers\ConsoleServiceProvider;
 use Nwidart\Modules\Providers\ContractsServiceProvider;
 
@@ -44,18 +46,29 @@ abstract class ModulesServiceProvider extends ServiceProvider
     {
     }
 
+    protected function getCachedModulePath()
+    {
+        return Str::replaceLast('services.php', 'modules.php', $this->app->getCachedServicesPath());
+    }
+
     /**
      * Register all modules.
      */
-    protected function registerModules(): void
+    protected function registerModules()
     {
-        $this->app->register(BootstrapServiceProvider::class);
+        // $this->app->register(\Nwidart\Modules\Providers\BootstrapServiceProvider::class);
+
+        $providers = app()->make(ModuleManifest::class)->providersArray();
+
+        (new ProviderRepository($this->app, new Filesystem(), $this->getCachedModulePath()))
+            ->load($providers);
+
     }
 
     /**
      * Register package's namespaces.
      */
-    protected function registerNamespaces(): void
+    protected function registerNamespaces()
     {
         $configPath = __DIR__ . '/../config/config.php';
         $stubsPath = dirname(__DIR__) . '/src/Commands/stubs';
@@ -76,7 +89,7 @@ abstract class ModulesServiceProvider extends ServiceProvider
     /**
      * Register providers.
      */
-    protected function registerProviders(): void
+    protected function registerProviders()
     {
         $this->app->register(ConsoleServiceProvider::class);
         $this->app->register(ContractsServiceProvider::class);

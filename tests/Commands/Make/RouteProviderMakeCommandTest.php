@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -45,13 +34,23 @@ class RouteProviderMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_change_the_custom_controller_namespace(): void
+    public function test_it_generates_a_new_service_provider_class()
     {
-        $this->app['config']->set('modules.paths.generator.controller.path', 'Base/Http/Controllers');
-        $this->app['config']->set('modules.paths.generator.provider.path', 'Base/Providers');
-
+        $path = $this->modulePath.'/Providers/RouteServiceProvider.php';
+        $this->finder->delete($path);
         $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
-        $file = $this->finder->get($this->getModuleBasePath() . '/Base/Providers/RouteServiceProvider.php');
+
+        $this->assertTrue(is_file($path));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_file_with_content()
+    {
+        $path = $this->modulePath.'/Providers/RouteServiceProvider.php';
+        $this->finder->delete($path);
+        $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
+
+        $file = $this->finder->get($path);
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -63,7 +62,7 @@ class RouteProviderMakeCommandTest extends BaseTestCase
 
         $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
 
-        $file = $this->finder->get($this->getModuleBasePath() . '/SuperProviders/RouteServiceProvider.php');
+        $file = $this->finder->get($this->getModuleBasePath().'/SuperProviders/RouteServiceProvider.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -73,23 +72,11 @@ class RouteProviderMakeCommandTest extends BaseTestCase
     {
         $this->app['config']->set('modules.paths.generator.provider.namespace', 'SuperProviders');
 
-        $path = $this->modulePath . '/Providers/RouteServiceProvider.php';
+        $path = $this->modulePath.'/Providers/RouteServiceProvider.php';
         $this->finder->delete($path);
         $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
 
         $file = $this->finder->get($path);
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_can_overwrite_file(): void
-    {
-        $this->artisan('module:route-provider', ['module' => 'Blog']);
-        $this->app['config']->set('modules.stubs.files.routes/web', 'SuperRoutes/web.php');
-
-        $code = $this->artisan('module:route-provider', ['module' => 'Blog', '--force' => true]);
-        $file = $this->finder->get($this->modulePath . '/Providers/RouteServiceProvider.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
@@ -102,31 +89,33 @@ class RouteProviderMakeCommandTest extends BaseTestCase
 
         $code = $this->artisan('module:route-provider', ['module' => 'Blog', '--force' => true]);
 
-        $file = $this->finder->get($this->modulePath . '/Providers/RouteServiceProvider.php');
+        $file = $this->finder->get($this->modulePath.'/Providers/RouteServiceProvider.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
-    public function test_it_generated_correct_file_with_content()
+    public function test_it_can_overwrite_file(): void
     {
-        $path = $this->modulePath . '/Providers/RouteServiceProvider.php';
-        $this->finder->delete($path);
-        $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
+        $this->artisan('module:route-provider', ['module' => 'Blog']);
+        $this->app['config']->set('modules.stubs.files.routes/web', 'SuperRoutes/web.php');
 
-        $file = $this->finder->get($path);
+        $code = $this->artisan('module:route-provider', ['module' => 'Blog', '--force' => true]);
+        $file = $this->finder->get($this->modulePath.'/Providers/RouteServiceProvider.php');
 
         $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 
-    public function test_it_generates_a_new_service_provider_class()
+    public function test_it_can_change_the_custom_controller_namespace(): void
     {
-        $path = $this->modulePath . '/Providers/RouteServiceProvider.php';
-        $this->finder->delete($path);
-        $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
+        $this->app['config']->set('modules.paths.generator.controller.path', 'Base/Http/Controllers');
+        $this->app['config']->set('modules.paths.generator.provider.path', 'Base/Providers');
 
-        $this->assertTrue(is_file($path));
+        $code = $this->artisan('module:route-provider', ['module' => 'Blog']);
+        $file = $this->finder->get($this->getModuleBasePath().'/Base/Providers/RouteServiceProvider.php');
+
+        $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 }

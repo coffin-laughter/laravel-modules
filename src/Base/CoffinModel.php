@@ -26,6 +26,7 @@ use Nwidart\Modules\Traits\Db\ScopeTenantData;
 use Nwidart\Modules\Traits\Db\ScopeTrait;
 use Nwidart\Modules\Traits\Db\Trans;
 use Nwidart\Modules\Traits\Db\WithAttributes;
+use Nwidart\Modules\Traits\Db\WithSearch;
 
 abstract class CoffinModel extends Model
 {
@@ -35,6 +36,7 @@ abstract class CoffinModel extends Model
     use SoftDeletes;
     use Trans;
     use WithAttributes;
+    use WithSearch;
 
     protected $dateFormat = 'U';
 

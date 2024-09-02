@@ -110,7 +110,7 @@
         $( document ).ready(function() {
             $(document).keypressAction({
                 actions: [
-                    { key: 'c', route: "<?php echo route('admin.recipe.recipe.create') ?>" }
+                    { key: 'c', route: "<?= route('admin.recipe.recipe.create') ?>" }
                 ]
             });
         });

@@ -1,15 +1,4 @@
 <?php
-/**
- *  +-------------------------------------------------------------------------------------------
- *  | Coffin [ 花开不同赏，花落不同悲。欲问相思处，花开花落时。 ]
- *  +-------------------------------------------------------------------------------------------
- *  | This is not a free software, without any authorization is not allowed to use and spread.
- *  +-------------------------------------------------------------------------------------------
- *  | Copyright (c) 2006~2024 All rights reserved.
- *  +-------------------------------------------------------------------------------------------
- *  | @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
- *  +-------------------------------------------------------------------------------------------
- */
 
 namespace Nwidart\Modules\Tests\Commands\Make;
 
@@ -46,39 +35,11 @@ class InterfaceMakeCommandTest extends BaseTestCase
         parent::tearDown();
     }
 
-    public function test_it_can_generate_a_interface_in_sub_namespace_in_correct_folder()
-    {
-        $code = $this->artisan('module:make-interface', ['name' => 'Api\\MyInterface', 'module' => 'Blog']);
-
-        $this->assertTrue(is_file($this->modulePath . '/Interfaces/Api/MyInterface.php'));
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_can_generate_a_interface_in_sub_namespace_with_correct_generated_file()
-    {
-        $code = $this->artisan('module:make-interface', ['name' => 'Api\\MyInterface', 'module' => 'Blog']);
-
-        $file = $this->finder->get($this->modulePath . '/Interfaces/Api/MyInterface.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
-    public function test_it_generated_correct_file_with_content()
-    {
-        $code = $this->artisan('module:make-interface', ['name' => 'MyInterface', 'module' => 'Blog']);
-
-        $file = $this->finder->get($this->modulePath . '/Interfaces/MyInterface.php');
-
-        $this->assertMatchesSnapshot($file);
-        $this->assertSame(0, $code);
-    }
-
     public function test_it_generates_a_new_interface_class()
     {
         $code = $this->artisan('module:make-interface', ['name' => 'MyInterface', 'module' => 'Blog']);
 
-        $this->assertTrue(is_file($this->modulePath . '/Interfaces/MyInterface.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Interfaces/MyInterface.php'));
         $this->assertSame(0, $code);
     }
 
@@ -87,7 +48,35 @@ class InterfaceMakeCommandTest extends BaseTestCase
         $this->artisan('module:make-interface', ['name' => 'MyInterface', 'module' => 'Blog']);
         $code = $this->artisan('module:make-interface', ['name' => 'MyInterface', 'module' => 'Blog', '--force' => true]);
 
-        $this->assertTrue(is_file($this->modulePath . '/Interfaces/MyInterface.php'));
+        $this->assertTrue(is_file($this->modulePath.'/Interfaces/MyInterface.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_generated_correct_file_with_content()
+    {
+        $code = $this->artisan('module:make-interface', ['name' => 'MyInterface', 'module' => 'Blog']);
+
+        $file = $this->finder->get($this->modulePath.'/Interfaces/MyInterface.php');
+
+        $this->assertMatchesSnapshot($file);
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_can_generate_a_interface_in_sub_namespace_in_correct_folder()
+    {
+        $code = $this->artisan('module:make-interface', ['name' => 'Api\\MyInterface', 'module' => 'Blog']);
+
+        $this->assertTrue(is_file($this->modulePath.'/Interfaces/Api/MyInterface.php'));
+        $this->assertSame(0, $code);
+    }
+
+    public function test_it_can_generate_a_interface_in_sub_namespace_with_correct_generated_file()
+    {
+        $code = $this->artisan('module:make-interface', ['name' => 'Api\\MyInterface', 'module' => 'Blog']);
+
+        $file = $this->finder->get($this->modulePath.'/Interfaces/Api/MyInterface.php');
+
+        $this->assertMatchesSnapshot($file);
         $this->assertSame(0, $code);
     }
 }
