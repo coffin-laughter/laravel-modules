@@ -568,7 +568,7 @@ trait BaseOperate
      * @author: coffin's laughter | <chuanshuo_yongyuan@163.com>
      * @time  : 2024-09-02 09:55
      */
-    protected function setPaginate(bool $isPaginate = true): static
+    public function setPaginate(bool $isPaginate = true): static
     {
         $this->isPaginate = $isPaginate;
 
